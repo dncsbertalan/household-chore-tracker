@@ -1,0 +1,104 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="nhNWAsOi5Cg3ZDsgR0qE">
+    <mxGraphModel dx="1018" dy="697" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="g_YVFoyZInKC6v--cNgo-3" edge="1" parent="1" style="endArrow=none;dashed=1;html=1;rounded=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="520" y="530" as="sourcePoint" />
+            <mxPoint x="520" y="30" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="g_YVFoyZInKC6v--cNgo-4" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="FRONTEND" vertex="1">
+          <mxGeometry height="30" width="60" x="300" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="g_YVFoyZInKC6v--cNgo-5" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="BACKEND" vertex="1">
+          <mxGeometry height="30" width="60" x="660" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="g_YVFoyZInKC6v--cNgo-8" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="UI" vertex="1">
+          <mxGeometry height="60" width="120" x="260" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="g_YVFoyZInKC6v--cNgo-11" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="&lt;b&gt;Receiving broadcast message&lt;/b&gt;" vertex="1">
+          <mxGeometry height="30" width="200" x="250" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="g_YVFoyZInKC6v--cNgo-20" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="SYNC ENGINE/SERVICE" vertex="1">
+          <mxGeometry height="60" width="120" x="260" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="g_YVFoyZInKC6v--cNgo-21" edge="1" parent="1" source="g_YVFoyZInKC6v--cNgo-20" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="g_YVFoyZInKC6v--cNgo-22" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="330" y="460" as="sourcePoint" />
+            <mxPoint x="380" y="410" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="w--QvLp8ZzKuk2HCLJ77-9" connectable="0" parent="g_YVFoyZInKC6v--cNgo-21" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="changes persist&amp;nbsp;&lt;div&gt;in the local db&lt;/div&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.4303" y="1" as="geometry">
+            <mxPoint x="-51" y="8" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="g_YVFoyZInKC6v--cNgo-22" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="LOCAL DB" vertex="1">
+          <mxGeometry height="60" width="120" x="260" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="g_YVFoyZInKC6v--cNgo-24" edge="1" parent="1" source="g_YVFoyZInKC6v--cNgo-22" style="endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" target="g_YVFoyZInKC6v--cNgo-8" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points" />
+            <mxPoint x="50" y="420" as="sourcePoint" />
+            <mxPoint x="100" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="g_YVFoyZInKC6v--cNgo-25" connectable="0" parent="g_YVFoyZInKC6v--cNgo-24" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="UI updates automatically&amp;nbsp;" vertex="1">
+          <mxGeometry relative="1" x="-0.4383" y="-3" as="geometry">
+            <mxPoint x="-67" y="12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="g_YVFoyZInKC6v--cNgo-26" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="BROADCAST SERVICE" vertex="1">
+          <mxGeometry height="60" width="120" x="630" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="g_YVFoyZInKC6v--cNgo-27" edge="1" parent="1" source="g_YVFoyZInKC6v--cNgo-26" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.25;exitDx=0;exitDy=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;" target="g_YVFoyZInKC6v--cNgo-20" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points" />
+            <mxPoint x="600" y="500" as="sourcePoint" />
+            <mxPoint x="410" y="330" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="w--QvLp8ZzKuk2HCLJ77-1" connectable="0" parent="g_YVFoyZInKC6v--cNgo-27" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="sends a broadcast message to clients" vertex="1">
+          <mxGeometry relative="1" x="0.104" as="geometry">
+            <mxPoint x="18" y="-10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="w--QvLp8ZzKuk2HCLJ77-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="API" vertex="1">
+          <mxGeometry height="60" width="120" x="630" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="w--QvLp8ZzKuk2HCLJ77-4" edge="1" parent="1" source="g_YVFoyZInKC6v--cNgo-20" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=-0.004;entryY=0.342;entryDx=0;entryDy=0;entryPerimeter=0;" target="w--QvLp8ZzKuk2HCLJ77-3" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="500" y="175" />
+              <mxPoint x="500" y="250" />
+            </Array>
+            <mxPoint x="410" y="400" as="sourcePoint" />
+            <mxPoint x="460" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="w--QvLp8ZzKuk2HCLJ77-5" connectable="0" parent="w--QvLp8ZzKuk2HCLJ77-4" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="sends sync API call" vertex="1">
+          <mxGeometry relative="1" x="-0.1136" y="-1" as="geometry">
+            <mxPoint x="51" y="11" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="w--QvLp8ZzKuk2HCLJ77-6" edge="1" parent="1" source="w--QvLp8ZzKuk2HCLJ77-3" style="endArrow=classic;html=1;rounded=0;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=0.808;entryY=1.022;entryDx=0;entryDy=0;entryPerimeter=0;" target="g_YVFoyZInKC6v--cNgo-20" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="356.96" y="275" />
+            </Array>
+            <mxPoint x="410" y="400" as="sourcePoint" />
+            <mxPoint x="460" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="w--QvLp8ZzKuk2HCLJ77-8" connectable="0" parent="w--QvLp8ZzKuk2HCLJ77-6" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="result is sent back to the&amp;nbsp;&lt;div&gt;sync engine/service of the frontend&lt;/div&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.1677" y="-2" as="geometry">
+            <mxPoint x="27" y="20" as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
