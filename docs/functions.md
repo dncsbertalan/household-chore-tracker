@@ -98,6 +98,14 @@ Nem biztos:
 
 - Új feladat generálása természetes nyelven megadott leírás alapján.
 - Új feladat generálása a felhasználó által készített vagy feltöltött kép alapján.
+- A generált feladatok megtekintése és manuális módosítása a létrehozás előtt.
+- A generált javaslatok egyenkénti elfogadása vagy elutasítása.
+
+## Intelligens feladatkiosztás
+
+- Új feladat létrehozásakor a feladat elvégzésére alkalmas háztartástagok automatikus javaslata (a javaslat meghatározása a háztartástagok aktuális és korábbi feladatai, terheltsége és feladatelőzményei alapján).
+- Több megfelelő háztartástag rangsorolt javaslata.
+- A javaslat elfogadása esetén a kiválasztott háztartástag normál feladat-hozzárendelésként történő beállítása.
 
 ## Főbb képernyők és felhasználói felületi funkciók
 
