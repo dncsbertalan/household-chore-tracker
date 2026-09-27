@@ -94,6 +94,11 @@ Nem biztos:
 - A generált háztartás-konfiguráció megtekintése és manuális módosítása a létrehozás előtt.
 - A generált javaslat egyes elemeinek elfogadása vagy elutasítása.
 
+## Kép, illetve leírás alapján feladat generálása
+
+- Új feladat generálása természetes nyelven megadott leírás alapján.
+- Új feladat generálása a felhasználó által készített vagy feltöltött kép alapján.
+
 ## Főbb képernyők és felhasználói felületi funkciók
 
 - Bejelentkezési és regisztrációs képernyő.
