@@ -8,7 +8,7 @@
 
 Nem biztos:
 
-- Alternatív bejelentkezési lehetőség Apple-fiókkal.
+- Alternatív bejelentkezési lehetőség Apple- vagy Google-fiókkal.
 
 ## Háztartások kezelése
 
@@ -85,6 +85,14 @@ Nem biztos:
 ## Konfliktuskezelés
 
 - Verzió alapú optimista konfliktus kezelés.
+
+## Háztartás létrehozása AI segítségével
+
+- A háztartás manuális vagy AI által támogatott létrehozási módjának kiválasztása.
+- A háztartás jellemzőinek és a felhasználó preferenciáinak felmérése egy kérdőív segítségével.
+- A megadott válaszok alapján AI segítségével kezdeti háztartás-konfiguráció generálása.
+- A generált háztartás-konfiguráció megtekintése és manuális módosítása a létrehozás előtt.
+- A generált javaslat egyes elemeinek elfogadása vagy elutasítása.
 
 ## Főbb képernyők és felhasználói felületi funkciók
 
