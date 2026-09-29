@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: household-chore-tracker
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/household_chore_tracker
+    username: household_app_user
+    password: fuzkup-jezfan-tEqxe8
+
+  jpa:
+    hibernate:
+      ddl-auto: update
