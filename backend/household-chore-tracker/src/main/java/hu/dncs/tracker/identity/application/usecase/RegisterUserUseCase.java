@@ -1,5 +1,6 @@
-package hu.dncs.tracker.identity.application;
+package hu.dncs.tracker.identity.application.usecase;
 
+import hu.dncs.tracker.identity.application.command.RegisterUserCommand;
 import hu.dncs.tracker.identity.application.exception.EmailAlreadyRegisteredException;
 import hu.dncs.tracker.identity.domain.model.PasswordCredential;
 import hu.dncs.tracker.identity.domain.model.User;

@@ -1,4 +1,4 @@
-package hu.dncs.tracker.identity.application;
+package hu.dncs.tracker.identity.application.command;
 
 public record RegisterUserCommand(String email, String password, String firtName, String lastName) {
     @Override

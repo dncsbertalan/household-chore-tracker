@@ -11,3 +11,11 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: validate
+
+identity:
+  tokens:
+    secret: ${AUTH_TOKEN_SECRET:}
+    issuer: household-chore-tracker
+    audience: household-chore-tracker-api
+    access-ttl: 15m
+    refresh-ttl: 30d
