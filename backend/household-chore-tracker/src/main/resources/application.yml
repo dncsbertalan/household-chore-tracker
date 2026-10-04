@@ -8,5 +8,6 @@ spring:
     password: fuzkup-jezfan-tEqxe8
 
   jpa:
+    open-in-view: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
