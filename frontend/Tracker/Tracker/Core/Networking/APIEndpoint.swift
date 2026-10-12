@@ -8,7 +8,6 @@ nonisolated enum HTTPMethod: String, Sendable {
     case delete = "DELETE"
 }
 
-/// Paths are relative to the client's base URL (for example, `auth/csrf`).
 nonisolated struct APIEndpoint: Sendable {
     let path: String
     var method: HTTPMethod = .get

@@ -4,12 +4,12 @@ import Foundation
 actor APIClient {
     private let configuration: APIConfiguration
     private let session: URLSession
-
+    
     init(configuration: APIConfiguration, session: URLSession? = nil) {
         self.configuration = configuration
         self.session = session ?? Self.makeSession()
     }
-
+    
     func send<Response: Decodable & Sendable>(
         _ endpoint: APIEndpoint, as type: Response.Type = Response.self
     ) async throws -> Response {
@@ -21,12 +21,12 @@ actor APIClient {
             throw APIError.decodingFailed
         }
     }
-
+    
     /// For successful responses whose body is intentionally unused, including HTTP 204.
     func sendWithoutResponse(_ endpoint: APIEndpoint) async throws {
         _ = try await execute(endpoint)
     }
-
+    
     private func execute(_ endpoint: APIEndpoint) async throws -> Data {
         try Task.checkCancellation()
         let request = try makeRequest(endpoint)
@@ -48,7 +48,7 @@ actor APIClient {
         }
         return data
     }
-
+    
     private func makeRequest(_ endpoint: APIEndpoint) throws -> URLRequest {
         // Reject absolute URLs, traversal and embedded queries. Query values are encoded separately.
         let segments = endpoint.path.split(separator: "/", omittingEmptySubsequences: false)
@@ -75,7 +75,7 @@ actor APIClient {
         }
         return request
     }
-
+    
     nonisolated private static func makeSession() -> URLSession {
         let configuration = URLSessionConfiguration.ephemeral
         // Retains CSRF session cookies in memory without persisting auth responses to disk.

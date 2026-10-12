@@ -1,9 +1,5 @@
 import Foundation
 
-
-
-
-
 /// A single persisted value keeps the token pair and expiry metadata consistent.
 nonisolated struct StoredTokens: Codable, Sendable, Equatable {
     let accessToken: String
