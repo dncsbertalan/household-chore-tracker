@@ -5,13 +5,13 @@ nonisolated protocol SigningIn: Sendable {
 }
 
 actor LoginService: SigningIn, SigningOut {
-    private let client: APIClient
+    private let client: any APIRequesting
     private let tokenStore: any TokenStoring
     private var isSigningIn = false
     private var sessionGeneration = 0
     private var pendingSave: Task<Void, Error>?
 
-    init(client: APIClient, tokenStore: any TokenStoring) {
+    init(client: any APIRequesting, tokenStore: any TokenStoring) {
         self.client = client
         self.tokenStore = tokenStore
     }
@@ -22,10 +22,11 @@ actor LoginService: SigningIn, SigningOut {
         let generation = sessionGeneration
         defer { isSigningIn = false }
         let headers = try await CSRFService(client: client).headers()
-        let endpoint = try APIEndpoint.json("auth/login", body: request, headers: headers)
         // Start the expiry clock before sending; network latency must not extend token validity.
         let issuedAt = Date()
-        let response = try await client.send(endpoint, as: TokenResponse.self)
+        let response = try await client.request(
+            endpoint: "auth/login", method: .post, body: request, headers: headers, as: TokenResponse.self
+        )
         let tokens = try StoredTokens(response: response, issuedAt: issuedAt)
         try Task.checkCancellation()
         guard generation == sessionGeneration else { throw CancellationError() }

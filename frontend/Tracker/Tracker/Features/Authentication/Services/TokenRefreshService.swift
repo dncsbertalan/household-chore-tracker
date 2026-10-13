@@ -18,12 +18,12 @@ nonisolated struct RefreshRequest: Encodable, Sendable {
 
 /// Inject one instance into authenticated services; there is no global singleton.
 actor TokenRefreshService {
-    private let client: APIClient
+    private let client: any APIRequesting
     private let tokenStore: any TokenStoring
     private let now: @Sendable () -> Date
     private var inFlight: (id: UUID, refreshToken: String, task: Task<StoredTokens, Error>)?
 
-    init(client: APIClient, tokenStore: any TokenStoring, now: @escaping @Sendable () -> Date = { Date() }) {
+    init(client: any APIRequesting, tokenStore: any TokenStoring, now: @escaping @Sendable () -> Date = { Date() }) {
         self.client = client
         self.tokenStore = tokenStore
         self.now = now

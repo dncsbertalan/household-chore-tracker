@@ -1,13 +1,26 @@
 import Foundation
 
 /// Share one client between feature services. Actor isolation keeps decoding off the UI actor.
-actor APIClient {
+actor APIClient: APIRequesting {
     private let configuration: APIConfiguration
-    private let session: URLSession
+    private let transport: any HTTPTransport
+    private let sleep: @Sendable (TimeInterval) async throws -> Void
     
     init(configuration: APIConfiguration, session: URLSession? = nil) {
         self.configuration = configuration
-        self.session = session ?? Self.makeSession()
+        self.transport = URLSessionTransport(session: session ?? Self.makeSession())
+        self.sleep = { try await Task.sleep(for: .seconds($0)) }
+    }
+
+    init(
+        configuration: APIConfiguration, transport: any HTTPTransport,
+        sleep: @escaping @Sendable (TimeInterval) async throws -> Void = {
+            try await Task.sleep(for: .seconds($0))
+        }
+    ) {
+        self.configuration = configuration
+        self.transport = transport
+        self.sleep = sleep
     }
     
     func send<Response: Decodable & Sendable>(
@@ -28,12 +41,27 @@ actor APIClient {
     }
     
     private func execute(_ endpoint: APIEndpoint) async throws -> Data {
+        var attempt = 1
+        while true {
+            do { return try await executeOnce(endpoint) }
+            catch {
+                try Task.checkCancellation()
+                guard let delay = endpoint.retryPolicy.delay(
+                    afterAttempt: attempt, method: endpoint.method, error: error
+                ) else { throw error }
+                try await sleep(delay)
+                attempt += 1
+            }
+        }
+    }
+
+    private func executeOnce(_ endpoint: APIEndpoint) async throws -> Data {
         try Task.checkCancellation()
         let request = try makeRequest(endpoint)
         let data: Data
         let response: URLResponse
         do {
-            (data, response) = try await session.data(for: request)
+            (data, response) = try await transport.data(for: request)
         } catch let error as URLError {
             if error.code == .cancelled || Task.isCancelled { throw CancellationError() }
             throw APIError.transport(error.code)
@@ -64,6 +92,10 @@ actor APIClient {
         if !endpoint.queryItems.isEmpty { components.queryItems = endpoint.queryItems }
         guard let url = components.url else { throw APIError.invalidEndpoint }
         var request = URLRequest(url: url)
+        if let timeout = endpoint.timeout {
+            guard timeout.isFinite, timeout > 0 else { throw APIError.invalidEndpoint }
+            request.timeoutInterval = timeout
+        }
         request.httpMethod = endpoint.method.rawValue
         request.httpBody = endpoint.body
         request.setValue("application/json", forHTTPHeaderField: "Accept")

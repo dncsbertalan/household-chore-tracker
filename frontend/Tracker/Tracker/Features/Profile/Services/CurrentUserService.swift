@@ -5,12 +5,12 @@ nonisolated protocol CurrentUserFetching: Sendable {
 }
 
 nonisolated struct CurrentUserService: CurrentUserFetching {
-    private let client: AuthenticatedAPIClient
+    private let client: any APIRequesting
 
-    init(client: AuthenticatedAPIClient) { self.client = client }
+    init(client: any APIRequesting) { self.client = client }
 
     func fetchCurrentUser() async throws -> CurrentUser {
-        try await client.send(APIEndpoint(path: "users/me"), as: CurrentUser.self)
+        try await client.request(endpoint: "users/me", retryPolicy: .transientReads, as: CurrentUser.self)
     }
 }
 

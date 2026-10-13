@@ -5,9 +5,9 @@ nonisolated protocol Registering: Sendable {
 }
 
 nonisolated struct RegistrationService: Registering {
-    private let client: APIClient
+    private let client: any APIRequesting
 
-    init(client: APIClient) {
+    init(client: any APIRequesting) {
         self.client = client
     }
 
@@ -15,9 +15,9 @@ nonisolated struct RegistrationService: Registering {
         // Both calls use the same session: URLSession retains and sends the CSRF cookie.
         // Fetch a fresh token for each explicit submission; never automatically replay a POST.
         let headers = try await CSRFService(client: client).headers()
-        let endpoint = try APIEndpoint.json(
-            "auth/register", body: request, headers: headers
+        return try await client.request(
+            endpoint: "auth/register", method: .post, body: request, headers: headers,
+            as: RegistrationResponse.self
         )
-        return try await client.send(endpoint, as: RegistrationResponse.self)
     }
 }

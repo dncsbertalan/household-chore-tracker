@@ -14,6 +14,8 @@ nonisolated struct APIEndpoint: Sendable {
     var queryItems: [URLQueryItem] = []
     var headers: [String: String] = [:]
     var body: Data?
+    var timeout: TimeInterval?
+    var retryPolicy: APIRetryPolicy = .none
     
     static func json<Body: Encodable>(
         _ path: String,
