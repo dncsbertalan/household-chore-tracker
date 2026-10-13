@@ -12,11 +12,11 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class GetCurrentUserUseCase {
-    private final UserRepository users;
+    private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
     public User execute(UUID authenticatedUserId) {
-        return users.findById(authenticatedUserId)
+        return userRepository.findById(authenticatedUserId)
                 .orElseThrow(CurrentUserNotFoundException::new);
     }
 }

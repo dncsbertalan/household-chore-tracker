@@ -7,6 +7,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.util.UUID;
+import java.util.Objects;
 
 @Entity
 @Table(name = "household_member", uniqueConstraints =
@@ -45,4 +46,19 @@ public class HouseholdMember {
 
     @Version
     private Long version;
+
+    protected HouseholdMember() {
+    }
+
+    public HouseholdMember(UUID householdId, UUID userId, HouseholdRole householdRole) {
+        this.householdId = Objects.requireNonNull(householdId);
+        this.userId = Objects.requireNonNull(userId);
+        this.householdRole = Objects.requireNonNull(householdRole);
+
+        if (!householdId.equals(householdRole.getHouseholdId())) {
+            throw new IllegalArgumentException("Member role must belong to the same household");
+        }
+
+        this.joinedAt = Instant.now();
+    }
 }

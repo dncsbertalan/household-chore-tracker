@@ -41,9 +41,9 @@ public class Household {
     }
 
     public Household(UUID householdId, String name, String description, UUID createdByUserId) {
-        this.householdId = householdId;
+        this.householdId = Objects.requireNonNull(householdId);
         this.name = validateName(name);
-        this.description = description;
+        this.description = validateDescription(description);
         this.createdByUserId = Objects.requireNonNull(createdByUserId);
     }
 
@@ -61,13 +61,20 @@ public class Household {
         return normalized;
     }
 
+    private static String validateDescription(String description) {
+        if (description != null && description.length() > 500) {
+            throw new IllegalArgumentException("Household description is too long");
+        }
+        return description;
+    }
+
     public void rename(String newName) {
         this.name = validateName(newName);
         this.updatedAt = Instant.now();
     }
 
     public void updateDescription(String description) {
-        this.description = description;
+        this.description = validateDescription(description);
         this.updatedAt = Instant.now();
     }
 }
