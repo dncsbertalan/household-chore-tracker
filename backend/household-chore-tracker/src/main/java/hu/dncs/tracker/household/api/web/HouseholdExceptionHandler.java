@@ -1,7 +1,7 @@
 package hu.dncs.tracker.household.api.web;
 
 import hu.dncs.tracker.household.application.exception.HouseholdAlreadyExistsException;
-import hu.dncs.tracker.identity.application.exception.CurrentUserNotFoundException;
+import hu.dncs.tracker.household.application.exception.HouseholdCreatorNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,8 +15,8 @@ class HouseholdExceptionHandler extends ResponseEntityExceptionHandler {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, exception.getMessage());
     }
 
-    @ExceptionHandler(CurrentUserNotFoundException.class)
-    ProblemDetail handleMissingUser(CurrentUserNotFoundException exception) {
+    @ExceptionHandler(HouseholdCreatorNotFoundException.class)
+    ProblemDetail handleMissingUser(HouseholdCreatorNotFoundException exception) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, exception.getMessage());
     }
 }

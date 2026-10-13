@@ -16,7 +16,6 @@ public class GetCurrentUserUseCase {
 
     @Transactional(readOnly = true)
     public User execute(UUID authenticatedUserId) {
-        return userRepository.findById(authenticatedUserId)
-                .orElseThrow(CurrentUserNotFoundException::new);
+        return userRepository.findById(authenticatedUserId).orElseThrow(CurrentUserNotFoundException::new);
     }
 }
