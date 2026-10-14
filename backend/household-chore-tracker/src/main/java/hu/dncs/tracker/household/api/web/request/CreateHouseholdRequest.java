@@ -13,10 +13,10 @@ public record CreateHouseholdRequest(
         @NotBlank @Size(max = 100) String name,
         @Size(max = 500) String description,
         @NotEmpty List<@NotNull @Valid CreateHouseholdRoleRequest> roles,
-        @NotBlank @Size(max = 50) String creatorRoleName
+        @NotNull UUID creatorRoleId,
+        @NotNull UUID householdMemberId
 ) {
     public CreateHouseholdRequest {
         name = name == null ? null : name.trim();
-        creatorRoleName = creatorRoleName == null ? null : creatorRoleName.trim();
     }
 }

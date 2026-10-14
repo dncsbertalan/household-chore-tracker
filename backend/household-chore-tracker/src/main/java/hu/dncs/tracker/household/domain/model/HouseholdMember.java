@@ -16,12 +16,12 @@ import java.util.Objects;
 @Getter
 public class HouseholdMember {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "household_member_id")
     private UUID householdMemberId;
 
-    @Column(name = "household_id", nullable = false)
-    private UUID householdId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "household_id", nullable = false)
+    private Household household;
 
     @Column(name = "user_id", nullable = false)
     private UUID userId;
@@ -50,12 +50,13 @@ public class HouseholdMember {
     protected HouseholdMember() {
     }
 
-    public HouseholdMember(UUID householdId, UUID userId, HouseholdRole householdRole) {
-        this.householdId = Objects.requireNonNull(householdId);
+    public HouseholdMember(UUID householdMemberId, Household household, UUID userId, HouseholdRole householdRole) {
+        this.householdMemberId = Objects.requireNonNull(householdMemberId);
+        this.household = Objects.requireNonNull(household);
         this.userId = Objects.requireNonNull(userId);
         this.householdRole = Objects.requireNonNull(householdRole);
 
-        if (!householdId.equals(householdRole.getHouseholdId())) {
+        if (!household.getHouseholdId().equals(householdRole.getHouseholdId())) {
             throw new IllegalArgumentException("Member role must belong to the same household");
         }
 

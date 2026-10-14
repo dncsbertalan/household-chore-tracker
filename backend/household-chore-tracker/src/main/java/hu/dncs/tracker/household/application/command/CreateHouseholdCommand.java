@@ -8,7 +8,8 @@ public record CreateHouseholdCommand(
         String name,
         String description,
         List<CreateHouseholdRoleCommand> roles,
-        String creatorRoleName
+        UUID creatorRoleId,
+        UUID householdMemberId
 ) {
     public CreateHouseholdCommand {
         roles = roles == null ? List.of() : List.copyOf(roles);

@@ -1,7 +1,9 @@
 package hu.dncs.tracker.household.application.usecase;
 
 import hu.dncs.tracker.household.application.command.CreateHouseholdCommand;
+import hu.dncs.tracker.household.application.command.CreateHouseholdRoleCommand;
 import hu.dncs.tracker.household.application.exception.HouseholdAlreadyExistsException;
+import hu.dncs.tracker.household.application.exception.HouseholdCreationConflictException;
 import hu.dncs.tracker.household.application.exception.HouseholdCreatorNotFoundException;
 import hu.dncs.tracker.household.application.exception.InvalidHouseholdRolesException;
 import hu.dncs.tracker.household.application.model.CreatedHousehold;
@@ -19,10 +21,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +34,7 @@ public class CreateHouseholdUseCase {
 
     @Transactional
     public CreatedHousehold execute(CreateHouseholdCommand command, UUID authenticatedUserId) {
-        if (! userLookup.userExists(authenticatedUserId)) {
+        if (!userLookup.userExists(authenticatedUserId)) {
             throw new HouseholdCreatorNotFoundException();
         }
 
@@ -45,37 +44,51 @@ public class CreateHouseholdUseCase {
 
         validateRoles(command);
 
+        if (command.householdMemberId() == null) {
+            throw new InvalidHouseholdRolesException("HouseholdMemberId is required.");
+        }
+
+        if (householdMemberRepository.existsById(command.householdMemberId()) ||
+                !householdRoleRepository.findAllById(command.roles().stream().map(CreateHouseholdRoleCommand::householdRoleId).toList()).isEmpty()) {
+            throw new HouseholdCreationConflictException();
+        }
+
         var household = new Household(command.householdId(), command.name(), command.description(), authenticatedUserId);
 
         try {
             // Flush the client-assigned ID before creating dependent records, including concurrent submissions.
             householdRepository.saveAndFlush(household);
+
+            var roles = createRoles(command, household);
+
+            var creatorRole = roles.stream()
+                    .filter(role -> role.getHouseholdRoleId().equals(command.creatorRoleId()))
+                    .findFirst()
+                    .orElseThrow();
+
+            var membership = householdMemberRepository.saveAndFlush(new HouseholdMember(command.householdMemberId(),
+                    household, authenticatedUserId, creatorRole));
+
+            return new CreatedHousehold(household, roles, membership);
         } catch (DataIntegrityViolationException exception) {
             for (Throwable cause = exception; cause != null; cause = cause.getCause()) {
-                if (cause instanceof ConstraintViolationException violation
-                        && "pk_household".equals(violation.getConstraintName())) {
-                    throw new HouseholdAlreadyExistsException();
+                if (cause instanceof ConstraintViolationException violation) {
+                    if ("pk_household".equals(violation.getConstraintName())) {
+                        throw new HouseholdAlreadyExistsException();
+                    }
+                    if (Set.of("pk_household_role", "pk_household_member").contains(violation.getConstraintName())) {
+                        throw new HouseholdCreationConflictException();
+                    }
                 }
             }
             throw exception;
         }
-
-        var roles = createRoles(command, household);
-
-        var creatorRole = roles.stream()
-                .filter(role -> role.getName().equals(command.creatorRoleName()))
-                .findFirst()
-                .orElseThrow();
-
-        householdMemberRepository.saveAndFlush(new HouseholdMember(household.getHouseholdId(), authenticatedUserId, creatorRole));
-
-        return new CreatedHousehold(household, roles);
     }
 
     private List<HouseholdRole> createRoles(CreateHouseholdCommand command, Household household) {
         var roles = new ArrayList<HouseholdRole>();
         for (var requestedRole : command.roles()) {
-            var role = new HouseholdRole(household.getHouseholdId(), requestedRole.name(), false);
+            var role = new HouseholdRole(requestedRole.householdRoleId(), household.getHouseholdId(), requestedRole.name(), false);
 
             for (var permissionName : requestedRole.permissions()) {
                 role.getPermissions().add(permissionRepository.findByName(permissionName)
@@ -93,14 +106,18 @@ public class CreateHouseholdUseCase {
         }
 
         var roleNames = new HashSet<String>();
+        var roleIds = new HashSet<UUID>();
         for (var role : command.roles()) {
-            if (! roleNames.add(role.name())) {
+            if (role.householdRoleId() == null || !roleIds.add(role.householdRoleId())) {
+                throw new InvalidHouseholdRolesException("Role IDs must be provided and unique within the household.");
+            }
+            if (!roleNames.add(role.name())) {
                 throw new InvalidHouseholdRolesException("Role names must be unique within the household.");
             }
         }
 
-        if (command.creatorRoleName() == null || ! roleNames.contains(command.creatorRoleName())) {
-            throw new InvalidHouseholdRolesException("CreatorRoleName must match a supplied role name.");
+        if (command.creatorRoleId() == null || !roleIds.contains(command.creatorRoleId())) {
+            throw new InvalidHouseholdRolesException("CreatorRoleId must match a supplied role ID.");
         }
     }
 }

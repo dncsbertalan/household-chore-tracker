@@ -14,12 +14,14 @@ public record HouseholdResponse(
         Instant createdAt,
         Instant updatedAt,
         Long version,
-        List<HouseholdRoleResponse> roles
+        List<HouseholdRoleResponse> roles,
+        HouseholdMemberResponse creatorMembership
 ) {
     public static HouseholdResponse from(CreatedHousehold created) {
         var household = created.household();
         return new HouseholdResponse(household.getHouseholdId(), household.getName(), household.getDescription(),
                 household.getCreatedByUserId(), household.getCreatedAt(), household.getUpdatedAt(), household.getVersion(),
-                created.roles().stream().map(HouseholdRoleResponse::from).toList());
+                created.roles().stream().map(HouseholdRoleResponse::from).toList(),
+                HouseholdMemberResponse.from(created.creatorMembership()));
     }
 }

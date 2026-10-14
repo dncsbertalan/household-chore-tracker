@@ -45,11 +45,15 @@ public class HouseholdRole {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
+
     protected HouseholdRole() {
     }
 
-    public HouseholdRole(UUID householdId, String name, Boolean isSystemRole) {
-        this.householdRoleId = UUID.randomUUID();
+    public HouseholdRole(UUID householdRoleId, UUID householdId, String name, Boolean isSystemRole) {
+        this.householdRoleId = Objects.requireNonNull(householdRoleId);
         this.householdId = Objects.requireNonNull(householdId);
         this.name = Objects.requireNonNull(name);
         this.isSystemRole = isSystemRole;

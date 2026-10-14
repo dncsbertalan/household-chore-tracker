@@ -15,12 +15,13 @@ public record HouseholdRoleResponse(
         Boolean isSystemRole,
         List<PermissionResponse> permissions,
         Instant createdAt,
-        Instant updatedAt
+        Instant updatedAt,
+        Long version
 ) {
     public static HouseholdRoleResponse from(HouseholdRole role) {
         return new HouseholdRoleResponse(role.getHouseholdRoleId(), role.getHouseholdId(), role.getName(),
                 role.getIsSystemRole(), role.getPermissions().stream()
                 .sorted(Comparator.comparing(Permission::getName))
-                .map(PermissionResponse::from).toList(), role.getCreatedAt(), role.getUpdatedAt());
+                .map(PermissionResponse::from).toList(), role.getCreatedAt(), role.getUpdatedAt(), role.getVersion());
     }
 }

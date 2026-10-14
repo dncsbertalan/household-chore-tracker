@@ -28,9 +28,9 @@ class HouseholdController {
         var created = createHouseholdUseCase.execute(
                 new CreateHouseholdCommand(request.householdId(), request.name(), request.description(),
                         request.roles().stream()
-                                .map(role -> new CreateHouseholdRoleCommand(role.name(), role.permissions()))
+                                .map(role -> new CreateHouseholdRoleCommand(role.householdRoleId(), role.name(), role.permissions()))
                                 .toList(),
-                        request.creatorRoleName()),
+                        request.creatorRoleId(), request.householdMemberId()),
                 UUID.fromString(authentication.getName())
         );
 
