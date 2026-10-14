@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct ContentView: View {
+struct RootView: View {
     let registrationService: (any Registering)?
     let loginService: (any SigningIn)?
     let currentUserService: (any CurrentUserFetching)?
@@ -97,7 +97,7 @@ struct ContentView: View {
 
 #if DEBUG
 #Preview {
-    ContentView(
+    RootView(
         registrationService: RegistrationPreviewService(), loginService: LoginPreviewService(),
         currentUserService: CurrentUserPreviewService(), logoutService: LogoutPreviewService()
     )

@@ -1,10 +1,3 @@
-//
-//  TrackerApp.swift
-//  Tracker
-//
-//  Created by Dancs Bertalan on 2026. 10. 06..
-//
-
 import SwiftUI
 
 @main
@@ -34,7 +27,7 @@ struct TrackerApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView(
+            RootView(
                 registrationService: registrationService, loginService: loginService,
                 currentUserService: currentUserService, logoutService: loginService
             )
