@@ -3,6 +3,7 @@ package hu.dncs.tracker.household.api.web;
 import hu.dncs.tracker.household.api.web.request.CreateHouseholdRequest;
 import hu.dncs.tracker.household.api.web.response.HouseholdResponse;
 import hu.dncs.tracker.household.application.command.CreateHouseholdCommand;
+import hu.dncs.tracker.household.application.command.CreateHouseholdRoleCommand;
 import hu.dncs.tracker.household.application.usecase.CreateHouseholdUseCase;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,12 +25,16 @@ class HouseholdController {
 
     @PostMapping
     ResponseEntity<HouseholdResponse> create(@Valid @RequestBody CreateHouseholdRequest request, Authentication authentication) {
-        var household = createHouseholdUseCase.execute(
-                new CreateHouseholdCommand(request.householdId(), request.name(), request.description()),
+        var created = createHouseholdUseCase.execute(
+                new CreateHouseholdCommand(request.householdId(), request.name(), request.description(),
+                        request.roles().stream()
+                                .map(role -> new CreateHouseholdRoleCommand(role.name(), role.permissions()))
+                                .toList(),
+                        request.creatorRoleName()),
                 UUID.fromString(authentication.getName())
         );
 
-        return ResponseEntity.created(URI.create("/api/v1/households/" + household.getHouseholdId()))
-                .body(HouseholdResponse.from(household));
+        return ResponseEntity.created(URI.create("/api/v1/households/" + created.household().getHouseholdId()))
+                .body(HouseholdResponse.from(created));
     }
 }
