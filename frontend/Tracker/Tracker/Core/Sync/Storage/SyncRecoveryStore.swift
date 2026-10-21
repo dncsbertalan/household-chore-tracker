@@ -16,7 +16,7 @@ struct SyncRecoveryStore {
         )).sorted {
             $0.createdAt == $1.createdAt ? $0.commandId.uuidString < $1.commandId.uuidString : $0.createdAt < $1.createdAt
         }
-        let households = LocalHouseholdStore(container: container)
+        let households = LocalHouseholdRepository(container: container)
         let summaries = records.map { record in
             let failure: SyncFailureSummary?
             do {

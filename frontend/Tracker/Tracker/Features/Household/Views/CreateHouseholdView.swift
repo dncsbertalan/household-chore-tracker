@@ -3,19 +3,20 @@ import SwiftUI
 
 struct CreateHouseholdView: View {
     let userId: UUID
+    @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
     @State private var model = CreateHouseholdViewModel()
     @State private var path: [Step] = []
     @FocusState private var focusedField: NameField?
-
+    
     private enum Step: Hashable {
         case firstRole, permissions
     }
-
+    
     private enum NameField: Hashable {
         case household, role
     }
-
+    
     var body: some View {
         NavigationStack(path: $path) {
             nameStep
@@ -27,17 +28,17 @@ struct CreateHouseholdView: View {
                 }
         }
     }
-
+    
     private var nameStep: some View {
         VStack(spacing: 24) {
             Image(systemName: "house.fill")
                 .font(.system(size: 64))
                 .foregroundStyle(.secondary)
-
+            
             nameField("household.name", text: $model.name, field: .household)
                 .accessibilityIdentifier("householdName")
                 .onSubmit(continueToFirstRole)
-
+            
             Spacer()
         }
         .padding()
@@ -47,18 +48,18 @@ struct CreateHouseholdView: View {
                             action: continueToFirstRole)
         }
     }
-
+    
     private var firstRoleStep: some View {
         VStack(spacing: 24) {
             Text("household.chooseRole")
                 .font(.largeTitle.bold())
                 .multilineTextAlignment(.center)
                 .accessibilityAddTraits(.isHeader)
-
+            
             nameField("household.roleName", text: $model.firstRoleName, field: .role)
                 .accessibilityIdentifier("householdRoleName")
                 .onSubmit(continueToPermissions)
-
+            
             Spacer()
         }
         .padding()
@@ -69,7 +70,7 @@ struct CreateHouseholdView: View {
                             action: continueToPermissions)
         }
     }
-
+    
     private var permissionsStep: some View {
         Form {
             Section("household.permissions") {
@@ -86,17 +87,24 @@ struct CreateHouseholdView: View {
                     ))
                 }
             }
+            if let error = model.errorMessage {
+                Section {
+                    Text(error)
+                        .foregroundStyle(.red)
+                }
+            }
         }
         .navigationTitle("household.permissions")
         .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden()
         .toolbar {
-            workflowToolbar(title: "household.createAction", isEnabled: true) {
-                // Household creation will be connected in a later step.
+            workflowToolbar(title: "household.createAction", isEnabled: model.canCreate) {
+                model.create(userId: userId, using: LocalHouseholdRepository(container: context.container))
+                if model.didSave { dismiss() }
             }
         }
     }
-
+    
     private func nameField(_ title: LocalizedStringKey, text: Binding<String>, field: NameField) -> some View {
         TextField(title, text: text)
             .font(.system(size: 28, weight: .medium))
@@ -127,20 +135,20 @@ struct CreateHouseholdView: View {
                 }
             }
     }
-
+    
     private func continueToFirstRole() {
         guard model.canContinueWithName else { return }
         focusedField = nil
         path.append(.firstRole)
     }
-
+    
     private func continueToPermissions() {
         guard model.canContinueWithFirstRole else { return }
         model.prepareFirstRole()
         focusedField = nil
         path.append(.permissions)
     }
-
+    
     @ToolbarContentBuilder
     private func workflowToolbar(title: LocalizedStringKey, isEnabled: Bool,
                                  action: @escaping () -> Void) -> some ToolbarContent {
