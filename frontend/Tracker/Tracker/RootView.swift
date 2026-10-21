@@ -17,10 +17,10 @@ struct RootView: View {
     
     var body: some View {
         TabView(selection: $appState.selectedTab) {
-            HouseholdMainView(currentUserService: currentUserService)
+            HouseholdCoordinatorView(currentUserService: currentUserService)
                 .id(appState.sessionRevision)
-                .tabItem { Label("household.home", systemImage: "house") }
-                .tag(AppState.Tab.home)
+                .tabItem { Label("household.tabName", systemImage: "house") }
+                .tag(AppState.Tab.household)
             
             NavigationStack {
                 List {

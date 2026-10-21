@@ -3,7 +3,7 @@ import Foundation
 
 @MainActor
 final class AppState: ObservableObject {
-    @Published var selectedTab: Tab = .home
+    @Published var selectedTab: Tab = .household
     @Published var sessionRevision = 0
     @Published var isAuthenticated = false
 
@@ -23,9 +23,7 @@ final class AppState: ObservableObject {
     }
     
     enum Tab: Hashable {
-        case home
-        case search
-        case cart
+        case household
         case profile
     }
 }
