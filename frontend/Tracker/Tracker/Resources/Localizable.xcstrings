@@ -1,861 +1,1636 @@
 {
-  "sourceLanguage": "en",
-  "strings": {
-    "common.close": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Close"
+  "sourceLanguage" : "en",
+  "strings" : {
+    "" : {
+
+    },
+    "auth.error.alreadySigningIn" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A sign-in request is already in progress."
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bezárás"
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Egy bejelentkezési kérés már folyamatban van."
           }
         }
       }
     },
-    "common.ok": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "OK"
+    "auth.error.csrf" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The security session could not be verified. Submit again to start a fresh session."
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "OK"
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A biztonsági munkamenetet nem sikerült ellenőrizni. Küldd el újra az űrlapot egy új munkamenet indításához."
           }
         }
       }
     },
-    "field.firstName": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "First name"
+    "auth.error.sessionExpired" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your session could not be renewed. Please sign in again."
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Keresztnév"
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A munkamenetedet nem sikerült megújítani. Jelentkezz be újra."
           }
         }
       }
     },
-    "field.lastName": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Last name"
+    "auth.error.signInRequired" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in first, then reopen your profile."
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vezetéknév"
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Először jelentkezz be, majd nyisd meg újra a profilodat."
           }
         }
       }
     },
-    "field.email": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Email"
+    "auth.register" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Register"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "E-mail-cím"
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regisztráció"
           }
         }
       }
     },
-    "field.password": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Password"
+    "auth.registering" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Registering…"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Jelszó"
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regisztráció…"
           }
         }
       }
     },
-    "field.registrationPassword": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Password (12–128 characters)"
+    "auth.signedIn" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signed in. Tokens saved securely."
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Jelszó (12–128 karakter)"
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sikeres bejelentkezés. A tokeneket biztonságosan mentettük."
           }
         }
       }
     },
-    "field.userID": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "User ID"
+    "auth.signedOut" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signed out. Your saved tokens have been removed."
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Felhasználóazonosító"
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sikeres kijelentkezés. A mentett tokeneket töröltük."
           }
         }
       }
     },
-    "auth.register": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Register"
+    "auth.signIn" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Regisztráció"
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bejelentkezés"
           }
         }
       }
     },
-    "auth.registering": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Registering…"
+    "auth.signingIn" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Signing in…"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Regisztráció…"
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bejelentkezés…"
           }
         }
       }
     },
-    "auth.signIn": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sign in"
+    "auth.signOut" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign out"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bejelentkezés"
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kijelentkezés"
           }
         }
       }
     },
-    "auth.signingIn": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Signing in…"
+    "auth.signOutFailed" : {
+      "comment" : "Preserve the format placeholder and its type; it is supplied by the localized Swift interpolation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not sign out: %@"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bejelentkezés…"
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nem sikerült kijelentkezni: %@"
           }
         }
       }
     },
-    "auth.signedIn": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Signed in. Tokens saved securely."
+    "Cancel" : {
+      "comment" : "A button that dismisses the current view.",
+      "isCommentAutoGenerated" : true
+    },
+    "Clear name" : {
+      "comment" : "A button that clears the journal's name.",
+      "isCommentAutoGenerated" : true
+    },
+    "Clear text" : {
+      "comment" : "A button that clears text.",
+      "isCommentAutoGenerated" : true
+    },
+    "common.close" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sikeres bejelentkezés. A tokeneket biztonságosan mentettük."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bezárás"
           }
         }
       }
     },
-    "auth.signOut": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sign out"
+    "common.ok" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Kijelentkezés"
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
           }
         }
       }
     },
-    "auth.signedOut": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Signed out. Your saved tokens have been removed."
+    "configuration.instructions" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set API_BASE_URL to a valid HTTPS backend address."
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sikeres kijelentkezés. A mentett tokeneket töröltük."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Állítsd az API_BASE_URL értékét egy érvényes HTTPS-kiszolgálócímre."
           }
         }
       }
     },
-    "auth.signOutFailed": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Could not sign out: %@"
+    "configuration.required" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Backend configuration required"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nem sikerült kijelentkezni: %@"
-          }
-        }
-      },
-      "comment": "Preserve the format placeholder and its type; it is supplied by the localized Swift interpolation."
-    },
-    "profile.title": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "My profile"
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Profilom"
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A kiszolgáló beállítása szükséges"
           }
         }
       }
     },
-    "profile.loading": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Loading profile…"
+    "field.email" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Email"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Profil betöltése…"
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-mail-cím"
           }
         }
       }
     },
-    "profile.fetch": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fetch profile"
+    "field.firstName" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "First name"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Profil betöltése"
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keresztnév"
           }
         }
       }
     },
-    "configuration.required": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Backend configuration required"
+    "field.lastName" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last name"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A kiszolgáló beállítása szükséges"
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vezetéknév"
           }
         }
       }
     },
-    "configuration.instructions": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Set API_BASE_URL to a valid HTTPS backend address."
+    "field.password" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Állítsd az API_BASE_URL értékét egy érvényes HTTPS-kiszolgálócímre."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jelszó"
           }
         }
       }
     },
-    "registration.success %@": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Account created for %@."
+    "field.registrationPassword" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Password (12–128 characters)"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A fiók létrejött ezzel az e-mail-címmel: %@."
-          }
-        }
-      },
-      "comment": "The placeholder contains a formatted timestamp or user email; do not translate its value."
-    },
-    "registration.signInSeparately": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Registration does not sign you in."
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A regisztráció után külön kell bejelentkezned."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jelszó (12–128 karakter)"
           }
         }
       }
     },
-    "registration.error.required": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "All four fields are required."
+    "field.userID" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "User ID"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Mind a négy mező kitöltése kötelező."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Felhasználóazonosító"
           }
         }
       }
     },
-    "registration.error.length": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Use a password of 12–128 characters, names up to 100, and an email up to 255."
+    "Hello, World!" : {
+      "comment" : "A text that is used to test text styling",
+      "isCommentAutoGenerated" : true
+    },
+    "household.addRole" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add role"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A jelszó 12–128 karakterből álljon, a nevek legfeljebb 100, az e-mail-cím legfeljebb 255 karakteresek legyenek."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Szerepkör hozzáadása"
           }
         }
       }
     },
-    "registration.error.fields": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Check the registration fields."
+    "household.back" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ellenőrizd a regisztrációs mezőket."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vissza"
           }
         }
       }
     },
-    "registration.error.email": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enter a valid email address of at most 255 characters."
+    "household.continue" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Adj meg egy érvényes, legfeljebb 255 karakteres e-mail-címet."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Folytatás"
           }
         }
       }
     },
-    "registration.error.password": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enter a password of 12–128 characters."
+    "household.create" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create household"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Adj meg egy 12–128 karakteres jelszót."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Háztartás létrehozása"
           }
         }
       }
     },
-    "registration.error.firstName": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enter a first name of at most 100 characters."
+    "household.description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Description (optional)"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Adj meg egy legfeljebb 100 karakteres keresztnevet."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leírás (nem kötelező)"
           }
         }
       }
     },
-    "registration.error.lastName": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enter a last name of at most 100 characters."
+    "household.details" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Household details"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Adj meg egy legfeljebb 100 karakteres vezetéknevet."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Háztartás adatai"
           }
         }
       }
     },
-    "registration.error.duplicate": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "An account already uses this email address."
+    "household.done" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ezzel az e-mail-címmel már létezik fiók."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kész"
           }
         }
       }
     },
-    "registration.error.http": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Registration failed (HTTP %lld). Please try again later."
+    "household.editRole" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit role"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A regisztráció sikertelen (HTTP %lld). Próbáld újra később."
-          }
-        }
-      },
-      "comment": "Preserve the format placeholder and its type; it is supplied by the localized Swift interpolation."
-    },
-    "login.error.required": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enter your email and password."
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Add meg az e-mail-címedet és a jelszavadat."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Szerepkör szerkesztése"
           }
         }
       }
     },
-    "login.error.fields": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Check your email and password fields."
+    "household.empty" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No households yet"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ellenőrizd az e-mail-címet és a jelszót."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Még nincs háztartásod"
           }
         }
       }
     },
-    "login.error.credentials": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Invalid email or password."
+    "household.emptyHelp" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap + to create your first household."
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hibás e-mail-cím vagy jelszó."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Az első háztartás létrehozásához koppints a + gombra."
           }
         }
       }
     },
-    "login.error.http": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sign-in failed (HTTP %lld). Please try again later."
+    "household.error.currentUser" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign in from the profile tab, then try again to load your households."
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A bejelentkezés sikertelen (HTTP %lld). Próbáld újra később."
-          }
-        }
-      },
-      "comment": "Preserve the format placeholder and its type; it is supplied by the localized Swift interpolation."
-    },
-    "auth.error.csrf": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The security session could not be verified. Submit again to start a fresh session."
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A biztonsági munkamenetet nem sikerült ellenőrizni. Küldd el újra az űrlapot egy új munkamenet indításához."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jelentkezz be a profil lapon, majd próbáld újra betölteni a háztartásaidat."
           }
         }
       }
     },
-    "auth.error.signInRequired": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sign in first, then reopen your profile."
+    "household.error.details" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a household name up to 100 characters and a description up to 500 characters."
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Először jelentkezz be, majd nyisd meg újra a profilodat."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adj meg egy legfeljebb 100 karakteres nevet és egy legfeljebb 500 karakteres leírást."
           }
         }
       }
     },
-    "auth.error.sessionExpired": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Your session could not be renewed. Please sign in again."
+    "household.error.roles" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Give each role a unique name up to 50 characters and select your role."
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A munkamenetedet nem sikerült megújítani. Jelentkezz be újra."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minden szerepkörnek adj egyedi, legfeljebb 50 karakteres nevet, és válaszd ki a saját szerepkörödet."
           }
         }
       }
     },
-    "auth.error.alreadySigningIn": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A sign-in request is already in progress."
+    "household.error.save" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Could not save the household. Please try again."
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Egy bejelentkezési kérés már folyamatban van."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nem sikerült menteni a háztartást. Próbáld újra."
           }
         }
       }
     },
-    "storage.error.secureTokens": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Secure token storage could not be accessed. Please try signing in again."
+    "household.error.uniqueRoleName" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A role with this name already exists."
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A biztonságos tokentároló nem érhető el. Próbálj újra bejelentkezni."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Már létezik ilyen nevű szerepkör."
           }
         }
       }
     },
-    "network.error.configuration": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The backend address is not configured correctly."
+    "household.firstRole" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create your first role"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A kiszolgáló címe nincs megfelelően beállítva."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Első szerepkör létrehozása"
           }
         }
       }
     },
-    "network.error.endpoint": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The API request address is invalid."
+    "household.home" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Home"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Az API-kérés címe érvénytelen."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kezdőlap"
           }
         }
       }
     },
-    "network.error.encoding": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The request could not be prepared."
+    "household.membership" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your membership"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A kérést nem sikerült előkészíteni."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tagságod"
           }
         }
       }
     },
-    "network.error.response": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The server returned an invalid response."
+    "household.membershipHelp" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You will be added as the first member with the selected role."
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A kiszolgáló érvénytelen választ küldött."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Az első tagként kerülsz a háztartásba, a kiválasztott szerepkörrel."
           }
         }
       }
     },
-    "network.error.http": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The request failed (HTTP %lld)."
+    "household.name" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Household Name"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A kérés sikertelen (HTTP %lld)."
-          }
-        }
-      },
-      "comment": "Preserve the format placeholder and its type; it is supplied by the localized Swift interpolation."
-    },
-    "network.error.decoding": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The server response could not be read."
-          }
-        },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A kiszolgáló válaszát nem sikerült feldolgozni."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Név"
           }
         }
       }
     },
-    "network.error.offline": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "There is no internet connection."
+    "household.nameLength %lld %lld" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld / %2$lld characters"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nincs internetkapcsolat."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld / %2$lld karakter"
           }
         }
       }
     },
-    "network.error.timeout": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The request timed out."
+    "household.namePrompt" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What is your household called?"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A kérés időtúllépés miatt megszakadt."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mi legyen a háztartás neve?"
           }
         }
       }
     },
-    "network.error.connection": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The server could not be reached."
+    "household.permission.delete" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete household"
           }
         },
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A kiszolgáló nem érhető el."
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Háztartás törlése"
+          }
+        }
+      }
+    },
+    "household.permission.memberAssignRole" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assign member roles"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tagok szerepkörének kiosztása"
+          }
+        }
+      }
+    },
+    "household.permission.memberInvite" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invite members"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tagok meghívása"
+          }
+        }
+      }
+    },
+    "household.permission.memberRemove" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove members"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tagok eltávolítása"
+          }
+        }
+      }
+    },
+    "household.permission.memberView" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View members"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tagok megtekintése"
+          }
+        }
+      }
+    },
+    "household.permission.roleCreate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Create roles"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Szerepkörök létrehozása"
+          }
+        }
+      }
+    },
+    "household.permission.roleDelete" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete roles"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Szerepkörök törlése"
+          }
+        }
+      }
+    },
+    "household.permission.roleUpdate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update roles"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Szerepkörök módosítása"
+          }
+        }
+      }
+    },
+    "household.permission.roleView" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View roles"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Szerepkörök megtekintése"
+          }
+        }
+      }
+    },
+    "household.permission.update" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update household"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Háztartás módosítása"
+          }
+        }
+      }
+    },
+    "household.permission.view" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View household"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Háztartás megtekintése"
+          }
+        }
+      }
+    },
+    "household.permissions" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permissions"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jogosultságok"
+          }
+        }
+      }
+    },
+    "household.removeRole" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove role"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Szerepkör törlése"
+          }
+        }
+      }
+    },
+    "household.retry" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try again"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Újra"
+          }
+        }
+      }
+    },
+    "household.review" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Review roles"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Szerepkörök áttekintése"
+          }
+        }
+      }
+    },
+    "household.roleDetails" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Role details"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Szerepkör adatai"
+          }
+        }
+      }
+    },
+    "household.roleName" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Role name"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Szerepkör neve"
+          }
+        }
+      }
+    },
+    "household.roles" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Roles"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Szerepkörök"
+          }
+        }
+      }
+    },
+    "household.rolesHelp" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add at least one role and choose its permissions. Swipe left to remove a role."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adj hozzá legalább egy szerepkört, és válaszd ki a jogosultságait. A törléshez húzd balra a szerepkört."
+          }
+        }
+      }
+    },
+    "household.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Households"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Háztartások"
+          }
+        }
+      }
+    },
+    "household.unnamedRole" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unnamed role"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Névtelen szerepkör"
+          }
+        }
+      }
+    },
+    "household.yourRole" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your role"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Szerepköröd"
+          }
+        }
+      }
+    },
+    "Journal Name" : {
+      "comment" : "A label for the journal name field.",
+      "isCommentAutoGenerated" : true
+    },
+    "login.error.credentials" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid email or password."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hibás e-mail-cím vagy jelszó."
+          }
+        }
+      }
+    },
+    "login.error.fields" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check your email and password fields."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ellenőrizd az e-mail-címet és a jelszót."
+          }
+        }
+      }
+    },
+    "login.error.http" : {
+      "comment" : "Preserve the format placeholder and its type; it is supplied by the localized Swift interpolation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign-in failed (HTTP %lld). Please try again later."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A bejelentkezés sikertelen (HTTP %lld). Próbáld újra később."
+          }
+        }
+      }
+    },
+    "login.error.required" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter your email and password."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add meg az e-mail-címedet és a jelszavadat."
+          }
+        }
+      }
+    },
+    "network.error.configuration" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The backend address is not configured correctly."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A kiszolgáló címe nincs megfelelően beállítva."
+          }
+        }
+      }
+    },
+    "network.error.connection" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The server could not be reached."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A kiszolgáló nem érhető el."
+          }
+        }
+      }
+    },
+    "network.error.decoding" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The server response could not be read."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A kiszolgáló válaszát nem sikerült feldolgozni."
+          }
+        }
+      }
+    },
+    "network.error.encoding" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The request could not be prepared."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A kérést nem sikerült előkészíteni."
+          }
+        }
+      }
+    },
+    "network.error.endpoint" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The API request address is invalid."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Az API-kérés címe érvénytelen."
+          }
+        }
+      }
+    },
+    "network.error.http" : {
+      "comment" : "Preserve the format placeholder and its type; it is supplied by the localized Swift interpolation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The request failed (HTTP %lld)."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A kérés sikertelen (HTTP %lld)."
+          }
+        }
+      }
+    },
+    "network.error.offline" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "There is no internet connection."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nincs internetkapcsolat."
+          }
+        }
+      }
+    },
+    "network.error.response" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The server returned an invalid response."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A kiszolgáló érvénytelen választ küldött."
+          }
+        }
+      }
+    },
+    "network.error.timeout" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The request timed out."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A kérés időtúllépés miatt megszakadt."
+          }
+        }
+      }
+    },
+    "profile.fetch" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fetch profile"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profil betöltése"
+          }
+        }
+      }
+    },
+    "profile.loading" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading profile…"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profil betöltése…"
+          }
+        }
+      }
+    },
+    "profile.title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My profile"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profilom"
+          }
+        }
+      }
+    },
+    "registration.error.duplicate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An account already uses this email address."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ezzel az e-mail-címmel már létezik fiók."
+          }
+        }
+      }
+    },
+    "registration.error.email" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a valid email address of at most 255 characters."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adj meg egy érvényes, legfeljebb 255 karakteres e-mail-címet."
+          }
+        }
+      }
+    },
+    "registration.error.fields" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check the registration fields."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ellenőrizd a regisztrációs mezőket."
+          }
+        }
+      }
+    },
+    "registration.error.firstName" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a first name of at most 100 characters."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adj meg egy legfeljebb 100 karakteres keresztnevet."
+          }
+        }
+      }
+    },
+    "registration.error.http" : {
+      "comment" : "Preserve the format placeholder and its type; it is supplied by the localized Swift interpolation.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Registration failed (HTTP %lld). Please try again later."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A regisztráció sikertelen (HTTP %lld). Próbáld újra később."
+          }
+        }
+      }
+    },
+    "registration.error.lastName" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a last name of at most 100 characters."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adj meg egy legfeljebb 100 karakteres vezetéknevet."
+          }
+        }
+      }
+    },
+    "registration.error.length" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use a password of 12–128 characters, names up to 100, and an email up to 255."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A jelszó 12–128 karakterből álljon, a nevek legfeljebb 100, az e-mail-cím legfeljebb 255 karakteresek legyenek."
+          }
+        }
+      }
+    },
+    "registration.error.password" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a password of 12–128 characters."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adj meg egy 12–128 karakteres jelszót."
+          }
+        }
+      }
+    },
+    "registration.error.required" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All four fields are required."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mind a négy mező kitöltése kötelező."
+          }
+        }
+      }
+    },
+    "registration.signInSeparately" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Registration does not sign you in."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A regisztráció után külön kell bejelentkezned."
+          }
+        }
+      }
+    },
+    "registration.success %@" : {
+      "comment" : "The placeholder contains a formatted timestamp or user email; do not translate its value.",
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account created for %@."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A fiók létrejött ezzel az e-mail-címmel: %@."
+          }
+        }
+      }
+    },
+    "Save" : {
+      "comment" : "A button that saves the current journal style.",
+      "isCommentAutoGenerated" : true
+    },
+    "storage.error.secureTokens" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Secure token storage could not be accessed. Please try signing in again."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A biztonságos tokentároló nem érhető el. Próbálj újra bejelentkezni."
           }
         }
       }
     }
   },
-  "version": "1.0"
+  "version" : "1.1"
 }

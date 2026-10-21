@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 struct RootView: View {
     let registrationService: (any Registering)?
@@ -11,49 +12,62 @@ struct RootView: View {
     @State private var isLoggingOut = false
     @State private var logoutMessage: String?
     @State private var isShowingLogoutMessage = false
-
+    
+    @EnvironmentObject private var appState: AppState
+    
     var body: some View {
-        NavigationStack {
-            List {
-                Button {
-                    isShowingProfile = true
-                } label: {
-                    Label("profile.title", systemImage: "person.text.rectangle")
-                }
-                Button("auth.signOut", role: .destructive) {
-                    guard let logoutService, !isLoggingOut else { return }
-                    isLoggingOut = true
-                    Task {
-                        defer { isLoggingOut = false }
-                        do {
-                            try await logoutService.logout()
-                            isShowingProfile = false
-                            isShowingLogin = false
-                            logoutMessage = String(localized: "auth.signedOut")
-                        } catch {
-                            logoutMessage = String(localized: "auth.signOutFailed", defaultValue: "Could not sign out: \(error.localizedDescription)")
+        TabView(selection: $appState.selectedTab) {
+            HouseholdMainView(currentUserService: currentUserService)
+                .id(appState.sessionRevision)
+                .tabItem { Label("household.home", systemImage: "house") }
+                .tag(AppState.Tab.home)
+            
+            NavigationStack {
+                List {
+                    Button {
+                        isShowingProfile = true
+                    } label: {
+                        Label("profile.title", systemImage: "person.text.rectangle")
+                    }
+                    Button("auth.signOut", role: .destructive) {
+                        guard let logoutService, !isLoggingOut else { return }
+                        isLoggingOut = true
+                        Task {
+                            defer { isLoggingOut = false }
+                            do {
+                                try await logoutService.logout()
+                                appState.isAuthenticated = false
+                                appState.sessionRevision += 1
+                                isShowingProfile = false
+                                isShowingLogin = false
+                                logoutMessage = String(localized: "auth.signedOut")
+                            } catch {
+                                logoutMessage = String(localized: "auth.signOutFailed", defaultValue: "Could not sign out: \(error.localizedDescription)")
+                            }
+                            isShowingLogoutMessage = true
                         }
-                        isShowingLogoutMessage = true
+                    }
+                    .disabled(logoutService == nil || isLoggingOut)
+                }
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button {
+                            isShowingLogin = true
+                        } label: {
+                            Label("auth.signIn", systemImage: "person.crop.circle")
+                        }
+                    }
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        Button {
+                            isShowingRegistration = true
+                        } label: {
+                            Label("auth.register", systemImage: "person.badge.plus")
+                        }
                     }
                 }
-                .disabled(logoutService == nil || isLoggingOut)
             }
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        isShowingLogin = true
-                    } label: {
-                        Label("auth.signIn", systemImage: "person.crop.circle")
-                    }
-                }
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        isShowingRegistration = true
-                    } label: {
-                        Label("auth.register", systemImage: "person.badge.plus")
-                    }
-                }
-            }
+            .tabItem { Label("profile.title", systemImage: "person") }
+            .tag(AppState.Tab.profile)
         }
         .sheet(isPresented: $isShowingRegistration) {
             if let registrationService {
@@ -68,7 +82,10 @@ struct RootView: View {
         }
         .sheet(isPresented: $isShowingLogin) {
             if let loginService {
-                LoginView(service: loginService)
+                LoginView(service: loginService) {
+                    appState.isAuthenticated = true
+                    appState.sessionRevision += 1
+                }
             } else {
                 ContentUnavailableView(
                     "configuration.required", systemImage: "network",
@@ -92,7 +109,7 @@ struct RootView: View {
             Text(logoutMessage ?? "")
         }
     }
-
+    
 }
 
 #if DEBUG
@@ -101,5 +118,8 @@ struct RootView: View {
         registrationService: RegistrationPreviewService(), loginService: LoginPreviewService(),
         currentUserService: CurrentUserPreviewService(), logoutService: LogoutPreviewService()
     )
+    .environmentObject(AppState())
+    .modelContainer(for: TrackerSchema.models,
+                    inMemory: true)
 }
 #endif

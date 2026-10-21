@@ -4,9 +4,11 @@ struct LoginView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var model: LoginModel
     @State private var submission: Task<Void, Never>?
+    private let onSignIn: () -> Void
 
-    init(service: any SigningIn) {
+    init(service: any SigningIn, onSignIn: @escaping () -> Void = {}) {
         _model = State(initialValue: LoginModel(service: service))
+        self.onSignIn = onSignIn
     }
 
     var body: some View {
@@ -27,6 +29,7 @@ struct LoginView: View {
                         guard submission == nil else { return }
                         submission = Task {
                             await model.login()
+                            if model.didSignIn { onSignIn() }
                             submission = nil
                         }
                     } label: {
