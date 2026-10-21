@@ -8,7 +8,7 @@ struct HouseholdCoordinatorView: View {
 
     var body: some View {
         NavigationStack(path: $router.path) {
-            HouseholdMainView(currentUserService: currentUserService, model: model)
+            HouseholdListView(currentUserService: currentUserService, model: model)
                 .navigationDestination(for: HouseholdRoute.self) { route in
                     destination(for: route)
                 }
