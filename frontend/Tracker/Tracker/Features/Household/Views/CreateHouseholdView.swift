@@ -64,7 +64,6 @@ struct CreateHouseholdView: View {
         }
         .padding()
         .onAppear { focusedField = .role }
-        .navigationBarBackButtonHidden()
         .toolbar {
             workflowToolbar(title: "household.continue", isEnabled: model.canContinueWithFirstRole,
                             action: continueToPermissions)
@@ -96,7 +95,6 @@ struct CreateHouseholdView: View {
         }
         .navigationTitle("household.permissions")
         .navigationBarTitleDisplayMode(.inline)
-        .navigationBarBackButtonHidden()
         .toolbar {
             workflowToolbar(title: "household.createAction", isEnabled: model.canCreate) {
                 model.create(userId: userId, using: LocalHouseholdRepository(container: context.container))
@@ -157,15 +155,6 @@ struct CreateHouseholdView: View {
                 Button { dismiss() } label: { Image(systemName: "xmark") }
                     .accessibilityLabel("common.close")
                     .accessibilityIdentifier("exitHouseholdCreation")
-            } else {
-                Button {
-                    focusedField = nil
-                    path.removeLast()
-                } label: {
-                    Image(systemName: "chevron.left")
-                }
-                .accessibilityLabel("household.back")
-                .accessibilityIdentifier("backHouseholdCreation")
             }
         }
         ToolbarItem(placement: .topBarTrailing) {
