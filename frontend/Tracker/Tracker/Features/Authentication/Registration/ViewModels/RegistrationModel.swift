@@ -27,13 +27,13 @@ final class RegistrationModel {
         let lastName = lastName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !email.isEmpty, !firstName.isEmpty, !lastName.isEmpty,
               !password.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            errorMessage = String(localized: "registration.error.required")
+            errorMessage = AppLocalization.string("registration.error.required")
             return
         }
         // Java's @Size counts UTF-16 code units. Preserve the password exactly as entered.
         guard email.utf16.count <= 255, firstName.utf16.count <= 100,
               lastName.utf16.count <= 100, (12...128).contains(password.utf16.count) else {
-            errorMessage = String(localized: "registration.error.length")
+            errorMessage = AppLocalization.string("registration.error.length")
             return
         }
         isSubmitting = true
@@ -52,17 +52,17 @@ final class RegistrationModel {
             case 400:
                 let messages: [String] = problem?.errors?.map { fieldError -> String in
                     switch fieldError.field {
-                    case "email": String(localized: "registration.error.email")
-                    case "password": String(localized: "registration.error.password")
-                    case "firstName": String(localized: "registration.error.firstName")
-                    case "lastName": String(localized: "registration.error.lastName")
-                    default: String(localized: "registration.error.fields")
+                    case "email": AppLocalization.string("registration.error.email")
+                    case "password": AppLocalization.string("registration.error.password")
+                    case "firstName": AppLocalization.string("registration.error.firstName")
+                    case "lastName": AppLocalization.string("registration.error.lastName")
+                    default: AppLocalization.string("registration.error.fields")
                     }
                 } ?? []
-                errorMessage = messages.isEmpty ? String(localized: "registration.error.fields") : messages.joined(separator: "\n")
-            case 403: errorMessage = String(localized: "auth.error.csrf")
-            case 409: errorMessage = String(localized: "registration.error.duplicate")
-            default: errorMessage = String(localized: "registration.error.http", defaultValue: "Registration failed (HTTP \(status)). Please try again later.")
+                errorMessage = messages.isEmpty ? AppLocalization.string("registration.error.fields") : messages.joined(separator: "\n")
+            case 403: errorMessage = AppLocalization.string("auth.error.csrf")
+            case 409: errorMessage = AppLocalization.string("registration.error.duplicate")
+            default: errorMessage = AppLocalization.string("registration.error.http", defaultValue: "Registration failed (HTTP \(status)). Please try again later.")
             }
         } catch {
             errorMessage = error.localizedDescription

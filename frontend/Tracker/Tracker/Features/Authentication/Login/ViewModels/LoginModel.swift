@@ -21,7 +21,7 @@ final class LoginModel {
         guard !email.isEmpty, email.utf16.count <= 255,
               !password.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
               password.utf16.count <= 128 else {
-            errorMessage = String(localized: "login.error.required")
+            errorMessage = AppLocalization.string("login.error.required")
             return
         }
         isSubmitting = true
@@ -34,10 +34,10 @@ final class LoginModel {
         } catch is CancellationError {
         } catch APIError.http(let status, _) {
             switch status {
-            case 400: errorMessage = String(localized: "login.error.fields")
-            case 401: errorMessage = String(localized: "login.error.credentials")
-            case 403: errorMessage = String(localized: "auth.error.csrf")
-            default: errorMessage = String(localized: "login.error.http", defaultValue: "Sign-in failed (HTTP \(status)). Please try again later.")
+            case 400: errorMessage = AppLocalization.string("login.error.fields")
+            case 401: errorMessage = AppLocalization.string("login.error.credentials")
+            case 403: errorMessage = AppLocalization.string("auth.error.csrf")
+            default: errorMessage = AppLocalization.string("login.error.http", defaultValue: "Sign-in failed (HTTP \(status)). Please try again later.")
             }
         } catch {
             errorMessage = error.localizedDescription

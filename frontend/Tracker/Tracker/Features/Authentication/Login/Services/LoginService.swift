@@ -4,7 +4,7 @@ nonisolated protocol SigningIn: Sendable {
     func login(_ request: LoginRequest) async throws
 }
 
-actor LoginService: SigningIn, SigningOut {
+actor LoginService: SigningIn, LogoutProtocol {
     private let client: any APIRequesting
     private let tokenStore: any TokenStoring
     private var isSigningIn = false
@@ -51,7 +51,7 @@ actor LoginService: SigningIn, SigningOut {
 
 nonisolated enum LoginError: Error, LocalizedError {
     case alreadyInProgress
-    var errorDescription: String? { String(localized: "auth.error.alreadySigningIn") }
+    var errorDescription: String? { AppLocalization.string("auth.error.alreadySigningIn") }
 }
 
 #if DEBUG

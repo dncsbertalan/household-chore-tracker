@@ -6,8 +6,8 @@ nonisolated enum SessionError: Error, LocalizedError, Sendable {
 
     var errorDescription: String? {
         switch self {
-        case .signInRequired: return String(localized: "auth.error.signInRequired")
-        case .sessionExpired: return String(localized: "auth.error.sessionExpired")
+        case .signInRequired: return AppLocalization.string("auth.error.signInRequired")
+        case .sessionExpired: return AppLocalization.string("auth.error.sessionExpired")
         }
     }
 }
