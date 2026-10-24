@@ -1,5 +1,8 @@
-enum HouseholdSheet: String, Identifiable {
-    case createHousehold
+import Foundation
 
-    var id: String { rawValue }
+enum HouseholdSheet: Hashable, Identifiable {
+    case createHousehold
+    case createChore(householdId: UUID)
+
+    var id: Self { self }
 }

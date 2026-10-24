@@ -30,7 +30,7 @@ struct HouseholdListView: View {
                 ContentUnavailableView {
                     Label("household.title", systemImage: "house")
                 } description: {
-                    Text(model.errorMessage ?? String(localized: "household.error.currentUser"))
+                    Text(model.errorMessage ?? AppLocalization.string("household.error.currentUser"))
                 } actions: {
                     Button("household.retry") {
                         Task { await model.loadUser(service: currentUserService) }

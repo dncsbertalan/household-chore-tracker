@@ -11,7 +11,7 @@ final class HouseholdMainViewModel {
     func loadUser(service: (any CurrentUserFetching)?) async {
         guard !isLoading, userId == nil else { return }
         guard let service else {
-            errorMessage = String(localized: "configuration.required")
+            errorMessage = AppLocalization.string("configuration.required")
             return
         }
         isLoading = true
@@ -23,7 +23,7 @@ final class HouseholdMainViewModel {
             userId = user.id
         } catch is CancellationError {
         } catch {
-            errorMessage = String(localized: "household.error.currentUser")
+            errorMessage = AppLocalization.string("household.error.currentUser")
         }
     }
 }

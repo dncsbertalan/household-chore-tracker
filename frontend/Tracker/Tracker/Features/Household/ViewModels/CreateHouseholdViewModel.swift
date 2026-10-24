@@ -61,11 +61,11 @@ final class CreateHouseholdViewModel {
         errorMessage = nil
         guard canContinueWithName,
               HouseholdConstraints.normalizedName(description).utf16.count <= HouseholdConstraints.descriptionMaxLength else {
-            errorMessage = String(localized: "household.error.details")
+            errorMessage = AppLocalization.string("household.error.details")
             return
         }
         guard canContinueWithFirstRole else {
-            errorMessage = String(localized: "household.error.roles")
+            errorMessage = AppLocalization.string("household.error.roles")
             return
         }
         prepareFirstRole()
@@ -78,11 +78,11 @@ final class CreateHouseholdViewModel {
             ))
             didSave = true
         } catch LocalHouseholdStoreError.invalidDetails {
-            errorMessage = String(localized: "household.error.details")
+            errorMessage = AppLocalization.string("household.error.details")
         } catch LocalHouseholdStoreError.invalidRole {
-            errorMessage = String(localized: "household.error.roles")
+            errorMessage = AppLocalization.string("household.error.roles")
         } catch {
-            errorMessage = String(localized: "household.error.save")
+            errorMessage = AppLocalization.string("household.error.save")
         }
     }
     

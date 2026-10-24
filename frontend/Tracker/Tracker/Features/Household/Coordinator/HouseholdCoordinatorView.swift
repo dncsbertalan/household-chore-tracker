@@ -1,5 +1,5 @@
-import SwiftUI
 import SwiftData
+import SwiftUI
 
 struct HouseholdCoordinatorView: View {
     var currentUserService: (any CurrentUserFetching)? = nil
@@ -8,16 +8,23 @@ struct HouseholdCoordinatorView: View {
 
     var body: some View {
         NavigationStack(path: $router.path) {
-            HouseholdListView(currentUserService: currentUserService, model: model)
-                .navigationDestination(for: HouseholdRoute.self) { route in
-                    destination(for: route)
-                }
+            HouseholdListView(
+                currentUserService: currentUserService,
+                model: model
+            )
+            .navigationDestination(for: HouseholdRoute.self) { route in
+                destination(for: route)
+            }
         }
         .sheet(item: $router.sheet) { sheet in
             switch sheet {
             case .createHousehold:
                 if let userId = model.userId {
                     CreateHouseholdView(userId: userId)
+                }
+            case .createChore(let householdId):
+                if let userId = model.userId {
+                    CreateChoreView(householdId: householdId, userId: userId)
                 }
             }
         }
@@ -36,8 +43,10 @@ struct HouseholdCoordinatorView: View {
 }
 
 #if DEBUG
-#Preview {
-    HouseholdCoordinatorView(currentUserService: CurrentUserPreviewService())
+    #Preview {
+        HouseholdCoordinatorView(
+            currentUserService: CurrentUserPreviewService()
+        )
         .modelContainer(for: TrackerSchema.models, inMemory: true)
-}
+    }
 #endif
