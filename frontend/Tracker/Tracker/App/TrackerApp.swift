@@ -5,19 +5,20 @@ import OSLog
 @main
 struct TrackerApp: App {
     @StateObject private var appState = AppState()
-
+    
     private let registrationService: RegistrationService?
     private let loginService: LoginService?
     private let currentUserService: CurrentUserService?
     private let tokenStore: KeychainTokenStore?
     private let container: ModelContainer
-
+    
     init() {
         do {
             container = try ModelContainer(for: TrackerSchema.schema)
         } catch {
             fatalError("Could not open the app's SwiftData store: \(error)")
         }
+        
         if let configuration = try? APIConfiguration.from() {
             let client = APIClient(configuration: configuration)
             registrationService = RegistrationService(client: client)
@@ -39,7 +40,7 @@ struct TrackerApp: App {
             tokenStore = nil
         }
     }
-
+    
     var body: some Scene {
         WindowGroup {
             RootView(

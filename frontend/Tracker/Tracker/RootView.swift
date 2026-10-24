@@ -5,10 +5,10 @@ struct RootView: View {
     let registrationService: (any Registering)?
     let loginService: (any SigningIn)?
     let currentUserService: (any CurrentUserFetching)?
-    let logoutService: (any SigningOut)?
+    let logoutService: (any LogoutProtocol)?
+    @AppStorage(AppLanguage.storageKey) private var language: AppLanguage = .system
     @State private var isShowingRegistration = false
     @State private var isShowingLogin = false
-    @State private var isShowingProfile = false
     @State private var isLoggingOut = false
     @State private var logoutMessage: String?
     @State private var isShowingLogoutMessage = false
@@ -21,34 +21,30 @@ struct RootView: View {
                 .id(appState.sessionRevision)
                 .tabItem { Label("household.tabName", systemImage: "house") }
                 .tag(AppState.Tab.household)
+
+            ChoresCoordinatorView(currentUserService: currentUserService)
+                .id(appState.sessionRevision)
+                .tabItem { Label("chores.title", systemImage: "checklist") }
+                .tag(AppState.Tab.chores)
             
             NavigationStack {
-                List {
-                    Button {
-                        isShowingProfile = true
-                    } label: {
-                        Label("profile.title", systemImage: "person.text.rectangle")
+                Group {
+                    if let currentUserService {
+                        ProfileView(
+                            service: currentUserService,
+                            isAuthenticated: appState.isAuthenticated,
+                            isLoggingOut: isLoggingOut,
+                            canLogOut: logoutService != nil,
+                            onLogout: logout
+                        )
+                    } else {
+                        ContentUnavailableView(
+                            "configuration.required", systemImage: "network",
+                            description: Text("configuration.instructions")
+                        )
                     }
-                    Button("auth.signOut", role: .destructive) {
-                        guard let logoutService, !isLoggingOut else { return }
-                        isLoggingOut = true
-                        Task {
-                            defer { isLoggingOut = false }
-                            do {
-                                try await logoutService.logout()
-                                appState.isAuthenticated = false
-                                appState.sessionRevision += 1
-                                isShowingProfile = false
-                                isShowingLogin = false
-                                logoutMessage = String(localized: "auth.signedOut")
-                            } catch {
-                                logoutMessage = String(localized: "auth.signOutFailed", defaultValue: "Could not sign out: \(error.localizedDescription)")
-                            }
-                            isShowingLogoutMessage = true
-                        }
-                    }
-                    .disabled(logoutService == nil || isLoggingOut)
                 }
+                .navigationTitle("profile.title")
                 .toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         Button {
@@ -66,9 +62,12 @@ struct RootView: View {
                     }
                 }
             }
+            .id(appState.sessionRevision)
             .tabItem { Label("profile.title", systemImage: "person") }
             .tag(AppState.Tab.profile)
         }
+        // Recreate screen models so stored validation messages also use the new language.
+        .id(language)
         .sheet(isPresented: $isShowingRegistration) {
             if let registrationService {
                 RegistrationView(service: registrationService)
@@ -93,23 +92,31 @@ struct RootView: View {
                 )
             }
         }
-        .sheet(isPresented: $isShowingProfile) {
-            if let currentUserService {
-                ProfileView(service: currentUserService)
-            } else {
-                ContentUnavailableView(
-                    "configuration.required", systemImage: "network",
-                    description: Text("configuration.instructions")
-                )
-            }
-        }
         .alert("auth.signOut", isPresented: $isShowingLogoutMessage) {
             Button("common.ok", role: .cancel) { }
         } message: {
             Text(logoutMessage ?? "")
         }
+        .environment(\.locale, language.locale)
     }
-    
+
+    private func logout() {
+        guard let logoutService, !isLoggingOut else { return }
+        isLoggingOut = true
+        Task {
+            defer { isLoggingOut = false }
+            do {
+                try await logoutService.logout()
+                appState.isAuthenticated = false
+                appState.sessionRevision += 1
+                isShowingLogin = false
+                logoutMessage = AppLocalization.string("auth.signedOut")
+            } catch {
+                logoutMessage = AppLocalization.string("auth.signOutFailed", defaultValue: "Could not sign out: \(error.localizedDescription)")
+            }
+            isShowingLogoutMessage = true
+        }
+    }
 }
 
 #if DEBUG
