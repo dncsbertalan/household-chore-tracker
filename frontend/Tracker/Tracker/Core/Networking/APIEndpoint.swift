@@ -16,7 +16,7 @@ nonisolated struct APIEndpoint: Sendable {
     var body: Data?
     var timeout: TimeInterval?
     var retryPolicy: APIRetryPolicy = .none
-    
+
     static func json<Body: Encodable>(
         _ path: String,
         method: HTTPMethod = .post,
@@ -25,7 +25,9 @@ nonisolated struct APIEndpoint: Sendable {
     ) throws -> APIEndpoint {
         do {
             return APIEndpoint(
-                path: path, method: method, headers: headers,
+                path: path,
+                method: method,
+                headers: headers,
                 body: try JSONEncoder().encode(body)
             )
         } catch {

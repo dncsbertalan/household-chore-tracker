@@ -5,11 +5,15 @@ nonisolated enum APIRetryPolicy: Sendable {
     /// At most three GET attempts with exponential backoff and jitter. Never replays mutations.
     case transientReads
 
-    func delay(afterAttempt attempt: Int, method: HTTPMethod, error: Error) -> TimeInterval? {
+    func delay(afterAttempt attempt: Int, method: HTTPMethod, error: Error)
+        -> TimeInterval?
+    {
         guard case .transientReads = self, method == .get, attempt < 3,
-              let error = error as? APIError else { return nil }
+            let error = error as? APIError
+        else { return nil }
         switch error {
-        case .http(let status, _) where [500, 502, 503, 504].contains(status): break
+        case .http(let status, _) where [500, 502, 503, 504].contains(status):
+            break
         case .transport(.timedOut), .transport(.networkConnectionLost): break
         default: return nil
         }
