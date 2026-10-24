@@ -1,11 +1,11 @@
 import Foundation
 
-nonisolated protocol SigningOut: Sendable {
+nonisolated protocol LogoutProtocol: Sendable {
     func logout() async throws
 }
 
 #if DEBUG
-nonisolated struct LogoutPreviewService: SigningOut {
+nonisolated struct LogoutPreviewService: LogoutProtocol {
     func logout() async throws { }
 }
 #endif
