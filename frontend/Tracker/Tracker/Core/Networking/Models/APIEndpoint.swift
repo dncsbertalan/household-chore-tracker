@@ -1,19 +1,13 @@
 import Foundation
 
-nonisolated enum HTTPMethod: String, Sendable {
-    case get = "GET"
-    case post = "POST"
-    case put = "PUT"
-    case patch = "PATCH"
-    case delete = "DELETE"
-}
-
 nonisolated struct APIEndpoint: Sendable {
     let path: String
     var method: HTTPMethod = .get
     var queryItems: [URLQueryItem] = []
     var headers: [String: String] = [:]
     var body: Data?
+    /// Bind durable commands to the authenticated account that created them.
+    var expectedAccountId: UUID?
     var timeout: TimeInterval?
     var retryPolicy: APIRetryPolicy = .none
 

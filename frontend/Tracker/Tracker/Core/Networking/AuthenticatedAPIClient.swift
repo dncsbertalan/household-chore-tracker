@@ -1,17 +1,18 @@
 import Foundation
 
 /// Opt-in authenticated transport. Public auth requests continue to use APIClient directly.
-nonisolated struct AuthenticatedAPIClient: APIRequesting {
-    private let client: any APIRequesting
+nonisolated struct AuthenticatedAPIClient: APIClientProtocol {
+    private let client: any APIClientProtocol
     private let session: TokenRefreshService
 
-    init(client: any APIRequesting, session: TokenRefreshService) {
+    init(client: any APIClientProtocol, session: TokenRefreshService) {
         self.client = client
         self.session = session
     }
 
     func send<Response: Decodable & Sendable>(
-        _ endpoint: APIEndpoint, as type: Response.Type = Response.self
+        _ endpoint: APIEndpoint,
+        as type: Response.Type = Response.self
     ) async throws -> Response {
         try await perform(endpoint) { endpoint in
             try await client.send(endpoint, as: type)
@@ -30,13 +31,17 @@ nonisolated struct AuthenticatedAPIClient: APIRequesting {
     ) async throws -> Response {
         let token = try await session.accessToken()
         do {
-            return try await operation(authorizing(endpoint, token: token))
+            let request = try await verifiedRequest(endpoint, token: token)
+            return try await operation(request)
         } catch APIError.http(let status, _) where status == 401 {
             // Only safe reads are automatically replayed. Mutations require explicit feature policy.
-            guard endpoint.method == .get else { throw SessionError.sessionExpired }
+            guard endpoint.method == .get else {
+                throw SessionError.sessionExpired
+            }
             let renewed = try await session.accessToken(rejectedToken: token)
             do {
-                return try await operation(authorizing(endpoint, token: renewed))
+                let request = try await verifiedRequest(endpoint, token: renewed)
+                return try await operation(request)
             } catch APIError.http(let status, _) where status == 401 {
                 try await session.invalidate(accessToken: renewed)
                 throw SessionError.sessionExpired
@@ -44,7 +49,20 @@ nonisolated struct AuthenticatedAPIClient: APIRequesting {
         }
     }
 
-    private func authorizing(_ endpoint: APIEndpoint, token: String) -> APIEndpoint {
+    private func verifiedRequest(_ endpoint: APIEndpoint, token: String) async throws -> APIEndpoint {
+        if let expectedAccountId = endpoint.expectedAccountId {
+            let user = try await client.send(
+                authorizing(APIEndpoint(path: "users/me"), token: token), as: CurrentUser.self
+            )
+            guard user.id == expectedAccountId else { throw SessionError.signInRequired }
+        }
+        try Task.checkCancellation()
+        return authorizing(endpoint, token: token)
+    }
+
+    private func authorizing(_ endpoint: APIEndpoint, token: String)
+        -> APIEndpoint
+    {
         var request = endpoint
         request.headers["Authorization"] = "Bearer \(token)"
         return request
