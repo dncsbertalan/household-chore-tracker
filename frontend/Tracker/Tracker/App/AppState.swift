@@ -8,7 +8,7 @@ final class AppState: ObservableObject {
     @Published var sessionRevision = 0
     @Published var isAuthenticated = false
 
-    func restoreAuthentication(from tokenStore: any TokenStoring) async {
+    func restoreAuthentication(from tokenStore: any TokenStoreProtocol) async {
         let revision = sessionRevision
         do {
             let tokens = try await tokenStore.load()

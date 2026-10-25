@@ -1,14 +1,14 @@
 import Foundation
 
 /// Shared interface for public and authenticated clients, and feature-service test doubles.
-nonisolated protocol APIRequesting: Sendable {
+nonisolated protocol APIClientProtocol: Sendable {
     func send<Response: Decodable & Sendable>(
         _ endpoint: APIEndpoint, as type: Response.Type
     ) async throws -> Response
     func sendWithoutResponse(_ endpoint: APIEndpoint) async throws
 }
 
-nonisolated extension APIRequesting {
+nonisolated extension APIClientProtocol {
     func request<Response: Decodable & Sendable>(
         endpoint: String,
         method: HTTPMethod = .get,
