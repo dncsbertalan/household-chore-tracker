@@ -9,7 +9,7 @@ class AppModelContainer {
     }
 
     init(isStoredInMemory: Bool = false) {
-        let schema = TrackerSchema.schema
+        let schema = AppSchema.schema
 
         let modelConfiguration = ModelConfiguration(
             schema: schema,

@@ -7,5 +7,6 @@ enum AppSchema {
         LocalChore.self, LocalChoreSchedule.self, LocalChoreOccurrence.self,
         LocalChoreCompletion.self, LocalChoreApproval.self, OutboxEntry.self,
     ]
+
     static let schema = Schema(models)
 }

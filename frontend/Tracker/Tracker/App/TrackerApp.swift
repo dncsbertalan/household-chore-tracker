@@ -1,10 +1,10 @@
-import OSLog
 import SwiftData
 import SwiftUI
 
 @main
 struct TrackerApp: App {
     @StateObject private var appState = AppState()
+    private let container = AppModelContainer()
 
     private let registrationService: RegistrationService?
     private let loginService: LoginService?
@@ -13,7 +13,6 @@ struct TrackerApp: App {
     private let syncEngine: SyncEngine?
     private let connectivityMonitor = NetworkConnectivityMonitor()
     @Environment(\.scenePhase) private var scenePhase
-    private let container = AppModelContainer()
 
     init() {
         if let configuration = try? APIConfiguration.from() {
@@ -38,7 +37,7 @@ struct TrackerApp: App {
             )
             currentUserService = userService
             syncEngine = SyncEngine(
-                queue: OutboxQueue(container: container),
+                queue: OutboxQueue(container: container.modelContainer),
                 dispatcher: OutboxDispatcher(handlers: [
                     CreateHouseholdOutboxHandler(client: authenticatedClient)
                 ]),

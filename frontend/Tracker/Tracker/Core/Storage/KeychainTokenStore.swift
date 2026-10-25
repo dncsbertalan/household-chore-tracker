@@ -1,25 +1,7 @@
 import Foundation
 import Security
 
-nonisolated protocol TokenStoring: Sendable {
-    func save(_ tokens: StoredTokens) async throws
-    func load() async throws -> StoredTokens?
-    func clear() async throws
-    func replace(_ tokens: StoredTokens, ifMatching expected: StoredTokens)
-        async throws -> Bool
-    func clear(ifMatching expected: StoredTokens) async throws -> Bool
-}
-
-nonisolated enum TokenStorageError: Error, LocalizedError, Sendable {
-    case keychain(OSStatus)
-    case invalidData
-
-    var errorDescription: String? {
-        AppLocalization.string("storage.error.secureTokens")
-    }
-}
-
-actor KeychainTokenStore: TokenStoring {
+actor KeychainTokenStore: TokenStoreProtocol {
     private let service: String
     private let account = "authentication-tokens"
 
