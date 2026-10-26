@@ -77,7 +77,7 @@ final class CreateChoreViewModel {
             errorMessage = AppLocalization.string("chores.error.members")
         } catch LocalChoreRepositoryError.householdUnavailable {
             errorMessage = AppLocalization.string("household.unavailableHelp")
-        } catch LocalChoreRepositoryError.permissionDenied {
+        } catch HouseholdAuthorizationError.permissionDenied(_) {
             errorMessage = AppLocalization.string("chores.error.permission")
         } catch {
             errorMessage = AppLocalization.string("chores.error.save")

@@ -3,6 +3,7 @@ import SwiftData
 
 struct HouseholdDetailView: View {
     let userId: UUID
+    private let authorization = HouseholdAuthorizationService()
     @Environment(HouseholdRouter.self) private var router
     @Query private var households: [LocalHousehold]
 
@@ -44,7 +45,7 @@ struct HouseholdDetailView: View {
                 }
                 .navigationTitle(household.name)
                 .toolbar {
-                    if household.hasPermission(.choreCreate, userId: userId) {
+                    if authorization.hasPermission(.choreCreate, in: household, userId: userId) {
                         ToolbarItem(placement: .topBarTrailing) {
                             Button {
                                 router.sheet = .createChore(householdId: household.householdId)

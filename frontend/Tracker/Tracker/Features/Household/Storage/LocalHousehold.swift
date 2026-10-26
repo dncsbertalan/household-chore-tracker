@@ -58,16 +58,3 @@ final class LocalHousehold: SyncableEntity {
         self.householdMembers = householdMembers
     }
 }
-
-extension LocalHousehold {
-    func hasPermission(_ permission: HouseholdPermission, userId: UUID) -> Bool
-    {
-        deletedAt == nil
-            && householdMembers.contains { member in
-                member.userId == userId && member.deletedAt == nil
-                    && member.role.deletedAt == nil
-                    && member.role.household.householdId == householdId
-                    && member.role.permissions.contains(permission)
-            }
-    }
-}

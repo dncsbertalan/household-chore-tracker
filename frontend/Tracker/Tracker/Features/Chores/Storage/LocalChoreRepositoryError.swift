@@ -3,6 +3,5 @@ nonisolated enum LocalChoreRepositoryError: Error {
     case invalidSchedule
     case invalidMembers
     case householdUnavailable
-    case permissionDenied
     case duplicateID
 }

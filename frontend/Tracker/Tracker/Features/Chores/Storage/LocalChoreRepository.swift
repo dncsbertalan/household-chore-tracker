@@ -4,6 +4,7 @@ import SwiftData
 @MainActor
 struct LocalChoreRepository: ChoreRepositoryProtocol {
     let container: ModelContainer
+    private let authorization = HouseholdAuthorizationService()
 
     func create(_ creation: ChoreCreation) throws {
         guard creation.hasValidDetails else { throw LocalChoreRepositoryError.invalidDetails }
@@ -17,9 +18,7 @@ struct LocalChoreRepository: ChoreRepositoryProtocol {
             predicate: #Predicate { $0.householdId == householdId && $0.deletedAt == nil }
         )).first else { throw LocalChoreRepositoryError.householdUnavailable }
 
-        guard household.hasPermission(.choreCreate, userId: creation.createdByUserId) else {
-            throw LocalChoreRepositoryError.permissionDenied
-        }
+        try authorization.requirePermission(.choreCreate, in: household, userId: creation.createdByUserId)
 
         let members = household.householdMembers.filter { $0.deletedAt == nil }
         let memberIds = Set(members.map(\.householdMemberId))
