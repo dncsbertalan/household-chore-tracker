@@ -2,8 +2,8 @@ import SwiftData
 import SwiftUI
 
 struct HouseholdCoordinatorView: View {
-    var currentUserService: (any CurrentUserFetching)? = nil
-    @State private var model = HouseholdMainViewModel()
+    var currentUserService: (any CurrentUserServiceProtocol)? = nil
+    @State private var model = CurrentUserViewModel()
     @State private var router = HouseholdRouter()
 
     var body: some View {
@@ -47,6 +47,6 @@ struct HouseholdCoordinatorView: View {
         HouseholdCoordinatorView(
             currentUserService: CurrentUserPreviewService()
         )
-        .modelContainer(for: TrackerSchema.models, inMemory: true)
+        .modelContainer(for: AppSchema.models, inMemory: true)
     }
 #endif

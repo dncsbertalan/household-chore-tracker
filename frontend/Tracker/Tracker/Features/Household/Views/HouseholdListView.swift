@@ -2,12 +2,12 @@ import SwiftUI
 import SwiftData
 
 struct HouseholdListView: View {
-    let currentUserService: (any CurrentUserFetching)?
-    let model: HouseholdMainViewModel
+    let currentUserService: (any CurrentUserServiceProtocol)?
+    let model: CurrentUserViewModel
     @Environment(HouseholdRouter.self) private var router
     @Query private var households: [LocalHousehold]
 
-    init(currentUserService: (any CurrentUserFetching)? = nil, model: HouseholdMainViewModel) {
+    init(currentUserService: (any CurrentUserServiceProtocol)? = nil, model: CurrentUserViewModel) {
         self.currentUserService = currentUserService
         self.model = model
 
@@ -77,6 +77,6 @@ struct HouseholdListView: View {
 #if DEBUG
 #Preview {
     HouseholdCoordinatorView(currentUserService: CurrentUserPreviewService())
-        .modelContainer(for: TrackerSchema.models, inMemory: true)
+        .modelContainer(for: AppSchema.models, inMemory: true)
 }
 #endif

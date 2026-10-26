@@ -37,17 +37,17 @@ final class CreateHouseholdViewModel {
 
     var firstRolePermissions: Set<HouseholdPermission> {
         get {
-            roles[preparedFirstRoleName ?? HouseholdConstraints.normalizedName(firstRoleName)]
+            roles[preparedFirstRoleName ?? HouseholdConstraints.trimmedText(firstRoleName)]
                 ?? Set(HouseholdPermission.allCases)
         }
         set {
-            roles[preparedFirstRoleName ?? HouseholdConstraints.normalizedName(firstRoleName)] = newValue
+            roles[preparedFirstRoleName ?? HouseholdConstraints.trimmedText(firstRoleName)] = newValue
         }
     }
 
     func prepareFirstRole() {
         guard canContinueWithFirstRole else { return }
-        let roleName = HouseholdConstraints.normalizedName(firstRoleName)
+        let roleName = HouseholdConstraints.trimmedText(firstRoleName)
         let permissions = firstRolePermissions
         if let previousName = preparedFirstRoleName, previousName != roleName {
             roles.removeValue(forKey: previousName)
@@ -60,7 +60,7 @@ final class CreateHouseholdViewModel {
         guard !didSave else { return }
         errorMessage = nil
         guard canContinueWithName,
-              HouseholdConstraints.normalizedName(description).utf16.count <= HouseholdConstraints.descriptionMaxLength else {
+              HouseholdConstraints.trimmedText(description).utf16.count <= HouseholdConstraints.descriptionMaxLength else {
             errorMessage = AppLocalization.string("household.error.details")
             return
         }
@@ -77,9 +77,9 @@ final class CreateHouseholdViewModel {
                 creatorUserId: userId, creatorRoleId: creatorRoleId
             ))
             didSave = true
-        } catch LocalHouseholdStoreError.invalidDetails {
+        } catch LocalHouseholdRepositoryError.invalidDetails {
             errorMessage = AppLocalization.string("household.error.details")
-        } catch LocalHouseholdStoreError.invalidRole {
+        } catch LocalHouseholdRepositoryError.invalidRole {
             errorMessage = AppLocalization.string("household.error.roles")
         } catch {
             errorMessage = AppLocalization.string("household.error.save")

@@ -3,22 +3,22 @@ import SwiftData
 
 @MainActor
 struct LocalHouseholdRepository: HouseholdRepositoryProtocol {
-    static let schema = TrackerSchema.schema
+    static let schema = AppSchema.schema
     let container: ModelContainer
 
     func create(_ creation: HouseholdCreation) throws {
-        let name = HouseholdConstraints.normalizedName(creation.name)
-        let description = HouseholdConstraints.normalizedName(
+        let name = HouseholdConstraints.trimmedText(creation.name)
+        let description = HouseholdConstraints.trimmedText(
             creation.description
         )
-        let roleName = HouseholdConstraints.normalizedName(creation.roleName)
+        let roleName = HouseholdConstraints.trimmedText(creation.roleName)
         guard HouseholdConstraints.isValidName(name),
             description.utf16.count <= HouseholdConstraints.descriptionMaxLength
         else {
-            throw LocalHouseholdStoreError.invalidDetails
+            throw LocalHouseholdRepositoryError.invalidDetails
         }
         guard HouseholdConstraints.isValidRoleName(roleName) else {
-            throw LocalHouseholdStoreError.invalidRole
+            throw LocalHouseholdRepositoryError.invalidRole
         }
 
         // Keep this transaction separate from unrelated edits in the UI's context.
@@ -34,7 +34,7 @@ struct LocalHouseholdRepository: HouseholdRepositoryProtocol {
                 )
             ) == 0
         else {
-            throw LocalHouseholdStoreError.duplicateID
+            throw LocalHouseholdRepositoryError.duplicateID
         }
 
         let household = LocalHousehold(
@@ -75,20 +75,24 @@ struct LocalHouseholdRepository: HouseholdRepositoryProtocol {
         household.householdMembers = [member]
         role.members = [member]
 
-        ///TODO: Insert the household creation outbox record in this context before saving,
-        /// using these same household, role, and membership IDs so it commits with the graph.
         do {
+            let request = CreateHouseholdRequest(
+                householdId: household.householdId, name: household.name,
+                description: household.householdDescription,
+                roles: [CreateHouseholdRequest.Role(
+                    householdRoleId: role.householdRoleId, name: role.name, permissions: role.permissions
+                )],
+                creatorRoleId: role.householdRoleId, householdMemberId: member.householdMemberId
+            )
+            try OutboxStore.enqueue(OutboxOperation(
+                accountId: creation.creatorUserId, entityType: .household,
+                entityId: household.householdId, action: .create, payload: request
+            ), in: context)
             try context.save()
         } catch {
             context.rollback()
             throw error
         }
-        ///TODO: Notify the sync coordinator after the graph and its future outbox record commit.
+        NotificationCenter.default.post(name: .outboxDidEnqueue, object: nil)
     }
-}
-
-nonisolated enum LocalHouseholdStoreError: Error {
-    case duplicateID
-    case invalidDetails
-    case invalidRole
 }

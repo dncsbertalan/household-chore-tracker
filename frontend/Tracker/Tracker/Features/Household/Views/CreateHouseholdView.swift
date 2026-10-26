@@ -171,7 +171,7 @@ struct CreateHouseholdView: View {
         .ignoresSafeArea()
         .sheet(isPresented: .constant(true)) {
             CreateHouseholdView(userId: UUID())
-                .modelContainer(for: TrackerSchema.models,
+                .modelContainer(for: AppSchema.models,
                                 inMemory: true)
         }
 }
