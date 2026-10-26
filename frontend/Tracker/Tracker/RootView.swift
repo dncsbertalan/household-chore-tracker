@@ -2,10 +2,10 @@ import SwiftUI
 import SwiftData
 
 struct RootView: View {
-    let registrationService: (any Registering)?
-    let loginService: (any SigningIn)?
-    let currentUserService: (any CurrentUserFetching)?
-    let logoutService: (any LogoutProtocol)?
+    let registrationService: (any RegistrationServiceProtocol)?
+    let loginService: (any LoginServiceProtocol)?
+    let currentUserService: (any CurrentUserServiceProtocol)?
+    let logoutService: (any LogoutServiceProtocol)?
     @AppStorage(AppLanguage.storageKey) private var language: AppLanguage = .system
     @State private var isShowingRegistration = false
     @State private var isShowingLogin = false
@@ -126,7 +126,7 @@ struct RootView: View {
         currentUserService: CurrentUserPreviewService(), logoutService: LogoutPreviewService()
     )
     .environmentObject(AppState())
-    .modelContainer(for: TrackerSchema.models,
+    .modelContainer(for: AppSchema.models,
                     inMemory: true)
 }
 #endif
