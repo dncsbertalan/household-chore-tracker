@@ -297,7 +297,7 @@ class IdempotencyIntegrationTests {
         var roleId = UUID.randomUUID();
         var body = """
                 {"householdId":"%s", "name":"Home", "description":null,
-                 "roles":[{"householdRoleId":"%s", "name":"Admin", "permissions":["HOUSEHOLD_VIEW"]}],
+                 "roles":[{"householdRoleId":"%s", "name":"Admin", "permissions":["HOUSEHOLD_MEMBER_VIEW"]}],
                  "creatorRoleId":"%s", "householdMemberId":"%s"}
                 """.formatted(id, roleId, roleId, UUID.randomUUID());
         var key = UUID.randomUUID();
