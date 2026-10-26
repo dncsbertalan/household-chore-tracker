@@ -1,7 +1,7 @@
 import Foundation
 
 nonisolated struct CSRFService: Sendable {
-    let client: any APIRequesting
+    let client: any APIClientProtocol
 
     func headers() async throws -> [String: String] {
         let csrf = try await client.request(endpoint: "auth/csrf", as: CSRFResponse.self)
@@ -12,9 +12,4 @@ nonisolated struct CSRFService: Sendable {
         }
         return [csrf.headerName: csrf.token]
     }
-}
-
-nonisolated struct CSRFResponse: Decodable, Sendable {
-    let token: String
-    let headerName: String
 }
