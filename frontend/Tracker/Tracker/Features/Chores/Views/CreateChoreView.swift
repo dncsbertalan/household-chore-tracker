@@ -267,7 +267,7 @@ struct CreateChoreView: View {
 
 #if DEBUG
 #Preview {
-    let container = try! ModelContainer(for: TrackerSchema.schema,
+    let container = try! ModelContainer(for: AppSchema.schema,
                                        configurations: ModelConfiguration(isStoredInMemoryOnly: true))
     let userId = UUID()
     let household = LocalHousehold(householdId: UUID(), name: "Home", createdByUserId: userId,

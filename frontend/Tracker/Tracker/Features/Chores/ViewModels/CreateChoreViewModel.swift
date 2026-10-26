@@ -69,15 +69,15 @@ final class CreateChoreViewModel {
         do {
             try repository.create(creation)
             didSave = true
-        } catch LocalChoreStoreError.invalidDetails {
+        } catch LocalChoreRepositoryError.invalidDetails {
             errorMessage = AppLocalization.string("chores.error.details")
-        } catch LocalChoreStoreError.invalidSchedule {
+        } catch LocalChoreRepositoryError.invalidSchedule {
             errorMessage = AppLocalization.string("chores.error.schedule")
-        } catch LocalChoreStoreError.invalidMembers {
+        } catch LocalChoreRepositoryError.invalidMembers {
             errorMessage = AppLocalization.string("chores.error.members")
-        } catch LocalChoreStoreError.householdUnavailable {
+        } catch LocalChoreRepositoryError.householdUnavailable {
             errorMessage = AppLocalization.string("household.unavailableHelp")
-        } catch LocalChoreStoreError.permissionDenied {
+        } catch LocalChoreRepositoryError.permissionDenied {
             errorMessage = AppLocalization.string("chores.error.permission")
         } catch {
             errorMessage = AppLocalization.string("chores.error.save")

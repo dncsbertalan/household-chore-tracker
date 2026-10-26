@@ -2,8 +2,8 @@ import SwiftData
 import SwiftUI
 
 struct ChoresCoordinatorView: View {
-    var currentUserService: (any CurrentUserFetching)? = nil
-    @State private var model = HouseholdMainViewModel()
+    var currentUserService: (any CurrentUserServiceProtocol)? = nil
+    @State private var model = CurrentUserViewModel()
     @State private var router = ChoresRouter()
 
     var body: some View {
@@ -43,6 +43,6 @@ struct ChoresCoordinatorView: View {
 #if DEBUG
 #Preview {
     ChoresCoordinatorView(currentUserService: CurrentUserPreviewService())
-        .modelContainer(for: TrackerSchema.models, inMemory: true)
+        .modelContainer(for: AppSchema.models, inMemory: true)
 }
 #endif

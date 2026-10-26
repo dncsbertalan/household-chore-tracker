@@ -73,6 +73,6 @@ struct ChoresView: View {
             .navigationTitle("chores.title")
     }
     .environment(ChoresRouter())
-    .modelContainer(for: TrackerSchema.models, inMemory: true)
+    .modelContainer(for: AppSchema.models, inMemory: true)
 }
 #endif

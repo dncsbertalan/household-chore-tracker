@@ -6,8 +6,8 @@ struct LocalChoreRepository: ChoreRepositoryProtocol {
     let container: ModelContainer
 
     func create(_ creation: ChoreCreation) throws {
-        guard creation.hasValidDetails else { throw LocalChoreStoreError.invalidDetails }
-        guard creation.hasValidSchedule else { throw LocalChoreStoreError.invalidSchedule }
+        guard creation.hasValidDetails else { throw LocalChoreRepositoryError.invalidDetails }
+        guard creation.hasValidSchedule else { throw LocalChoreRepositoryError.invalidSchedule }
 
         // Isolate this save from unrelated UI edits, just like household creation.
         let context = ModelContext(container)
@@ -15,10 +15,10 @@ struct LocalChoreRepository: ChoreRepositoryProtocol {
         let householdId = creation.householdId
         guard let household = try context.fetch(FetchDescriptor<LocalHousehold>(
             predicate: #Predicate { $0.householdId == householdId && $0.deletedAt == nil }
-        )).first else { throw LocalChoreStoreError.householdUnavailable }
+        )).first else { throw LocalChoreRepositoryError.householdUnavailable }
 
         guard household.hasPermission(.choreCreate, userId: creation.createdByUserId) else {
-            throw LocalChoreStoreError.permissionDenied
+            throw LocalChoreRepositoryError.permissionDenied
         }
 
         let members = household.householdMembers.filter { $0.deletedAt == nil }
@@ -28,13 +28,13 @@ struct LocalChoreRepository: ChoreRepositoryProtocol {
               assigneeIds.isSubset(of: memberIds),
               creation.requiredApprovalCount >= 0,
               creation.requiredApprovalCount <= memberIds.count else {
-            throw LocalChoreStoreError.invalidMembers
+            throw LocalChoreRepositoryError.invalidMembers
         }
 
         let choreId = creation.choreId
         guard try context.fetchCount(FetchDescriptor<LocalChore>(
             predicate: #Predicate { $0.choreId == choreId }
-        )) == 0 else { throw LocalChoreStoreError.duplicateID }
+        )) == 0 else { throw LocalChoreRepositoryError.duplicateID }
 
         let chore = LocalChore(
             choreId: choreId, title: creation.normalizedTitle,
@@ -74,13 +74,4 @@ struct LocalChoreRepository: ChoreRepositoryProtocol {
         }
         // Chore API/outbox delivery is not available yet; these records remain pending locally.
     }
-}
-
-nonisolated enum LocalChoreStoreError: Error {
-    case invalidDetails
-    case invalidSchedule
-    case invalidMembers
-    case householdUnavailable
-    case permissionDenied
-    case duplicateID
 }
