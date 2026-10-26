@@ -2,12 +2,12 @@ import SwiftUI
 
 struct LoginView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var model: LoginModel
+    @State private var model: LoginViewModel
     @State private var submission: Task<Void, Never>?
     private let onSignIn: () -> Void
 
-    init(service: any SigningIn, onSignIn: @escaping () -> Void = {}) {
-        _model = State(initialValue: LoginModel(service: service))
+    init(service: any LoginServiceProtocol, onSignIn: @escaping () -> Void = {}) {
+        _model = State(initialValue: LoginViewModel(service: service))
         self.onSignIn = onSignIn
     }
 

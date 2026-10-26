@@ -1,17 +1,13 @@
 import Foundation
 
-nonisolated protocol SigningIn: Sendable {
-    func login(_ request: LoginRequest) async throws
-}
-
-actor LoginService: SigningIn, LogoutProtocol {
-    private let client: any APIRequesting
-    private let tokenStore: any TokenStoring
+actor LoginService: LoginServiceProtocol, LogoutServiceProtocol {
+    private let client: any APIClientProtocol
+    private let tokenStore: any TokenStoreProtocol
     private var isSigningIn = false
     private var sessionGeneration = 0
     private var pendingSave: Task<Void, Error>?
 
-    init(client: any APIRequesting, tokenStore: any TokenStoring) {
+    init(client: any APIClientProtocol, tokenStore: any TokenStoreProtocol) {
         self.client = client
         self.tokenStore = tokenStore
     }
@@ -48,14 +44,3 @@ actor LoginService: SigningIn, LogoutProtocol {
         // Refresh uses conditional writes: deleting the pair also blocks late refresh results.
     }
 }
-
-nonisolated enum LoginError: Error, LocalizedError {
-    case alreadyInProgress
-    var errorDescription: String? { AppLocalization.string("auth.error.alreadySigningIn") }
-}
-
-#if DEBUG
-nonisolated struct LoginPreviewService: SigningIn {
-    func login(_ request: LoginRequest) async throws { }
-}
-#endif

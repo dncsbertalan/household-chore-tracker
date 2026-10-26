@@ -3,15 +3,15 @@ import Observation
 
 @MainActor
 @Observable
-final class LoginModel {
+final class LoginViewModel {
     var email = ""
     var password = ""
     private(set) var isSubmitting = false
     private(set) var errorMessage: String?
     private(set) var didSignIn = false
-    private let service: any SigningIn
+    private let service: any LoginServiceProtocol
 
-    init(service: any SigningIn) { self.service = service }
+    init(service: any LoginServiceProtocol) { self.service = service }
 
     func login() async {
         guard !isSubmitting else { return }
