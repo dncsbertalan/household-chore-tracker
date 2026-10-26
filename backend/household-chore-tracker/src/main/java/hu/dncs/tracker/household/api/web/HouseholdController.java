@@ -5,6 +5,7 @@ import hu.dncs.tracker.household.api.web.response.HouseholdResponse;
 import hu.dncs.tracker.household.application.command.CreateHouseholdCommand;
 import hu.dncs.tracker.household.application.command.CreateHouseholdRoleCommand;
 import hu.dncs.tracker.household.application.usecase.CreateHouseholdUseCase;
+import hu.dncs.tracker.idempotency.api.web.Idempotent;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ class HouseholdController {
     private final CreateHouseholdUseCase createHouseholdUseCase;
 
     @PostMapping
+    @Idempotent("household.create")
     ResponseEntity<HouseholdResponse> create(@Valid @RequestBody CreateHouseholdRequest request, Authentication authentication) {
         var created = createHouseholdUseCase.execute(
                 new CreateHouseholdCommand(request.householdId(), request.name(), request.description(),
