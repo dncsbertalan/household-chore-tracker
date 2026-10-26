@@ -1517,6 +1517,57 @@
         }
       }
     },
+    "household.permission.choreApproveCompletion" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Approve chore completions"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feladatok teljesítésének jóváhagyása"
+          }
+        }
+      }
+    },
+    "household.permission.choreAssignMember" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assign members to chores"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tagok hozzárendelése feladatokhoz"
+          }
+        }
+      }
+    },
+    "household.permission.choreComplete" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Complete assigned chores"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saját feladatok teljesítése"
+          }
+        }
+      }
+    },
     "household.permission.choreCreate" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1530,6 +1581,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Feladatok létrehozása"
+          }
+        }
+      }
+    },
+    "household.permission.choreDelete" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete chores"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feladatok törlése"
+          }
+        }
+      }
+    },
+    "household.permission.choreReopen" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reopen completed chores"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teljesített feladatok újranyitása"
+          }
+        }
+      }
+    },
+    "household.permission.choreUpdate" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit chores"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feladatok módosítása"
           }
         }
       }
@@ -1683,40 +1785,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Szerepkörök megtekintése"
-          }
-        }
-      }
-    },
-    "household.permission.update" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Update household"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Háztartás módosítása"
-          }
-        }
-      }
-    },
-    "household.permission.view" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "View household"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Háztartás megtekintése"
           }
         }
       }
