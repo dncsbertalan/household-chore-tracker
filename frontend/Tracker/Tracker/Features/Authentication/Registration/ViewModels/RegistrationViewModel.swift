@@ -3,7 +3,7 @@ import Observation
 
 @MainActor
 @Observable
-final class RegistrationModel {
+final class RegistrationViewModel {
     var email = ""
     var password = ""
     var firstName = ""
@@ -12,9 +12,9 @@ final class RegistrationModel {
     private(set) var errorMessage: String?
     private(set) var registeredUser: RegistrationResponse?
 
-    private let service: any Registering
+    private let service: any RegistrationServiceProtocol
 
-    init(service: any Registering) {
+    init(service: any RegistrationServiceProtocol) {
         self.service = service
     }
 

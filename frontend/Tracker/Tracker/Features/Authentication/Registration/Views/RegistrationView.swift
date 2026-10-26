@@ -2,11 +2,11 @@ import SwiftUI
 
 struct RegistrationView: View {
     @Environment(\.dismiss) private var dismiss
-    @State private var model: RegistrationModel
+    @State private var model: RegistrationViewModel
     @State private var submission: Task<Void, Never>?
 
-    init(service: any Registering) {
-        _model = State(initialValue: RegistrationModel(service: service))
+    init(service: any RegistrationServiceProtocol) {
+        _model = State(initialValue: RegistrationViewModel(service: service))
     }
 
     var body: some View {

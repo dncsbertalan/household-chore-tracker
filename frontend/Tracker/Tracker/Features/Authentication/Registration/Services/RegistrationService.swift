@@ -1,13 +1,9 @@
 import Foundation
 
-nonisolated protocol Registering: Sendable {
-    func register(_ request: RegistrationRequest) async throws -> RegistrationResponse
-}
+nonisolated struct RegistrationService: RegistrationServiceProtocol {
+    private let client: any APIClientProtocol
 
-nonisolated struct RegistrationService: Registering {
-    private let client: any APIRequesting
-
-    init(client: any APIRequesting) {
+    init(client: any APIClientProtocol) {
         self.client = client
     }
 

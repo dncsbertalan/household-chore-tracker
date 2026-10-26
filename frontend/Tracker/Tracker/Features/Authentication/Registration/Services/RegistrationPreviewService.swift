@@ -2,7 +2,7 @@
 import Foundation
 
 /// Keeps previews interactive without contacting the backend or creating real accounts.
-nonisolated struct RegistrationPreviewService: Registering {
+nonisolated struct RegistrationPreviewService: RegistrationServiceProtocol {
     func register(_ request: RegistrationRequest) async throws -> RegistrationResponse {
         RegistrationResponse(
             id: UUID(), email: request.email,
