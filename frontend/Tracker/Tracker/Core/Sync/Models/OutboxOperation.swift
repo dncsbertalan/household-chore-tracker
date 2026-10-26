@@ -1,30 +1,19 @@
 import Foundation
 
-enum EntityType: String, Codable, Sendable {
-    case household
-}
-
-enum MutationAction: String, Codable, Sendable {
-    case create
-    case update
-    case delete
-    case complete
-}
-
-struct OutboxOperation: Sendable {
+nonisolated struct OutboxOperation: Sendable {
     let id: UUID
     let accountId: UUID
-    let entityType: EntityType
+    let entityType: OutboxEntityType
     let entityId: UUID
-    let action: MutationAction
+    let action: OutboxAction
     let payload: Data
 
     init<Payload: Encodable>(
         id: UUID = UUID(),
         accountId: UUID,
-        entityType: EntityType,
+        entityType: OutboxEntityType,
         entityId: UUID,
-        action: MutationAction,
+        action: OutboxAction,
         payload: Payload
     ) throws {
         self.id = id
@@ -36,18 +25,5 @@ struct OutboxOperation: Sendable {
         let encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
         self.payload = try encoder.encode(payload)
-    }
-}
-
-extension OutboxEntry {
-    convenience init(_ operation: OutboxOperation) {
-        self.init(
-            id: operation.id,
-            accountId: operation.accountId,
-            entityType: operation.entityType.rawValue,
-            entityId: operation.entityId,
-            operation: operation.action.rawValue,
-            payload: operation.payload
-        )
     }
 }

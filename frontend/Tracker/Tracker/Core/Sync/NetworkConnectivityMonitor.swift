@@ -2,13 +2,7 @@ import Foundation
 import Network
 
 @MainActor
-protocol ConnectivityMonitoring {
-    func start(_ update: @escaping @MainActor @Sendable (Bool) -> Void)
-    func stop()
-}
-
-@MainActor
-final class NetworkConnectivityMonitor: ConnectivityMonitoring {
+final class NetworkConnectivityMonitor: ConnectivityMonitorProtocol {
     private var monitor: NWPathMonitor?
     private var generation: UUID?
 

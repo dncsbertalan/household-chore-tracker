@@ -10,7 +10,8 @@ final class OutboxEntry {
 
     var entityType: String
     var entityId: UUID
-    var operation: String
+    @Attribute(originalName: "operation")
+    var action: String
 
     var payload: Data
 
@@ -26,7 +27,7 @@ final class OutboxEntry {
         accountId: UUID,
         entityType: String,
         entityId: UUID,
-        operation: String,
+        action: String,
         payload: Data,
         createdAt: Date = .now
     ) {
@@ -34,12 +35,25 @@ final class OutboxEntry {
         self.accountId = accountId
         self.entityType = entityType
         self.entityId = entityId
-        self.operation = operation
+        self.action = action
         self.payload = payload
         self.createdAt = createdAt
         self.retryCount = 0
         self.nextAttemptAt = createdAt
         self.status = OutboxStatus.pending.rawValue
         self.lastError = nil
+    }
+}
+
+extension OutboxEntry {
+    convenience init(_ operation: OutboxOperation) {
+        self.init(
+            id: operation.id,
+            accountId: operation.accountId,
+            entityType: operation.entityType.rawValue,
+            entityId: operation.entityId,
+            action: operation.action.rawValue,
+            payload: operation.payload
+        )
     }
 }
