@@ -6,11 +6,11 @@ struct ProfileView: View {
     let canLogOut: Bool
     let onLogout: () -> Void
     @AppStorage(AppLanguage.storageKey) private var language: AppLanguage = .system
-    @State private var model: ProfileModel
+    @State private var model: ProfileViewModel
     @State private var reload: Task<Void, Never>?
 
     init(
-        service: any CurrentUserFetching,
+        service: any CurrentUserServiceProtocol,
         isAuthenticated: Bool,
         isLoggingOut: Bool,
         canLogOut: Bool,
@@ -20,7 +20,7 @@ struct ProfileView: View {
         self.isLoggingOut = isLoggingOut
         self.canLogOut = canLogOut
         self.onLogout = onLogout
-        _model = State(initialValue: ProfileModel(service: service))
+        _model = State(initialValue: ProfileViewModel(service: service))
     }
 
     var body: some View {

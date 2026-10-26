@@ -3,13 +3,13 @@ import Observation
 
 @MainActor
 @Observable
-final class ProfileModel {
+final class ProfileViewModel {
     private(set) var user: CurrentUser?
     private(set) var isLoading = false
     private(set) var errorMessage: String?
-    private let service: any CurrentUserFetching
+    private let service: any CurrentUserServiceProtocol
 
-    init(service: any CurrentUserFetching) { self.service = service }
+    init(service: any CurrentUserServiceProtocol) { self.service = service }
 
     func load() async {
         guard !isLoading else { return }
