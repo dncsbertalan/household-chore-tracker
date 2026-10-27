@@ -2,6 +2,7 @@ package hu.dncs.tracker;
 
 import hu.dncs.tracker.household.infrastructure.persistence.HouseholdRepository;
 import hu.dncs.tracker.idempotency.api.web.Idempotent;
+import hu.dncs.tracker.identity.api.web.CurrentUserId;
 import hu.dncs.tracker.identity.domain.model.User;
 import hu.dncs.tracker.identity.infrastructure.persistence.UserRepository;
 import jakarta.validation.Valid;
@@ -9,6 +10,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestComponent;
@@ -29,6 +32,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.net.URI;
@@ -319,6 +323,69 @@ class IdempotencyIntegrationTests {
         assertThat(receipts()).isZero();
     }
 
+    @Test
+    void plainDtoWithResponseStatusReplaysTheExactResponse() throws Exception {
+        var key = UUID.randomUUID();
+        var payload = body(UUID.randomUUID(), "plain response");
+        var original = sendPlain(key, payload);
+        assertSameSuccess(original, sendPlain(key, payload));
+        assertThat(mutations.calls.get()).isEqualTo(1);
+        assertThat(effects()).isEqualTo(1);
+        assertThat(receipts()).isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT account_id FROM idempotency_test_effect", UUID.class)).isEqualTo(account);
+    }
+
+    @Test
+    void voidWithResponseStatusReplaysAnEmpty204WithoutRepeatingTheMutation() throws Exception {
+        var id = UUID.randomUUID();
+        send(account, UUID.randomUUID().toString(), body(id, "delete me"));
+        var key = UUID.randomUUID();
+        for (int attempt = 0; attempt < 2; attempt++) {
+            mvc.perform(delete(PATH + "/plain/" + id).with(jwt().jwt(jwt -> jwt.subject(account.toString())))
+                            .header("Idempotency-Key", key))
+                    .andExpect(status().isNoContent());
+        }
+        assertThat(mutations.calls.get()).isEqualTo(2);
+        assertThat(effects()).isZero();
+        assertThat(receipts()).isEqualTo(2);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"application", "serialization"})
+    void plainDtoFailuresRollBackAndAllowRetry(String failure) throws Exception {
+        if (failure.equals("application")) {
+            mutations.failNext.set(true);
+        } else {
+            mutations.failSerializationNext.set(true);
+        }
+        var key = UUID.randomUUID();
+        var payload = body(UUID.randomUUID(), "retry me");
+        assertThat(sendPlain(key, payload).getResponse().getStatus()).isEqualTo(500);
+        assertThat(effects()).isZero();
+        assertThat(receipts()).isZero();
+        assertThat(sendPlain(key, payload).getResponse().getStatus()).isEqualTo(201);
+        assertThat(effects()).isEqualTo(1);
+        assertThat(receipts()).isEqualTo(1);
+    }
+
+    private MvcResult sendPlain(UUID key, String body) throws Exception {
+        return mvc.perform(post(PATH + "/plain").with(jwt().jwt(jwt -> jwt.subject(account.toString())))
+                        .header("Idempotency-Key", key).contentType(APPLICATION_JSON).content(body))
+                .andReturn();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"callable", "deferred", "web-async", "streaming"})
+    void rejectsUnsupportedDirectResponsesBeforeInvokingTheController(String responseType) throws Exception {
+        mvc.perform(post(PATH + "/unsupported/" + responseType)
+                        .with(jwt().jwt(jwt -> jwt.subject(account.toString())))
+                        .header("Idempotency-Key", UUID.randomUUID()))
+                .andExpect(status().isInternalServerError());
+        assertThat(mutations.calls.get()).isZero();
+        assertThat(effects()).isZero();
+        assertThat(receipts()).isZero();
+    }
+
     private void concurrentRequests(boolean firstFails) throws Exception {
         var key = UUID.randomUUID().toString();
         var body = body(UUID.randomUUID(), "home");
@@ -400,6 +467,8 @@ class IdempotencyIntegrationTests {
 
     record Mutation(@NotNull UUID id, @NotBlank String name) {}
 
+    record PlainResponse(UUID id, String name, Instant createdAt, Object value) {}
+
     @TestComponent
     @RestController
     @RequestMapping(PATH)
@@ -450,6 +519,55 @@ class IdempotencyIntegrationTests {
             calls.incrementAndGet();
             jdbc.update("DELETE FROM idempotency_test_effect WHERE id = ?", id);
             return ResponseEntity.noContent().build();
+        }
+
+        @PostMapping("/plain")
+        @ResponseStatus(HttpStatus.CREATED)
+        @Idempotent("test.plain.create")
+        PlainResponse plain(@Valid @RequestBody Mutation request, @CurrentUserId UUID userId) {
+            calls.incrementAndGet();
+            jdbc.update("INSERT INTO idempotency_test_effect VALUES (?, ?, ?)", request.id(), request.name(), userId);
+            if (failNext.getAndSet(false)) {
+                throw new IllegalStateException("Failure after database write.");
+            }
+            return new PlainResponse(request.id(), request.name(), Instant.now(),
+                    failSerializationNext.getAndSet(false) ? new BrokenResponse() : "ok");
+        }
+
+        @DeleteMapping("/plain/{id}")
+        @ResponseStatus(HttpStatus.NO_CONTENT)
+        @Idempotent("test.plain.delete")
+        void plainRemove(@PathVariable UUID id) {
+            calls.incrementAndGet();
+            jdbc.update("DELETE FROM idempotency_test_effect WHERE id = ?", id);
+        }
+
+        @PostMapping("/unsupported/callable")
+        @Idempotent("test.unsupported.callable")
+        java.util.concurrent.Callable<PlainResponse> callable() {
+            calls.incrementAndGet();
+            return null;
+        }
+
+        @PostMapping("/unsupported/deferred")
+        @Idempotent("test.unsupported.deferred")
+        org.springframework.web.context.request.async.DeferredResult<PlainResponse> deferred() {
+            calls.incrementAndGet();
+            return null;
+        }
+
+        @PostMapping("/unsupported/web-async")
+        @Idempotent("test.unsupported.web-async")
+        org.springframework.web.context.request.async.WebAsyncTask<PlainResponse> webAsync() {
+            calls.incrementAndGet();
+            return null;
+        }
+
+        @PostMapping("/unsupported/streaming")
+        @Idempotent("test.unsupported.streaming")
+        org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody streaming() {
+            calls.incrementAndGet();
+            return null;
         }
     }
 
