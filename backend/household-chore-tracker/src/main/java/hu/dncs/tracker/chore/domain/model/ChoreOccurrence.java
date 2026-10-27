@@ -43,9 +43,15 @@ public class ChoreOccurrence {
     @Column(name = "occurrence_status", nullable = false, length = 30)
     private ChoreOccurrenceStatus occurrenceStatus;
 
+    @Column(name = "updated_by_household_member_id", nullable = false)
+    private UUID updatedByHouseholdMemberId;
+
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
+    @Column(name = "created_by_household_member_id", nullable = false, updatable = false)
+    private UUID createdByHouseholdMemberId;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -57,7 +63,8 @@ public class ChoreOccurrence {
 
     protected ChoreOccurrence() {}
 
-    public ChoreOccurrence(UUID choreOccurrenceId, Chore chore, Instant scheduledAt, Instant dueAt) {
+    public ChoreOccurrence(UUID choreOccurrenceId, Chore chore, Instant scheduledAt, Instant dueAt,
+                           UUID createdByHouseholdMemberId) {
         this.choreOccurrenceId = choreOccurrenceId;
         this.choreId = chore.getChoreId();
         this.title = chore.getTitle();
@@ -67,5 +74,7 @@ public class ChoreOccurrence {
         this.scheduledAt = scheduledAt;
         this.dueAt = dueAt;
         this.occurrenceStatus = ChoreOccurrenceStatus.PENDING;
+        this.createdByHouseholdMemberId = Objects.requireNonNull(createdByHouseholdMemberId);
+        this.updatedByHouseholdMemberId = createdByHouseholdMemberId;
     }
 }

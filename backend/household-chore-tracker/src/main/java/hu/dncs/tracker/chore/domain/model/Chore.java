@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.Objects;
 
 @Entity
 @Table(name = "chore")
@@ -42,15 +43,15 @@ public class Chore {
     @Column(name = "household_member_id", nullable = false)
     private Set<UUID> assignedMemberIds = new HashSet<>();
 
-    @Column(name = "created_by_household_member_id", nullable = false)
-    private UUID createdByHouseholdMemberId;
-
     @Column(name = "updated_by_household_member_id", nullable = false)
     private UUID updatedByHouseholdMemberId;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
+    @Column(name = "created_by_household_member_id", nullable = false, updatable = false)
+    private UUID createdByHouseholdMemberId;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -64,12 +65,15 @@ public class Chore {
     }
 
     public Chore(UUID choreId, UUID householdId, String title, String description,
-                 UUID createdByUserId, Collection<UUID> assignedMemberIds, int requiredApprovalCount) {
+                 UUID createdByUserId, UUID createdByHouseholdMemberId,
+                 Collection<UUID> assignedMemberIds, int requiredApprovalCount) {
         this.choreId = choreId;
         this.householdId = householdId;
         this.title = title;
         this.description = description;
         this.createdByUserId = createdByUserId;
+        this.createdByHouseholdMemberId = Objects.requireNonNull(createdByHouseholdMemberId);
+        this.updatedByHouseholdMemberId = createdByHouseholdMemberId;
         this.assignedMemberIds.addAll(assignedMemberIds);
         this.requiredApprovalCount = requiredApprovalCount;
     }

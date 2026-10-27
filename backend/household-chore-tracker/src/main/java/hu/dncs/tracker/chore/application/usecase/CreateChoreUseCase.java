@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DateTimeException;
@@ -37,6 +38,9 @@ public class CreateChoreUseCase {
     @Transactional
     public CreatedChore execute(CreateChoreCommand command, UUID authenticatedUserId) {
         householdAuthorizationService.requirePermission(command.householdId(), authenticatedUserId, HouseholdPermission.CHORE_CREATE);
+        var actor = householdMemberRepository.findByHousehold_HouseholdIdAndUserId(command.householdId(), authenticatedUserId)
+                .orElseThrow(() -> new AccessDeniedException("Household membership is required."));
+        var actorMemberId = actor.getHouseholdMemberId();
         validate(command);
         if (choreRepository.existsById(command.choreId())
                 || (command.choreScheduleId() != null && choreScheduleRepository.existsById(command.choreScheduleId()))
@@ -48,24 +52,25 @@ public class CreateChoreUseCase {
             var chore = choreRepository.saveAndFlush(new Chore(command.choreId(), command.householdId(),
                     ChoreConstraints.trimmedText(command.title()), description.isEmpty()
                     ? null
-                    : description, authenticatedUserId,
+                    : description, authenticatedUserId, actorMemberId,
                     command.assignedMemberIds(), command.requiredApprovalCount()));
             ChoreSchedule schedule = null;
             if (command.pattern() != ChoreCreationPattern.ONCE) {
                 schedule = choreScheduleRepository.saveAndFlush(new ChoreSchedule(command.choreScheduleId(), chore.getChoreId(),
                         command.pattern().scheduleType(), command.recurrenceUnit(),
-                        command.recurrenceInterval(), command.scheduledAt(), command.timeZoneIdentifier()));
+                        command.recurrenceInterval(), command.scheduledAt(), command.timeZoneIdentifier(), actorMemberId));
             }
             ChoreOccurrence occurrence = null;
             if (command.pattern() != ChoreCreationPattern.ON_DEMAND) {
                 occurrence = choreOccurrenceRepository.saveAndFlush(new ChoreOccurrence(command.choreOccurrenceId(), chore,
-                        command.scheduledAt(), command.dueAt()));
+                        command.scheduledAt(), command.dueAt(), actorMemberId));
             }
             return new CreatedChore(chore, schedule, occurrence);
         } catch (DataIntegrityViolationException exception) {
             for (Throwable cause = exception; cause != null; cause = cause.getCause()) {
                 if (cause instanceof ConstraintViolationException violation
-                        && Set.of("chore_pkey", "chore_schedule_pkey", "chore_occurrence_pkey")
+                        && Set.of("chore_pkey", "chore_schedule_pkey", "chore_occurrence_pkey",
+                                  "pk_chore", "pk_chore_schedule", "pk_chore_occurrence")
                         .contains(violation.getConstraintName())) {
                     throw new ChoreCreationConflictException();
                 }
