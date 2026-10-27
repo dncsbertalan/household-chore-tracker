@@ -4,9 +4,12 @@ import hu.dncs.tracker.household.domain.model.HouseholdMember;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import java.util.List;
 import java.util.UUID;
 
 public interface HouseholdMemberRepository extends JpaRepository<HouseholdMember, UUID> {
+    List<HouseholdMember> findAllByHousehold_HouseholdId(UUID householdId);
+
     @Query("""
             select count(member) > 0
             from HouseholdMember member
