@@ -8,26 +8,32 @@ struct HouseholdAuthorizationService {
         in household: LocalHousehold,
         userId: UUID
     ) -> Bool {
-        household.deletedAt == nil
-            && household.householdMembers.contains { member in
-                member.userId == userId
-                    && member.deletedAt == nil
-                    && member.household.householdId == household.householdId
-                    && member.role.deletedAt == nil
-                    && member.role.household.householdId
-                        == household.householdId
-                    && member.role.permissions.contains(permission)
-            }
+        authorizedMember(permission, in: household, userId: userId) != nil
     }
 
     /// Use the current session's user ID and check again immediately before saving a protected operation.
+    @discardableResult
     func requirePermission(
         _ permission: HouseholdPermission,
         in household: LocalHousehold,
         userId: UUID
-    ) throws {
-        guard hasPermission(permission, in: household, userId: userId) else {
+    ) throws -> LocalHouseholdMember {
+        guard let member = authorizedMember(permission, in: household, userId: userId) else {
             throw HouseholdAuthorizationError.permissionDenied(permission)
+        }
+        return member
+    }
+
+    private func authorizedMember(
+        _ permission: HouseholdPermission, in household: LocalHousehold, userId: UUID
+    ) -> LocalHouseholdMember? {
+        guard household.deletedAt == nil else { return nil }
+        return household.householdMembers.first { member in
+            member.userId == userId && member.deletedAt == nil
+                && member.household.householdId == household.householdId
+                && member.role.deletedAt == nil
+                && member.role.household.householdId == household.householdId
+                && member.role.permissions.contains(permission)
         }
     }
 }
