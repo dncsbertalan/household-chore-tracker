@@ -40,7 +40,11 @@ struct TrackerApp: App {
                 queue: OutboxQueue(container: container.modelContainer),
                 dispatcher: OutboxDispatcher(handlers: [
                     CreateHouseholdOutboxHandler(client: authenticatedClient),
-                    CreateChoreOutboxHandler(client: authenticatedClient)
+                    CreateChoreOutboxHandler(client: authenticatedClient),
+                    HouseholdInvitationOutboxHandler(action: .create, client: authenticatedClient),
+                    HouseholdInvitationOutboxHandler(action: .accept, client: authenticatedClient),
+                    HouseholdInvitationOutboxHandler(action: .decline, client: authenticatedClient),
+                    HouseholdInvitationOutboxHandler(action: .revoke, client: authenticatedClient)
                 ]),
                 currentUserService: userService
             )

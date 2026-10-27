@@ -1330,6 +1330,34 @@
         }
       }
     },
+    "invitation.error.email" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Enter a valid email address." } },
+        "hu" : { "stringUnit" : { "state" : "translated", "value" : "Adj meg egy érvényes e-mail-címet." } }
+      }
+    },
+    "invitation.error.role" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "Select an available role in this household." } },
+        "hu" : { "stringUnit" : { "state" : "translated", "value" : "Válassz egy elérhető szerepkört ebben a háztartásban." } }
+      }
+    },
+    "invitation.error.notPending" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "This invitation has expired or is no longer pending." } },
+        "hu" : { "stringUnit" : { "state" : "translated", "value" : "Ez a meghívás lejárt, vagy már nem vár válaszra." } }
+      }
+    },
+    "invitation.error.alreadyQueued" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : { "stringUnit" : { "state" : "translated", "value" : "An action for this invitation is already queued. Wait for it to finish." } },
+        "hu" : { "stringUnit" : { "state" : "translated", "value" : "Ehhez a meghíváshoz már várakozik egy művelet. Várd meg, amíg befejeződik." } }
+      }
+    },
     "household.error.currentUser" : {
       "extractionState" : "manual",
       "localizations" : {
