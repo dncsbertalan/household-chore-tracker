@@ -15,7 +15,7 @@ nonisolated struct ChoreCreation {
     let assignedMemberIds: [UUID]
     let requiredApprovalCount: Int
 
-    // Frontend limits until a backend chore contract is introduced.
+    // Match the backend chore creation contract (UTF-16 code units).
     static let titleMaxLength = 100
     static let descriptionMaxLength = 500
 
@@ -28,10 +28,9 @@ nonisolated struct ChoreCreation {
     }
 
     var hasValidSchedule: Bool {
-        guard TimeZone(identifier: timeZoneIdentifier) != nil else { return false }
-        if pattern == .fixed || pattern == .afterCompletion {
-            guard recurrenceInterval > 0 else { return false }
-        }
+        guard timeZoneIdentifier.utf16.count <= 100,
+              TimeZone(identifier: timeZoneIdentifier) != nil,
+              recurrenceInterval > 0 else { return false }
         if pattern == .fixed && scheduledAt == nil { return false }
         if pattern == .onDemand && (scheduledAt != nil || dueAt != nil) { return false }
         if let scheduledAt, let dueAt, dueAt < scheduledAt { return false }

@@ -66,11 +66,16 @@ struct LocalChoreRepository: ChoreRepositoryProtocol {
         }
 
         do {
+            let request = CreateChoreRequest(creation: creation, chore: chore)
+            try OutboxStore.enqueue(OutboxOperation(
+                accountId: creation.createdByUserId, entityType: .chore,
+                entityId: chore.choreId, action: .create, payload: request
+            ), in: context)
             try context.save()
         } catch {
             context.rollback()
             throw error
         }
-        // Chore API/outbox delivery is not available yet; these records remain pending locally.
+        NotificationCenter.default.post(name: .outboxDidEnqueue, object: nil)
     }
 }

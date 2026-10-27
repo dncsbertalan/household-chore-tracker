@@ -1,10 +1,14 @@
 import Foundation
 
-nonisolated enum ChoreCreationPattern: String, CaseIterable, Identifiable, Sendable {
-    case once
-    case fixed
-    case afterCompletion
-    case onDemand
+nonisolated enum ChoreCreationPattern: String, Codable, CaseIterable, Identifiable, Sendable {
+    case once = "ONCE"
+    case fixed = "FIXED"
+    case afterCompletion = "AFTER_COMPLETION"
+    case onDemand = "ON_DEMAND"
+
+    init(from decoder: any Decoder) throws {
+        self = try ChoreEnumCoding.decode(Self.self, from: decoder)
+    }
 
     var id: String { rawValue }
 

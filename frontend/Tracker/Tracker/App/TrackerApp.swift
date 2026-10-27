@@ -39,7 +39,8 @@ struct TrackerApp: App {
             syncEngine = SyncEngine(
                 queue: OutboxQueue(container: container.modelContainer),
                 dispatcher: OutboxDispatcher(handlers: [
-                    CreateHouseholdOutboxHandler(client: authenticatedClient)
+                    CreateHouseholdOutboxHandler(client: authenticatedClient),
+                    CreateChoreOutboxHandler(client: authenticatedClient)
                 ]),
                 currentUserService: userService
             )

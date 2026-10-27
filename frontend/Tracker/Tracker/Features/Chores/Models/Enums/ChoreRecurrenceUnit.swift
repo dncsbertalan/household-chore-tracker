@@ -1,11 +1,15 @@
 import Foundation
 
 nonisolated enum ChoreRecurrenceUnit: String, Codable, CaseIterable, Sendable {
-    case hour
-    case day
-    case week
-    case month
-    case year
+    case hour = "HOUR"
+    case day = "DAY"
+    case week = "WEEK"
+    case month = "MONTH"
+    case year = "YEAR"
+
+    init(from decoder: any Decoder) throws {
+        self = try ChoreEnumCoding.decode(Self.self, from: decoder)
+    }
 
     var title: String {
         switch self {
