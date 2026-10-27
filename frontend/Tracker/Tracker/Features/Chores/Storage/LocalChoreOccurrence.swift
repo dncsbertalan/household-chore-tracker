@@ -10,6 +10,9 @@ final class LocalChoreOccurrence: SyncableEntity {
     var assignedMemberIds: [UUID]
     var requiredApprovalCount: Int
     var createdAt: Date
+    var createdByHouseholdMemberId: UUID?
+    var updatedByHouseholdMemberId: UUID?
+    var updatedAt: Date?
     var scheduledAt: Date?
     var dueAt: Date?
     var occurrenceStatus: ChoreOccurrenceStatus
@@ -35,6 +38,9 @@ final class LocalChoreOccurrence: SyncableEntity {
         self.assignedMemberIds = chore.assignedMemberIds
         self.requiredApprovalCount = chore.requiredApprovalCount
         self.createdAt = createdAt
+        self.createdByHouseholdMemberId = chore.createdByHouseholdMemberId
+        self.updatedByHouseholdMemberId = chore.createdByHouseholdMemberId
+        self.updatedAt = createdAt
         self.scheduledAt = scheduledAt
         self.dueAt = dueAt
         self.occurrenceStatus = occurrenceStatus

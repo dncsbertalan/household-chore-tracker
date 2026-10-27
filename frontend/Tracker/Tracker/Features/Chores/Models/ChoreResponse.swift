@@ -12,6 +12,10 @@ nonisolated struct ChoreResponse: Codable, Sendable {
     let requiredApprovalCount: Int
     let schedule: Schedule?
     let occurrence: Occurrence?
+    // Optional while older idempotency receipts still omit audit fields.
+    let createdByHouseholdMemberId: UUID?
+    let updatedByHouseholdMemberId: UUID?
+    let updatedAt: String?
 
     struct Schedule: Codable, Sendable {
         let choreScheduleId: UUID
@@ -21,6 +25,10 @@ nonisolated struct ChoreResponse: Codable, Sendable {
         let startsAt: String?
         let timeZoneIdentifier: String
         let version: Int64
+        let createdByHouseholdMemberId: UUID?
+        let updatedByHouseholdMemberId: UUID?
+        let createdAt: String?
+        let updatedAt: String?
     }
 
     struct Occurrence: Codable, Sendable {
@@ -34,5 +42,8 @@ nonisolated struct ChoreResponse: Codable, Sendable {
         let dueAt: String?
         let occurrenceStatus: ChoreOccurrenceStatus
         let version: Int64
+        let createdByHouseholdMemberId: UUID?
+        let updatedByHouseholdMemberId: UUID?
+        let updatedAt: String?
     }
 }

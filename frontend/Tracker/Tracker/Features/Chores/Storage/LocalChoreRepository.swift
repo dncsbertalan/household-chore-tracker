@@ -18,7 +18,7 @@ struct LocalChoreRepository: ChoreRepositoryProtocol {
             predicate: #Predicate { $0.householdId == householdId && $0.deletedAt == nil }
         )).first else { throw LocalChoreRepositoryError.householdUnavailable }
 
-        try authorization.requirePermission(.choreCreate, in: household, userId: creation.createdByUserId)
+        let creator = try authorization.requirePermission(.choreCreate, in: household, userId: creation.createdByUserId)
 
         let members = household.householdMembers.filter { $0.deletedAt == nil }
         let memberIds = Set(members.map(\.householdMemberId))
@@ -40,7 +40,8 @@ struct LocalChoreRepository: ChoreRepositoryProtocol {
             choreDescription: creation.normalizedDescription.isEmpty ? nil : creation.normalizedDescription,
             createdByUserId: creation.createdByUserId, household: household,
             assignedMemberIds: creation.assignedMemberIds,
-            requiredApprovalCount: creation.requiredApprovalCount
+            requiredApprovalCount: creation.requiredApprovalCount,
+            createdByHouseholdMemberId: creator.householdMemberId
         )
         context.insert(chore)
 

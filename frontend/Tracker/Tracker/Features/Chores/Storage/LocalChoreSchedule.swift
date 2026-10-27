@@ -16,6 +16,10 @@ final class LocalChoreSchedule: SyncableEntity {
     var startsAt: Date?
     var endsAt: Date?
     var timeZoneIdentifier: String
+    var createdByHouseholdMemberId: UUID?
+    var updatedByHouseholdMemberId: UUID?
+    var createdAt: Date?
+    var updatedAt: Date?
 
     var chore: LocalChore
 
@@ -41,5 +45,9 @@ final class LocalChoreSchedule: SyncableEntity {
         self.startsAt = startsAt
         self.endsAt = endsAt
         self.timeZoneIdentifier = timeZoneIdentifier
+        self.createdByHouseholdMemberId = chore.createdByHouseholdMemberId
+        self.updatedByHouseholdMemberId = chore.createdByHouseholdMemberId
+        self.createdAt = .now
+        self.updatedAt = createdAt
     }
 }

@@ -8,6 +8,9 @@ final class LocalChore: SyncableEntity {
     var choreDescription: String?
     var createdByUserId: UUID
     var createdAt: Date
+    var createdByHouseholdMemberId: UUID?
+    var updatedByHouseholdMemberId: UUID?
+    var updatedAt: Date?
 
     /// Household-member IDs, not user IDs. These are defaults for new occurrences.
     var assignedMemberIds: [UUID]
@@ -29,12 +32,16 @@ final class LocalChore: SyncableEntity {
 
     init(choreId: UUID = UUID(), title: String, choreDescription: String? = nil,
          createdByUserId: UUID, createdAt: Date = .now, household: LocalHousehold,
-         assignedMemberIds: [UUID] = [], requiredApprovalCount: Int = 0) {
+         assignedMemberIds: [UUID] = [], requiredApprovalCount: Int = 0,
+         createdByHouseholdMemberId: UUID? = nil) {
         self.choreId = choreId
         self.title = title
         self.choreDescription = choreDescription
         self.createdByUserId = createdByUserId
         self.createdAt = createdAt
+        self.createdByHouseholdMemberId = createdByHouseholdMemberId
+        self.updatedByHouseholdMemberId = createdByHouseholdMemberId
+        self.updatedAt = createdAt
         self.household = household
         self.assignedMemberIds = assignedMemberIds
         self.requiredApprovalCount = requiredApprovalCount

@@ -18,6 +18,7 @@ struct CreateChoreOutboxHandler: OutboxHandlerProtocol {
         guard response.choreId == request.choreId,
               response.householdId == request.householdId,
               response.createdByUserId == operation.accountId,
+              response.updatedByHouseholdMemberId == response.createdByHouseholdMemberId,
               response.version >= 0,
               response.title == request.title,
               response.description == request.description,
@@ -34,6 +35,8 @@ struct CreateChoreOutboxHandler: OutboxHandlerProtocol {
                   schedule.recurrenceInterval == request.recurrenceInterval,
                   try sameInstant(schedule.startsAt, request.scheduledAt),
                   schedule.timeZoneIdentifier == request.timeZoneIdentifier,
+                  schedule.createdByHouseholdMemberId == response.createdByHouseholdMemberId,
+                  schedule.updatedByHouseholdMemberId == response.createdByHouseholdMemberId,
                   schedule.version >= 0 else { throw OutboxError.invalidResponse }
         }
         if let occurrence = response.occurrence {
@@ -44,10 +47,16 @@ struct CreateChoreOutboxHandler: OutboxHandlerProtocol {
                   try sameInstant(occurrence.scheduledAt, request.scheduledAt),
                   try sameInstant(occurrence.dueAt, request.dueAt),
                   occurrence.occurrenceStatus == .pending,
+                  occurrence.createdByHouseholdMemberId == response.createdByHouseholdMemberId,
+                  occurrence.updatedByHouseholdMemberId == response.createdByHouseholdMemberId,
                   occurrence.version >= 0 else { throw OutboxError.invalidResponse }
         }
         // Validate timestamps before allowing acknowledgement to change local records.
         _ = try ChoreTimestamp.decode(response.createdAt)
+        _ = try response.updatedAt.map(ChoreTimestamp.decode)
+        _ = try response.schedule?.createdAt.map(ChoreTimestamp.decode)
+        _ = try response.schedule?.updatedAt.map(ChoreTimestamp.decode)
+        _ = try response.occurrence?.updatedAt.map(ChoreTimestamp.decode)
         if let schedule = response.schedule, let startsAt = schedule.startsAt {
             _ = try ChoreTimestamp.decode(startsAt)
         }
