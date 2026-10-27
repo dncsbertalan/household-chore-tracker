@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,5 +18,17 @@ class UserLookupImpl implements UserLookup {
     @Transactional(readOnly = true)
     public boolean userExists(UUID userId) {
         return userRepository.existsById(userId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<String> findEmailByUserId(UUID userId) {
+        return userRepository.findById(userId).map(user -> user.getEmail());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<UUID> findUserIdByEmail(String normalizedEmail) {
+        return userRepository.findByEmail(normalizedEmail).map(user -> user.getId());
     }
 }

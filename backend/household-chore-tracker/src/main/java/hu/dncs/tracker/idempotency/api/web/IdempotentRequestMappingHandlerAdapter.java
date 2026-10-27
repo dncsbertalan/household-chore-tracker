@@ -121,12 +121,13 @@ final class IdempotentRequestMappingHandlerAdapter extends RequestMappingHandler
 
     private void checkContract(HttpServletRequest request, HandlerMethod handler, Idempotent annotation) {
         var responseType = ResolvableType.forMethodReturnType(handler.getMethod());
-        var bodyType = responseType.getGeneric(0).resolve();
+        var bodyType = ResponseEntity.class.isAssignableFrom(responseType.toClass())
+                ? responseType.getGeneric(0).resolve() : responseType.resolve();
         if (annotation.value().isBlank() || annotation.value().length() > 100
                 || !MUTATIONS.contains(request.getMethod())
-                || responseType.resolve() != ResponseEntity.class || bodyType == null
+                || bodyType == null
                 || bodyType == Object.class || isStreamingType(bodyType)) {
-            throw new IllegalStateException("@Idempotent requires a named mutation returning ResponseEntity<DTO> or ResponseEntity<Void>.");
+            throw new IllegalStateException("@Idempotent requires a named mutation returning a concrete DTO, void, or ResponseEntity.");
         }
         for (var parameter : handler.getMethod().getParameterTypes()) {
             if (ServletResponse.class.isAssignableFrom(parameter) || java.io.OutputStream.class.isAssignableFrom(parameter)
@@ -140,6 +141,9 @@ final class IdempotentRequestMappingHandlerAdapter extends RequestMappingHandler
         return org.springframework.core.io.Resource.class.isAssignableFrom(type)
                 || org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody.class.isAssignableFrom(type)
                 || org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter.class.isAssignableFrom(type)
+                || java.util.concurrent.Callable.class.isAssignableFrom(type)
+                || org.springframework.web.context.request.async.DeferredResult.class.isAssignableFrom(type)
+                || org.springframework.web.context.request.async.WebAsyncTask.class.isAssignableFrom(type)
                 || java.io.InputStream.class.isAssignableFrom(type)
                 || java.util.concurrent.Future.class.isAssignableFrom(type)
                 || java.util.concurrent.CompletionStage.class.isAssignableFrom(type);
