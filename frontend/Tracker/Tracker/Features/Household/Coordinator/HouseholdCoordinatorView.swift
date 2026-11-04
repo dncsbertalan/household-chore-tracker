@@ -26,6 +26,10 @@ struct HouseholdCoordinatorView: View {
                 if let userId = model.userId {
                     CreateChoreView(householdId: householdId, userId: userId)
                 }
+            case .sendInvitation(let householdId):
+                if let userId = model.userId {
+                    SendHouseholdInvitationView(householdId: householdId, userId: userId)
+                }
             }
         }
         .environment(router)

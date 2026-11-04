@@ -5,6 +5,7 @@ struct HouseholdListView: View {
     let currentUserService: (any CurrentUserServiceProtocol)?
     let model: CurrentUserViewModel
     @Environment(HouseholdRouter.self) private var router
+    @Environment(\.syncEngine) private var syncEngine
     @Query private var households: [LocalHousehold]
 
     init(currentUserService: (any CurrentUserServiceProtocol)? = nil, model: CurrentUserViewModel) {
@@ -13,7 +14,9 @@ struct HouseholdListView: View {
 
         if let userId = model.userId {
             _households = Query(filter: #Predicate<LocalHousehold> {
-                $0.createdByUserId == userId && $0.deletedAt == nil
+                $0.deletedAt == nil && $0.householdMembers.contains { member in
+                    member.userId == userId && member.deletedAt == nil && member.role.deletedAt == nil
+                }
             })
         } else {
             _households = Query(filter: #Predicate<LocalHousehold> { _ in false })
@@ -51,13 +54,17 @@ struct HouseholdListView: View {
             }
         }
         .task { await model.loadUser(service: currentUserService) }
+        .refreshable { await syncEngine?.refresh() }
     }
 
     @ViewBuilder
     private var householdList: some View {
         if households.isEmpty {
-            ContentUnavailableView("household.empty", systemImage: "house",
-                                   description: Text("household.emptyHelp"))
+            List {
+                ContentUnavailableView("household.empty", systemImage: "house",
+                                       description: Text("household.emptyHelp"))
+                    .listRowBackground(Color.clear)
+            }
         } else {
             List(households) { household in
                 NavigationLink(value: HouseholdRoute.detail(householdId: household.householdId)) {

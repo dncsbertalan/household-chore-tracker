@@ -11,7 +11,10 @@ struct HouseholdDetailView: View {
         self.userId = userId
         // Resolve stable route IDs against the current account's live local data.
         _households = Query(filter: #Predicate<LocalHousehold> {
-            $0.householdId == householdId && $0.createdByUserId == userId && $0.deletedAt == nil
+            $0.householdId == householdId && $0.deletedAt == nil
+                && $0.householdMembers.contains { member in
+                    member.userId == userId && member.deletedAt == nil && member.role.deletedAt == nil
+                }
         })
     }
 
@@ -26,8 +29,23 @@ struct HouseholdDetailView: View {
                         }
                     }
                     Section("household.roles") {
-                        ForEach(household.householdRoles.filter { $0.deletedAt == nil }, id: \.householdRoleId) { role in
+                        ForEach(household.householdRoles.filter { role in
+                            role.deletedAt == nil && (authorization.hasPermission(.roleView, in: household, userId: userId)
+                                || authorization.hasPermission(.memberInvite, in: household, userId: userId)
+                                || household.householdMembers.contains { $0.userId == userId && $0.deletedAt == nil
+                                    && $0.role.householdRoleId == role.householdRoleId })
+                        }, id: \.householdRoleId) { role in
                             Text(role.name)
+                        }
+                    }
+                    if authorization.hasPermission(.memberInvite, in: household, userId: userId) {
+                        Section {
+                            Button {
+                                router.sheet = .sendInvitation(householdId: household.householdId)
+                            } label: {
+                                Label("invitation.send.title", systemImage: "person.badge.plus")
+                            }
+                            .accessibilityIdentifier("inviteHouseholdMember")
                         }
                     }
                     if !household.chores.filter({ $0.deletedAt == nil }).isEmpty {
@@ -63,5 +81,6 @@ struct HouseholdDetailView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .refreshable { await syncEngine?.refresh() }
     }
 }
