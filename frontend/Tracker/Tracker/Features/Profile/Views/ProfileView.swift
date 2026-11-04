@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ProfileView: View {
     let isAuthenticated: Bool
+    let isOnline: Bool
     let isLoggingOut: Bool
     let canLogOut: Bool
     let onLogout: () -> Void
@@ -12,11 +13,13 @@ struct ProfileView: View {
     init(
         service: any CurrentUserServiceProtocol,
         isAuthenticated: Bool,
+        isOnline: Bool,
         isLoggingOut: Bool,
         canLogOut: Bool,
         onLogout: @escaping () -> Void
     ) {
         self.isAuthenticated = isAuthenticated
+        self.isOnline = isOnline
         self.isLoggingOut = isLoggingOut
         self.canLogOut = canLogOut
         self.onLogout = onLogout
@@ -26,6 +29,8 @@ struct ProfileView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 32) {
+                connectionStatus
+
                 if !isAuthenticated {
                     ContentUnavailableView(
                         "profile.title", systemImage: "person.crop.circle",
@@ -108,6 +113,20 @@ struct ProfileView: View {
         }
     }
 
+    private var connectionStatus: some View {
+        let color: Color = isOnline ? .green : .red
+        let title: LocalizedStringKey = isOnline
+            ? "profile.connection.connected" : "profile.connection.notConnected"
+
+        return Label(title, systemImage: isOnline ? "wifi" : "wifi.slash")
+            .font(.caption.weight(.semibold))
+            .foregroundStyle(color)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(color.opacity(0.12), in: Capsule())
+            .accessibilityIdentifier("profile.connectionStatus")
+    }
+
     private func profileHeader(for user: CurrentUser) -> some View {
         var name = PersonNameComponents()
         name.givenName = user.firstName
@@ -146,10 +165,22 @@ struct ProfileView: View {
 }
 
 #if DEBUG
-#Preview {
+#Preview("Connected") {
     NavigationStack {
         ProfileView(
             service: CurrentUserPreviewService(), isAuthenticated: true,
+            isOnline: true,
+            isLoggingOut: false, canLogOut: true, onLogout: {}
+        )
+        .navigationTitle("profile.title")
+    }
+}
+
+#Preview("Not connected") {
+    NavigationStack {
+        ProfileView(
+            service: CurrentUserPreviewService(), isAuthenticated: true,
+            isOnline: false,
             isLoggingOut: false, canLogOut: true, onLogout: {}
         )
         .navigationTitle("profile.title")

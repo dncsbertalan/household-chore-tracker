@@ -1,39 +1,46 @@
 import SwiftUI
-import SwiftData
 
 struct HouseholdDetailView: View {
     let userId: UUID
+    let invitationRepository: HouseholdInvitationRepository?
     private let authorization = HouseholdAuthorizationService()
     @Environment(HouseholdRouter.self) private var router
-    @Query private var households: [LocalHousehold]
+    let householdId: UUID
+    @Environment(HouseholdStore.self) private var store
+    @State private var isLoading = false
+    @State private var errorMessage: String?
+    private var householdChores: [ChoreResponse] { store.chores.filter { $0.householdId == householdId } }
 
-    init(householdId: UUID, userId: UUID) {
+
+    init(householdId: UUID, userId: UUID, invitationRepository: HouseholdInvitationRepository? = nil) {
         self.userId = userId
-        // Resolve stable route IDs against the current account's live local data.
-        _households = Query(filter: #Predicate<LocalHousehold> {
-            $0.householdId == householdId && $0.deletedAt == nil
-                && $0.householdMembers.contains { member in
-                    member.userId == userId && member.deletedAt == nil && member.role.deletedAt == nil
-                }
-        })
+        self.invitationRepository = invitationRepository
+        self.householdId = householdId
     }
 
     var body: some View {
         Group {
-            if let household = households.first {
+            if isLoading {
+                ProgressView()
+            } else if let errorMessage {
+                ContentUnavailableView {
+                    Label("household.details", systemImage: "house")
+                } description: { Text(errorMessage) } actions: {
+                    Button("household.retry") { Task { await refresh() } }
+                }
+            } else if let household = store.household(id: householdId) {
                 List {
                     Section("household.details") {
                         LabeledContent("household.name", value: household.name)
-                        if let description = household.householdDescription, !description.isEmpty {
+                        if let description = household.description, !description.isEmpty {
                             Text(description)
                         }
                     }
                     Section("household.roles") {
-                        ForEach(household.householdRoles.filter { role in
-                            role.deletedAt == nil && (authorization.hasPermission(.roleView, in: household, userId: userId)
+                        ForEach(household.roles.filter { role in
+                            authorization.hasPermission(.roleView, in: household, userId: userId)
                                 || authorization.hasPermission(.memberInvite, in: household, userId: userId)
-                                || household.householdMembers.contains { $0.userId == userId && $0.deletedAt == nil
-                                    && $0.role.householdRoleId == role.householdRoleId })
+                                || household.members.contains { $0.userId == userId && $0.householdRole.householdRoleId == role.householdRoleId }
                         }, id: \.householdRoleId) { role in
                             Text(role.name)
                         }
@@ -45,15 +52,24 @@ struct HouseholdDetailView: View {
                             } label: {
                                 Label("invitation.send.title", systemImage: "person.badge.plus")
                             }
+                            .disabled(invitationRepository == nil)
                             .accessibilityIdentifier("inviteHouseholdMember")
+                            if let invitationRepository {
+                                NavigationLink {
+                                    HouseholdInvitationsView(accountId: userId, householdId: household.householdId,
+                                                             repository: invitationRepository)
+                                } label: {
+                                    Label("invitation.list.sent", systemImage: "envelope")
+                                }
+                            }
                         }
                     }
-                    if !household.chores.filter({ $0.deletedAt == nil }).isEmpty {
+                    if !householdChores.isEmpty {
                         Section("chores.title") {
-                            ForEach(household.chores.filter { $0.deletedAt == nil }, id: \.choreId) { chore in
+                            ForEach(householdChores, id: \.choreId) { chore in
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(chore.title).font(.headline)
-                                    if let description = chore.choreDescription {
+                                    if let description = chore.description {
                                         Text(description).foregroundStyle(.secondary)
                                     }
                                 }
@@ -81,6 +97,19 @@ struct HouseholdDetailView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
-        .refreshable { await syncEngine?.refresh() }
+        .task { await refresh() }
+        .refreshable { await refresh() }
+    }
+
+    private func refresh() async {
+        guard !isLoading else { return }
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+        do {
+            _ = try await store.household(id: householdId, accountId: userId)
+            _ = try await store.chores(accountId: userId, householdId: householdId)
+        } catch is CancellationError { }
+        catch { errorMessage = error.localizedDescription }
     }
 }

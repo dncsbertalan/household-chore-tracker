@@ -7,10 +7,6 @@ nonisolated enum ChoreRecurrenceUnit: String, Codable, CaseIterable, Sendable {
     case month = "MONTH"
     case year = "YEAR"
 
-    init(from decoder: any Decoder) throws {
-        self = try ChoreEnumCoding.decode(Self.self, from: decoder)
-    }
-
     var title: String {
         switch self {
         case .hour: AppLocalization.string("chores.recurrence.hour")

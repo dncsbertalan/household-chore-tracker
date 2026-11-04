@@ -120,7 +120,7 @@ public class HouseholdInvitationService {
         invitation.respond(ACCEPTED, now);
         householdInvitationRepository.flush();
 
-        // Include the complete role catalog so a newly joined household can be stored by the client.
+        // Return the role catalog used by the invitation workflow.
         return new JoinedHousehold(household,
                 householdRoleRepository.findAllByHouseholdIdOrderByCreatedAtAscHouseholdRoleIdAsc(household.getHouseholdId()), membership);
     }

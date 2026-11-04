@@ -1,5 +1,10 @@
 package hu.dncs.tracker.household.api.web;
 
+import hu.dncs.tracker.household.application.usecase.GetHouseholdsUseCase;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import java.util.List;
+
 import hu.dncs.tracker.household.api.web.request.CreateHouseholdRequest;
 import hu.dncs.tracker.household.api.web.response.HouseholdResponse;
 import hu.dncs.tracker.household.application.command.CreateHouseholdCommand;
@@ -23,6 +28,18 @@ import java.util.UUID;
 @RequiredArgsConstructor
 class HouseholdController {
     private final CreateHouseholdUseCase createHouseholdUseCase;
+
+    private final GetHouseholdsUseCase getHouseholds;
+
+    @GetMapping
+    List<HouseholdResponse> all(Authentication authentication) {
+        return getHouseholds.all(UUID.fromString(authentication.getName())).stream().map(HouseholdResponse::from).toList();
+    }
+
+    @GetMapping("/{id}")
+    HouseholdResponse one(@PathVariable UUID id, Authentication authentication) {
+        return HouseholdResponse.from(getHouseholds.one(id, UUID.fromString(authentication.getName())));
+    }
 
     @PostMapping
     @Idempotent("household.create")

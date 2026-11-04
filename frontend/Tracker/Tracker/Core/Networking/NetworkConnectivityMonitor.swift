@@ -19,7 +19,7 @@ final class NetworkConnectivityMonitor: ConnectivityMonitorProtocol {
                 update(connected)
             }
         }
-        monitor.start(queue: DispatchQueue(label: "Tracker.sync.connectivity"))
+        monitor.start(queue: DispatchQueue(label: "Tracker.network.status"))
     }
 
     func stop() {

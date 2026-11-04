@@ -1,6 +1,7 @@
 import Foundation
 
-nonisolated struct ChoreResponse: Codable, Sendable {
+nonisolated struct ChoreResponse: Codable, Sendable, Identifiable {
+    var id: UUID { choreId }
     let choreId: UUID
     let householdId: UUID
     let title: String
@@ -12,7 +13,7 @@ nonisolated struct ChoreResponse: Codable, Sendable {
     let requiredApprovalCount: Int
     let schedule: Schedule?
     let occurrence: Occurrence?
-    // Optional while older idempotency receipts still omit audit fields.
+    // Optional for compatibility with earlier API responses.
     let createdByHouseholdMemberId: UUID?
     let updatedByHouseholdMemberId: UUID?
     let updatedAt: String?

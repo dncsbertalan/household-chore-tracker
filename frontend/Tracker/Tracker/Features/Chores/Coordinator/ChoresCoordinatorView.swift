@@ -1,4 +1,3 @@
-import SwiftData
 import SwiftUI
 
 struct ChoresCoordinatorView: View {
@@ -43,6 +42,6 @@ struct ChoresCoordinatorView: View {
 #if DEBUG
 #Preview {
     ChoresCoordinatorView(currentUserService: CurrentUserPreviewService())
-        .modelContainer(for: AppSchema.models, inMemory: true)
+        .environment(HouseholdStore())
 }
 #endif

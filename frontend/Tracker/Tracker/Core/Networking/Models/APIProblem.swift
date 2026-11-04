@@ -8,4 +8,5 @@ nonisolated struct APIProblem: Decodable, Sendable {
     let detail: String?
     let instance: String?
     let errors: [FieldError]?
+    let code: String?
 }

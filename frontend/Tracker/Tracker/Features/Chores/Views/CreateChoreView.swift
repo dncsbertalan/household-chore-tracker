@@ -1,11 +1,11 @@
-import SwiftData
 import SwiftUI
 
 struct CreateChoreView: View {
     let userId: UUID
-    @Environment(\.modelContext) private var context
+    @Environment(HouseholdStore.self) private var store
     @Environment(\.dismiss) private var dismiss
-    @Query private var households: [LocalHousehold]
+    let householdId: UUID
+    private var household: HouseholdResponse? { store.household(id: householdId) }
     @State private var model: CreateChoreViewModel
     @State private var path: [Step] = []
     @FocusState private var isTitleFocused: Bool
@@ -17,15 +17,11 @@ struct CreateChoreView: View {
     init(householdId: UUID, userId: UUID) {
         self.userId = userId
         _model = State(initialValue: CreateChoreViewModel(householdId: householdId, userId: userId))
-        _households = Query(filter: #Predicate<LocalHousehold> {
-            $0.householdId == householdId && $0.createdByUserId == userId && $0.deletedAt == nil
-        })
+        self.householdId = householdId
     }
 
-    private var members: [LocalHouseholdMember] {
-        (households.first?.householdMembers ?? [])
-            .filter { $0.deletedAt == nil }
-            .sorted { $0.householdMemberId.uuidString < $1.householdMemberId.uuidString }
+    private var members: [HouseholdResponse.Member] {
+        (household?.members ?? []).sorted { $0.householdMemberId.uuidString < $1.householdMemberId.uuidString }
     }
 
     private var availableMemberIds: Set<UUID> { Set(members.map(\.householdMemberId)) }
@@ -40,6 +36,8 @@ struct CreateChoreView: View {
                     }
                 }
         }
+        .disabled(model.isSaving)
+        .interactiveDismissDisabled(model.isSaving)
         .onChange(of: availableMemberIds) { _, memberIds in
             model.selectedMemberIds.formIntersection(memberIds)
             model.requiredApprovalCount = min(model.requiredApprovalCount, max(1, memberIds.count))
@@ -49,7 +47,7 @@ struct CreateChoreView: View {
 
     private var detailsStep: some View {
         Group {
-            if households.first != nil {
+            if household != nil {
                 ScrollView {
                     VStack(spacing: 24) {
                         Image(systemName: "checklist")
@@ -109,7 +107,7 @@ struct CreateChoreView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             workflowToolbar(title: "household.continue",
-                            isEnabled: households.first != nil && model.canContinueWithDetails,
+                            isEnabled: household != nil && model.canContinueWithDetails,
                             action: continueToSchedule)
         }
     }
@@ -227,14 +225,16 @@ struct CreateChoreView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             workflowToolbar(title: "chores.create",
-                            isEnabled: households.first != nil && model.canCreate(availableMemberIds: availableMemberIds)) {
-                model.create(using: LocalChoreRepository(container: context.container))
-                if model.didSave { dismiss() }
+                            isEnabled: household != nil && model.canCreate(availableMemberIds: availableMemberIds)) {
+                Task {
+                    await model.create(using: store)
+                    if model.didSave { dismiss() }
+                }
             }
         }
     }
 
-    private func memberName(_ member: LocalHouseholdMember, index: Int) -> String {
+    private func memberName(_ member: HouseholdResponse.Member, index: Int) -> String {
         if let nickname = member.nickname?.trimmingCharacters(in: .whitespacesAndNewlines), !nickname.isEmpty {
             return nickname
         }
@@ -243,7 +243,7 @@ struct CreateChoreView: View {
     }
 
     private func continueToSchedule() {
-        guard households.first != nil, model.canContinueWithDetails else { return }
+        guard household != nil, model.canContinueWithDetails else { return }
         isTitleFocused = false
         path.append(.schedule)
     }
@@ -257,7 +257,9 @@ struct CreateChoreView: View {
             }
         }
         ToolbarItem(placement: .topBarTrailing) {
-            Button(action: action) { Text(title) }
+            Button(action: action) {
+                if model.isSaving { ProgressView() } else { Text(title) }
+            }
                 .buttonStyle(.borderedProminent)
                 .tint(.accentColor)
                 .disabled(!isEnabled)
@@ -267,19 +269,6 @@ struct CreateChoreView: View {
 
 #if DEBUG
 #Preview {
-    let container = try! ModelContainer(for: AppSchema.schema,
-                                       configurations: ModelConfiguration(isStoredInMemoryOnly: true))
-    let userId = UUID()
-    let household = LocalHousehold(householdId: UUID(), name: "Home", createdByUserId: userId,
-                                   localRevision: 1, status: .pending, householdRoles: [], householdMembers: [])
-    container.mainContext.insert(household)
-    let role = LocalHouseholdRole(householdRoleId: UUID(), name: "Owner", permissions: [.choreCreate],
-                                  household: household, isSystemRole: false, members: [])
-    container.mainContext.insert(role)
-    let member = LocalHouseholdMember(householdMemberId: UUID(), userId: userId,
-                                      household: household, role: role, localRevision: 1, status: .pending)
-    container.mainContext.insert(member)
-    return CreateChoreView(householdId: household.householdId, userId: userId)
-        .modelContainer(container)
+    CreateChoreView(householdId: UUID(), userId: UUID()).environment(HouseholdStore())
 }
 #endif

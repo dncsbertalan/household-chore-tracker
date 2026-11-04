@@ -1,11 +1,11 @@
 import SwiftUI
-import SwiftData
 
 struct RootView: View {
     let registrationService: (any RegistrationServiceProtocol)?
     let loginService: (any LoginServiceProtocol)?
     let currentUserService: (any CurrentUserServiceProtocol)?
     let logoutService: (any LogoutServiceProtocol)?
+    var invitationRepository: HouseholdInvitationRepository? = nil
     @AppStorage(AppLanguage.storageKey) private var language: AppLanguage = .system
     @State private var isShowingRegistration = false
     @State private var isShowingLogin = false
@@ -14,10 +14,11 @@ struct RootView: View {
     @State private var isShowingLogoutMessage = false
     
     @EnvironmentObject private var appState: AppState
+    @Environment(HouseholdStore.self) private var store
     
     var body: some View {
         TabView(selection: $appState.selectedTab) {
-            HouseholdCoordinatorView(currentUserService: currentUserService)
+            HouseholdCoordinatorView(currentUserService: currentUserService, invitationRepository: invitationRepository)
                 .id(appState.sessionRevision)
                 .tabItem { Label("household.tabName", systemImage: "house") }
                 .tag(AppState.Tab.household)
@@ -33,6 +34,7 @@ struct RootView: View {
                         ProfileView(
                             service: currentUserService,
                             isAuthenticated: appState.isAuthenticated,
+                            isOnline: appState.isOnline,
                             isLoggingOut: isLoggingOut,
                             canLogOut: logoutService != nil,
                             onLogout: logout
@@ -82,6 +84,8 @@ struct RootView: View {
         .sheet(isPresented: $isShowingLogin) {
             if let loginService {
                 LoginView(service: loginService) {
+                    store.clearSession()
+                    invitationRepository?.clearSession()
                     appState.isAuthenticated = true
                     appState.sessionRevision += 1
                 }
@@ -107,6 +111,9 @@ struct RootView: View {
             defer { isLoggingOut = false }
             do {
                 try await logoutService.logout()
+                invitationRepository?.clearSession()
+                store.clearSession()
+                appState.selectedHouseholdId = nil
                 appState.isAuthenticated = false
                 appState.sessionRevision += 1
                 isShowingLogin = false
@@ -126,7 +133,6 @@ struct RootView: View {
         currentUserService: CurrentUserPreviewService(), logoutService: LogoutPreviewService()
     )
     .environmentObject(AppState())
-    .modelContainer(for: AppSchema.models,
-                    inMemory: true)
+    .environment(HouseholdStore())
 }
 #endif

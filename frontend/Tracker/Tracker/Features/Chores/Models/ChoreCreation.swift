@@ -1,6 +1,9 @@
 import Foundation
 
-nonisolated struct ChoreCreation {
+nonisolated struct ChoreCreation: Equatable {
+    var requestId = UUID()
+    var scheduleId = UUID()
+    var occurrenceId = UUID()
     let choreId: UUID
     let householdId: UUID
     let createdByUserId: UUID

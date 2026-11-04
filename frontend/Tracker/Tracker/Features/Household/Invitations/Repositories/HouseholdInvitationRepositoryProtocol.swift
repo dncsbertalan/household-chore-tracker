@@ -2,9 +2,9 @@ import Foundation
 
 @MainActor
 protocol HouseholdInvitationRepositoryProtocol {
-    func invite(email: String, householdId: UUID, roleId: UUID, accountId: UUID) throws -> UUID
-    func accept(_ invitation: HouseholdInvitationResponse, accountId: UUID) throws -> UUID
-    func decline(_ invitation: HouseholdInvitationResponse, accountId: UUID) throws -> UUID
-    func revoke(_ invitation: HouseholdInvitationResponse, accountId: UUID) throws -> UUID
-    func pending(accountId: UUID) throws -> [PendingHouseholdInvitation]
+    func invite(email: String, householdId: UUID, roleId: UUID, accountId: UUID,
+                requestId: UUID) async throws -> HouseholdInvitationResponse
+    func accept(_ invitation: HouseholdInvitationResponse, accountId: UUID, requestId: UUID) async throws
+    func decline(_ invitation: HouseholdInvitationResponse, accountId: UUID, requestId: UUID) async throws
+    func revoke(_ invitation: HouseholdInvitationResponse, accountId: UUID, requestId: UUID) async throws
 }

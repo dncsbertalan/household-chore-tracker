@@ -6,10 +6,6 @@ nonisolated enum ChoreCreationPattern: String, Codable, CaseIterable, Identifiab
     case afterCompletion = "AFTER_COMPLETION"
     case onDemand = "ON_DEMAND"
 
-    init(from decoder: any Decoder) throws {
-        self = try ChoreEnumCoding.decode(Self.self, from: decoder)
-    }
-
     var id: String { rawValue }
 
     var title: String {

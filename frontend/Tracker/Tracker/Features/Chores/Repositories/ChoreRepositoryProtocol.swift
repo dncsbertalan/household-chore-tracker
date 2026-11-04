@@ -1,4 +1,7 @@
+import Foundation
+
 @MainActor
 protocol ChoreRepositoryProtocol {
-    func create(_ creation: ChoreCreation) throws
+    func chores(accountId: UUID, householdId: UUID?) async throws -> [ChoreResponse]
+    func create(_ creation: ChoreCreation) async throws -> ChoreResponse
 }

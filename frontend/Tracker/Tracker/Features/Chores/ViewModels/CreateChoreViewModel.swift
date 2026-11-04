@@ -6,7 +6,11 @@ import Observation
 final class CreateChoreViewModel {
     private let householdId: UUID
     private let userId: UUID
+    private var lastAttempt: ChoreCreation?
     private let choreId = UUID()
+    private let scheduleId = UUID()
+    private let occurrenceId = UUID()
+    private(set) var isSaving = false
 
     var title = ""
     var description = ""
@@ -32,7 +36,7 @@ final class CreateChoreViewModel {
     var canContinueWithSchedule: Bool { creation.hasValidSchedule }
 
     func canCreate(availableMemberIds: Set<UUID>) -> Bool {
-        canContinueWithDetails && canContinueWithSchedule && !didSave
+        canContinueWithDetails && canContinueWithSchedule && !didSave && !isSaving
             && selectedMemberIds.isSubset(of: availableMemberIds)
             && (!requiresApproval || (requiredApprovalCount > 0
                 && requiredApprovalCount <= availableMemberIds.count))
@@ -40,6 +44,7 @@ final class CreateChoreViewModel {
 
     private var creation: ChoreCreation {
         ChoreCreation(
+            scheduleId: scheduleId, occurrenceId: occurrenceId,
             choreId: choreId, householdId: householdId, createdByUserId: userId,
             title: title, description: description, pattern: pattern,
             recurrenceUnit: recurrenceUnit, recurrenceInterval: recurrenceInterval,
@@ -51,8 +56,8 @@ final class CreateChoreViewModel {
         )
     }
 
-    func create(using repository: any ChoreRepositoryProtocol) {
-        guard !didSave else { return }
+    func create(using repository: any ChoreRepositoryProtocol) async {
+        guard !didSave, !isSaving else { return }
         errorMessage = nil
         guard canContinueWithDetails else {
             errorMessage = AppLocalization.string("chores.error.details")
@@ -66,19 +71,22 @@ final class CreateChoreViewModel {
             errorMessage = AppLocalization.string("chores.error.members")
             return
         }
+        isSaving = true
+        defer { isSaving = false }
+        var submitted = creation
+        if let previous = lastAttempt {
+            var candidate = submitted
+            candidate.requestId = previous.requestId
+            if candidate == previous { submitted = candidate }
+        }
+        lastAttempt = submitted
         do {
-            try repository.create(creation)
+            _ = try await repository.create(submitted)
             didSave = true
-        } catch LocalChoreRepositoryError.invalidDetails {
-            errorMessage = AppLocalization.string("chores.error.details")
-        } catch LocalChoreRepositoryError.invalidSchedule {
-            errorMessage = AppLocalization.string("chores.error.schedule")
-        } catch LocalChoreRepositoryError.invalidMembers {
-            errorMessage = AppLocalization.string("chores.error.members")
-        } catch LocalChoreRepositoryError.householdUnavailable {
-            errorMessage = AppLocalization.string("household.unavailableHelp")
         } catch HouseholdAuthorizationError.permissionDenied(_) {
             errorMessage = AppLocalization.string("chores.error.permission")
+        } catch is CancellationError {
+            return
         } catch {
             errorMessage = AppLocalization.string("chores.error.save")
         }

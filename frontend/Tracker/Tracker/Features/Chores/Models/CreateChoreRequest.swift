@@ -16,22 +16,21 @@ nonisolated struct CreateChoreRequest: Codable, Sendable {
     let choreScheduleId: UUID?
     let choreOccurrenceId: UUID?
 
-    @MainActor
-    init(creation: ChoreCreation, chore: LocalChore) {
-        choreId = chore.choreId
-        householdId = chore.household.householdId
-        title = chore.title
-        description = chore.choreDescription
+    init(creation: ChoreCreation) {
+        choreId = creation.choreId
+        householdId = creation.householdId
+        title = creation.normalizedTitle
+        description = creation.normalizedDescription.isEmpty ? nil : creation.normalizedDescription
         pattern = creation.pattern
-        recurrenceUnit = chore.schedule?.recurrenceUnit
-        recurrenceInterval = chore.schedule?.recurrenceInterval ?? 1
+        recurrenceUnit = creation.pattern == .fixed || creation.pattern == .afterCompletion ? creation.recurrenceUnit : nil
+        recurrenceInterval = creation.recurrenceInterval
         scheduledAt = ChoreTimestamp.encode(creation.scheduledAt)
         dueAt = ChoreTimestamp.encode(creation.dueAt)
         timeZoneIdentifier = creation.timeZoneIdentifier
-        assignedMemberIds = chore.assignedMemberIds
-        requiredApprovalCount = chore.requiredApprovalCount
-        choreScheduleId = chore.schedule?.choreScheduleId
-        choreOccurrenceId = chore.occurrences.first?.choreOccurrenceId
+        assignedMemberIds = creation.assignedMemberIds
+        requiredApprovalCount = creation.requiredApprovalCount
+        choreScheduleId = creation.pattern == .once ? nil : creation.scheduleId
+        choreOccurrenceId = creation.pattern == .onDemand ? nil : creation.occurrenceId
     }
 }
 
@@ -43,12 +42,4 @@ nonisolated enum ChoreTimestamp {
         return formatter.string(from: date)
     }
 
-    static func decode(_ value: String) throws -> Date {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        guard let date = formatter.date(from: value) ?? ISO8601DateFormatter().date(from: value) else {
-            throw OutboxError.invalidResponse
-        }
-        return date
-    }
 }

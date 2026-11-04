@@ -1,9 +1,8 @@
-import SwiftData
 import SwiftUI
 
 struct CreateHouseholdView: View {
     let userId: UUID
-    @Environment(\.modelContext) private var context
+    @Environment(HouseholdStore.self) private var store
     @Environment(\.dismiss) private var dismiss
     @State private var model = CreateHouseholdViewModel()
     @State private var path: [Step] = []
@@ -27,6 +26,8 @@ struct CreateHouseholdView: View {
                     }
                 }
         }
+        .disabled(model.isSaving)
+        .interactiveDismissDisabled(model.isSaving)
     }
     
     private var nameStep: some View {
@@ -97,8 +98,10 @@ struct CreateHouseholdView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             workflowToolbar(title: "household.createAction", isEnabled: model.canCreate) {
-                model.create(userId: userId, using: LocalHouseholdRepository(container: context.container))
-                if model.didSave { dismiss() }
+                Task {
+                    await model.create(userId: userId, using: store)
+                    if model.didSave { dismiss() }
+                }
             }
         }
     }
@@ -158,7 +161,9 @@ struct CreateHouseholdView: View {
             }
         }
         ToolbarItem(placement: .topBarTrailing) {
-            Button(action: action) { Text(title) }
+            Button(action: action) {
+                if model.isSaving { ProgressView() } else { Text(title) }
+            }
                 .buttonStyle(.borderedProminent)
                 .tint(.accentColor)
                 .disabled(!isEnabled)
@@ -171,7 +176,6 @@ struct CreateHouseholdView: View {
         .ignoresSafeArea()
         .sheet(isPresented: .constant(true)) {
             CreateHouseholdView(userId: UUID())
-                .modelContainer(for: AppSchema.models,
-                                inMemory: true)
+                .environment(HouseholdStore())
         }
 }

@@ -1,5 +1,9 @@
 package hu.dncs.tracker.chore.api.web;
 
+import hu.dncs.tracker.chore.application.usecase.GetChoresUseCase;
+import org.springframework.web.bind.annotation.GetMapping;
+import java.util.List;
+
 import hu.dncs.tracker.chore.api.web.request.CreateChoreRequest;
 import hu.dncs.tracker.chore.api.web.response.ChoreResponse;
 import hu.dncs.tracker.chore.application.usecase.CreateChoreUseCase;
@@ -21,6 +25,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 class ChoreController {
     private final CreateChoreUseCase createChoreUseCase;
+
+    private final GetChoresUseCase getChores;
+
+    @GetMapping
+    List<ChoreResponse> all(Authentication authentication) {
+        return getChores.execute(UUID.fromString(authentication.getName()), null).stream().map(ChoreResponse::from).toList();
+    }
 
     @PostMapping
     @Idempotent("chore.create")

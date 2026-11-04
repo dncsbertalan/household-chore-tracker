@@ -7,6 +7,7 @@ final class AppState: ObservableObject {
     @Published var selectedHouseholdId: UUID? = nil
     @Published var sessionRevision = 0
     @Published var isAuthenticated = false
+    @Published var isOnline = false
 
     func restoreAuthentication(from tokenStore: any TokenStoreProtocol) async {
         let revision = sessionRevision

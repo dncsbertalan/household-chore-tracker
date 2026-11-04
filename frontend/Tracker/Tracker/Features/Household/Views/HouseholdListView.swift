@@ -1,32 +1,37 @@
 import SwiftUI
-import SwiftData
 
 struct HouseholdListView: View {
     let currentUserService: (any CurrentUserServiceProtocol)?
     let model: CurrentUserViewModel
+    let invitationRepository: HouseholdInvitationRepository?
     @Environment(HouseholdRouter.self) private var router
-    @Environment(\.syncEngine) private var syncEngine
-    @Query private var households: [LocalHousehold]
+    @Environment(HouseholdStore.self) private var store
+    @State private var isLoading = false
+    @State private var errorMessage: String?
+    private var households: [HouseholdResponse] { store.households }
 
-    init(currentUserService: (any CurrentUserServiceProtocol)? = nil, model: CurrentUserViewModel) {
+
+    init(currentUserService: (any CurrentUserServiceProtocol)? = nil, model: CurrentUserViewModel, invitationRepository: HouseholdInvitationRepository? = nil) {
         self.currentUserService = currentUserService
         self.model = model
+        self.invitationRepository = invitationRepository
 
-        if let userId = model.userId {
-            _households = Query(filter: #Predicate<LocalHousehold> {
-                $0.deletedAt == nil && $0.householdMembers.contains { member in
-                    member.userId == userId && member.deletedAt == nil && member.role.deletedAt == nil
-                }
-            })
-        } else {
-            _households = Query(filter: #Predicate<LocalHousehold> { _ in false })
-        }
     }
 
     var body: some View {
         Group {
             if model.userId != nil {
-                householdList
+                if isLoading {
+                    ProgressView()
+                } else if let errorMessage {
+                    ContentUnavailableView {
+                        Label("household.title", systemImage: "house")
+                    } description: { Text(errorMessage) } actions: {
+                        Button("household.retry") { Task { await refresh() } }
+                    }
+                } else {
+                    householdList
+                }
             } else if model.isLoading {
                 ProgressView()
             } else {
@@ -43,6 +48,16 @@ struct HouseholdListView: View {
         }
         .navigationTitle("household.title")
         .toolbar {
+            if let userId = model.userId, let invitationRepository {
+                ToolbarItem(placement: .topBarLeading) {
+                    NavigationLink {
+                        HouseholdInvitationsView(accountId: userId, repository: invitationRepository)
+                    } label: {
+                        Label("invitation.list.inbox", systemImage: "tray")
+                    }
+                    .accessibilityIdentifier("invitationInbox")
+                }
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     router.sheet = .createHousehold
@@ -54,7 +69,18 @@ struct HouseholdListView: View {
             }
         }
         .task { await model.loadUser(service: currentUserService) }
-        .refreshable { await syncEngine?.refresh() }
+        .task(id: model.userId) { await refresh() }
+        .refreshable { await refresh() }
+    }
+
+    private func refresh() async {
+        guard let userId = model.userId, !isLoading else { return }
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+        do { _ = try await store.households(accountId: userId) }
+        catch is CancellationError { }
+        catch { errorMessage = error.localizedDescription }
     }
 
     @ViewBuilder
@@ -70,7 +96,7 @@ struct HouseholdListView: View {
                 NavigationLink(value: HouseholdRoute.detail(householdId: household.householdId)) {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(household.name).font(.headline)
-                        if let description = household.householdDescription, !description.isEmpty {
+                        if let description = household.description, !description.isEmpty {
                             Text(description).foregroundStyle(.secondary)
                         }
                     }
@@ -84,6 +110,7 @@ struct HouseholdListView: View {
 #if DEBUG
 #Preview {
     HouseholdCoordinatorView(currentUserService: CurrentUserPreviewService())
-        .modelContainer(for: AppSchema.models, inMemory: true)
+        .environmentObject(AppState())
+        .environment(HouseholdStore())
 }
 #endif

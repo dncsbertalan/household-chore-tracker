@@ -11,6 +11,10 @@ final class CreateHouseholdViewModel {
     private var preparedFirstRoleName: String?
     var creatorRoleId: UUID
     private(set) var errorMessage: String?
+    private var lastAttempt: HouseholdCreation?
+    private let householdId = UUID()
+    private let membershipId = UUID()
+    private(set) var isSaving = false
     private(set) var didSave = false
     
     init() {
@@ -32,7 +36,7 @@ final class CreateHouseholdViewModel {
     }
 
     var canCreate: Bool {
-        canContinueWithName && canContinueWithFirstRole && !didSave
+        canContinueWithName && canContinueWithFirstRole && !didSave && !isSaving
     }
 
     var firstRolePermissions: Set<HouseholdPermission> {
@@ -56,8 +60,8 @@ final class CreateHouseholdViewModel {
         preparedFirstRoleName = roleName
     }
 
-    func create(userId: UUID, using repository: any HouseholdRepositoryProtocol) {
-        guard !didSave else { return }
+    func create(userId: UUID, using repository: any HouseholdRepositoryProtocol) async {
+        guard !didSave, !isSaving else { return }
         errorMessage = nil
         guard canContinueWithName,
               HouseholdConstraints.trimmedText(description).utf16.count <= HouseholdConstraints.descriptionMaxLength else {
@@ -70,17 +74,25 @@ final class CreateHouseholdViewModel {
         }
         prepareFirstRole()
 
-        do {
-            try repository.create(HouseholdCreation(
+        isSaving = true
+        defer { isSaving = false }
+        var creation = HouseholdCreation(
+                householdId: householdId, householdMemberId: membershipId,
                 name: name, description: description,
                 roleName: firstRoleName, permissions: firstRolePermissions,
                 creatorUserId: userId, creatorRoleId: creatorRoleId
-            ))
+            )
+        if let previous = lastAttempt {
+            var candidate = creation
+            candidate.requestId = previous.requestId
+            if candidate == previous { creation = candidate }
+        }
+        lastAttempt = creation
+        do {
+            _ = try await repository.create(creation)
             didSave = true
-        } catch LocalHouseholdRepositoryError.invalidDetails {
-            errorMessage = AppLocalization.string("household.error.details")
-        } catch LocalHouseholdRepositoryError.invalidRole {
-            errorMessage = AppLocalization.string("household.error.roles")
+        } catch is CancellationError {
+            return
         } catch {
             errorMessage = AppLocalization.string("household.error.save")
         }

@@ -1,4 +1,4 @@
-/// The task's lifecycle, separate from SyncableEntity.status.
+/// The task's business lifecycle.
 nonisolated enum ChoreOccurrenceStatus: String, Codable, CaseIterable, Sendable {
     case pending = "PENDING"
     case inProgress = "IN_PROGRESS"
@@ -7,7 +7,4 @@ nonisolated enum ChoreOccurrenceStatus: String, Codable, CaseIterable, Sendable 
     case skipped = "SKIPPED"
     case cancelled = "CANCELLED"
 
-    init(from decoder: any Decoder) throws {
-        self = try ChoreEnumCoding.decode(Self.self, from: decoder)
-    }
 }
