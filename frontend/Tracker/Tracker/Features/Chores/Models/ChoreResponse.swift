@@ -13,10 +13,22 @@ nonisolated struct ChoreResponse: Codable, Sendable, Identifiable {
     let requiredApprovalCount: Int
     let schedule: Schedule?
     let occurrence: Occurrence?
+    var occurrences: [Occurrence]? = nil
     // Optional for compatibility with earlier API responses.
     let createdByHouseholdMemberId: UUID?
     let updatedByHouseholdMemberId: UUID?
     let updatedAt: String?
+
+    var pattern: ChoreCreationPattern {
+        switch schedule?.scheduleType {
+        case .fixed: .fixed
+        case .afterCompletion: .afterCompletion
+        case .onDemand: .onDemand
+        case nil: .once
+        }
+    }
+
+    var isEditable: Bool { occurrence?.isEditable ?? true }
 
     struct Schedule: Codable, Sendable {
         let choreScheduleId: UUID
@@ -32,7 +44,9 @@ nonisolated struct ChoreResponse: Codable, Sendable, Identifiable {
         let updatedAt: String?
     }
 
-    struct Occurrence: Codable, Sendable {
+    struct Occurrence: Codable, Sendable, Identifiable {
+        var id: UUID { choreOccurrenceId }
+        var isEditable: Bool { occurrenceStatus == .pending || occurrenceStatus == .inProgress }
         let choreOccurrenceId: UUID
         let title: String
         let description: String?

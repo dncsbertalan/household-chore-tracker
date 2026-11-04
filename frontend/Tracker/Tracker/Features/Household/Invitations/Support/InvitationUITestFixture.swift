@@ -25,6 +25,8 @@ enum InvitationUITestFixture {
 
 @MainActor
 struct InvitationUITestHouseholdRepository: HouseholdRepositoryProtocol, ChoreRepositoryProtocol {
+    func chore(id: UUID, accountId: UUID) async throws -> ChoreResponse { throw APIError.invalidResponse }
+    func update(id: UUID, accountId: UUID, request: UpdateChoreRequest, requestId: UUID) async throws -> ChoreResponse { throw APIError.invalidResponse }
     func chores(accountId: UUID, householdId: UUID?) async throws -> [ChoreResponse] { [] }
     func create(_ creation: ChoreCreation) async throws -> ChoreResponse { throw APIError.invalidResponse }
     private let response = InvitationUITestFixture.household

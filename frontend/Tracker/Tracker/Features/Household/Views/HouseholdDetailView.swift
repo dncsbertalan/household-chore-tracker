@@ -67,12 +67,15 @@ struct HouseholdDetailView: View {
                     if !householdChores.isEmpty {
                         Section("chores.title") {
                             ForEach(householdChores, id: \.choreId) { chore in
-                                VStack(alignment: .leading, spacing: 4) {
-                                    Text(chore.title).font(.headline)
-                                    if let description = chore.description {
-                                        Text(description).foregroundStyle(.secondary)
+                                NavigationLink(value: HouseholdRoute.choreDetail(choreId: chore.id)) {
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text(chore.title).font(.headline)
+                                        if let description = chore.description {
+                                            Text(description).foregroundStyle(.secondary)
+                                        }
                                     }
                                 }
+                                .accessibilityIdentifier("chore-\(chore.id.uuidString)")
                             }
                         }
                     }

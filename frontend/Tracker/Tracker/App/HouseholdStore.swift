@@ -61,8 +61,8 @@ final class HouseholdStore: HouseholdRepositoryProtocol, ChoreRepositoryProtocol
         let result = try await householdRepository.household(id: id, accountId: accountId)
         try verify(session, accountId: accountId)
         guard self.revision == revision, reads[key] == request else { throw CancellationError() }
-        households.removeAll { $0.id == result.id }
-        households.append(result)
+        if let index = households.firstIndex(where: { $0.id == result.id }) { households[index] = result }
+        else { households.append(result) }
         return result
     }
 
@@ -104,11 +104,43 @@ final class HouseholdStore: HouseholdRepositoryProtocol, ChoreRepositoryProtocol
         return result
     }
 
+    func chore(id: UUID) -> ChoreResponse? { chores.first { $0.id == id } }
+
+    func chore(id: UUID, accountId: UUID) async throws -> ChoreResponse {
+        guard let choreRepository else { throw APIError.invalidResponse }
+        try Task.checkCancellation()
+        beginSession(accountId: accountId)
+        let session = session, revision = revision, request = UUID(), key = "chore-\(id)"
+        reads[key] = request
+        let result = try await choreRepository.chore(id: id, accountId: accountId)
+        try verify(session, accountId: accountId)
+        guard self.revision == revision, reads[key] == request else { throw CancellationError() }
+        replaceChore(result)
+        return result
+    }
+
+    func update(id: UUID, accountId: UUID, request: UpdateChoreRequest, requestId: UUID) async throws -> ChoreResponse {
+        guard let choreRepository else { throw APIError.invalidResponse }
+        try Task.checkCancellation()
+        beginSession(accountId: accountId)
+        let session = session
+        let result = try await choreRepository.update(id: id, accountId: accountId, request: request, requestId: requestId)
+        try verify(session, accountId: accountId)
+        replaceChore(result)
+        revision += 1
+        return result
+    }
+
     func record(_ household: HouseholdResponse) {
         households.removeAll { $0.id == household.id }
         households.append(household)
         households.sort { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
         revision += 1
+    }
+
+    private func replaceChore(_ response: ChoreResponse) {
+        if let index = chores.firstIndex(where: { $0.id == response.id }) { chores[index] = response }
+        else { chores.append(response) }
     }
 
     private func verify(_ session: UUID, accountId: UUID) throws {

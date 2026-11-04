@@ -17,6 +17,19 @@ struct TrackerApp: App {
         let state = AppState()
         _appState = StateObject(wrappedValue: state)
         #if DEBUG
+        if ChoreUITestFixture.isEnabled {
+            let repository = ChoreUITestRepository()
+            _store = State(initialValue: HouseholdStore(households: repository, chores: repository))
+            state.isAuthenticated = true
+            state.isOnline = true
+            registrationService = nil
+            loginService = nil
+            logoutService = nil
+            currentUserService = ChoreUITestUserService()
+            tokenStore = nil
+            invitationRepository = nil
+            return
+        }
         if InvitationUITestFixture.isEnabled {
             let store = HouseholdStore(households: InvitationUITestHouseholdRepository(), chores: InvitationUITestHouseholdRepository())
             _store = State(initialValue: store)
@@ -68,7 +81,7 @@ struct TrackerApp: App {
             .environment(store)
             .task {
                 #if DEBUG
-                if InvitationUITestFixture.isEnabled { return }
+                if InvitationUITestFixture.isEnabled || ChoreUITestFixture.isEnabled { return }
                 #endif
                 // Connectivity is informational; failed requests use the normal API error path.
                 connectivityMonitor.start { appState.isOnline = $0 }

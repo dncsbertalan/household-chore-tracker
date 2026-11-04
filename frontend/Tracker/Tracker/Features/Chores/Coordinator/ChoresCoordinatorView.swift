@@ -6,7 +6,7 @@ struct ChoresCoordinatorView: View {
     @State private var router = ChoresRouter()
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $router.path) {
             Group {
                 if let userId = model.userId {
                     ChoresView(userId: userId)
@@ -22,6 +22,12 @@ struct ChoresCoordinatorView: View {
                             Task { await model.loadUser(service: currentUserService) }
                         }
                     }
+                }
+            }
+            .navigationDestination(for: ChoreRoute.self) { route in
+                switch route {
+                case .detail(let choreId):
+                    if let userId = model.userId { ChoreDetailView(choreId: choreId, userId: userId) }
                 }
             }
             .navigationTitle("chores.title")
