@@ -78,6 +78,11 @@ public class Chore {
         this.requiredApprovalCount = requiredApprovalCount;
     }
 
+    public void recordActivity(UUID actor, Instant now) {
+        updatedByHouseholdMemberId = Objects.requireNonNull(actor);
+        updatedAt = now;
+    }
+
     public void update(String title, String description, Collection<UUID> assignees, int approvalCount, UUID actor) {
         this.title = title;
         this.description = description;

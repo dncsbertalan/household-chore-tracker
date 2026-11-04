@@ -23,6 +23,13 @@ struct RemoteChoreRepository: ChoreRepositoryProtocol {
         return try await client.send(endpoint, as: ChoreResponse.self)
     }
 
+    func perform(id: UUID, accountId: UUID, action: ChoreAction, request: ChoreActionRequest, requestId: UUID) async throws -> ChoreResponse {
+        var endpoint = APIEndpoint(path: "chores/\(id)/\(action.path)", method: .post,
+            headers: ["Idempotency-Key": requestId.uuidString], body: try JSONEncoder().encode(request))
+        endpoint.expectedAccountId = accountId
+        return try await client.send(endpoint, as: ChoreResponse.self)
+    }
+
     func create(_ creation: ChoreCreation) async throws -> ChoreResponse {
         guard creation.hasValidDetails, creation.hasValidSchedule else { throw APIError.encodingFailed }
         var endpoint = APIEndpoint(path: "chores", method: .post,

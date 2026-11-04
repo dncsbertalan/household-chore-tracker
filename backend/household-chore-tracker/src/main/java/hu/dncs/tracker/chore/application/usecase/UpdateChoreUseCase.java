@@ -35,6 +35,7 @@ public class UpdateChoreUseCase {
     private final HouseholdMemberRepository members;
     private final HouseholdAuthorizationService authorization;
     private final ChoreInputValidator validator;
+    private final GetChoreUseCase getChore;
 
     @Transactional
     public ChoreDetails execute(UUID id, UpdateChoreCommand command, UUID userId) {
@@ -100,6 +101,6 @@ public class UpdateChoreUseCase {
         chores.flush();
         chore.getAssignedMemberIds().size();
         history.forEach(o -> o.getAssignedMemberIds().size());
-        return new ChoreDetails(new CreatedChore(chore, schedule, current), history);
+        return getChore.execute(id, userId);
     }
 }

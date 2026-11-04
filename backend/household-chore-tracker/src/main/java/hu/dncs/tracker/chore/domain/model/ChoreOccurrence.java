@@ -61,6 +61,9 @@ public class ChoreOccurrence {
     @Column(name = "version", nullable = false)
     private Long version;
 
+    @Column(name = "generated_from_occurrence_id", unique = true)
+    private UUID generatedFromOccurrenceId;
+
     protected ChoreOccurrence() {}
 
     public ChoreOccurrence(UUID choreOccurrenceId, Chore chore, Instant scheduledAt, Instant dueAt,
@@ -77,6 +80,24 @@ public class ChoreOccurrence {
         this.createdByHouseholdMemberId = Objects.requireNonNull(createdByHouseholdMemberId);
         this.updatedByHouseholdMemberId = createdByHouseholdMemberId;
     }
+    public static ChoreOccurrence successor(Chore chore, ChoreOccurrence previous, Instant scheduledAt, Instant dueAt, UUID actor) {
+        var next = new ChoreOccurrence(UUID.randomUUID(), chore, scheduledAt, dueAt, actor);
+        next.generatedFromOccurrenceId = previous.getChoreOccurrenceId();
+        return next;
+    }
+
+    public void submitCompletion(boolean approvalRequired, UUID actor) {
+        if (!isEditable()) throw new IllegalStateException("This occurrence cannot be completed.");
+        occurrenceStatus = approvalRequired ? ChoreOccurrenceStatus.AWAITING_APPROVAL : ChoreOccurrenceStatus.COMPLETED;
+        updatedByHouseholdMemberId = actor;
+    }
+
+    public void resolveCompletion(boolean approved, UUID actor) {
+        if (occurrenceStatus != ChoreOccurrenceStatus.AWAITING_APPROVAL) throw new IllegalStateException("This occurrence is not awaiting approval.");
+        occurrenceStatus = approved ? ChoreOccurrenceStatus.COMPLETED : ChoreOccurrenceStatus.PENDING;
+        updatedByHouseholdMemberId = actor;
+    }
+
     public boolean isEditable() {
         return occurrenceStatus == ChoreOccurrenceStatus.PENDING || occurrenceStatus == ChoreOccurrenceStatus.IN_PROGRESS;
     }

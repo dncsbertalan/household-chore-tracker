@@ -38,6 +38,8 @@ nonisolated enum HouseholdPermission: String, Codable, CaseIterable, Identifiabl
     /// Approve chore completions in the household.
     case choreApproveCompletion = "CHORE_APPROVE_COMPLETION"
 
+    case choreSelfApproveCompletion = "CHORE_SELF_APPROVE_COMPLETION"
+
     var id: String { rawValue }
 
     var title: String {
@@ -57,6 +59,7 @@ nonisolated enum HouseholdPermission: String, Codable, CaseIterable, Identifiabl
         case .choreAssignMember: AppLocalization.string("household.permission.choreAssignMember")
         case .choreComplete: AppLocalization.string("household.permission.choreComplete")
         case .choreReopen: AppLocalization.string("household.permission.choreReopen")
+        case .choreSelfApproveCompletion: AppLocalization.string("household.permission.choreSelfApproveCompletion")
         case .choreApproveCompletion: AppLocalization.string("household.permission.choreApproveCompletion")
         }
     }

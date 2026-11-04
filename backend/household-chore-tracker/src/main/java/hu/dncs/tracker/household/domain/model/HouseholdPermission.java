@@ -67,5 +67,7 @@ public enum HouseholdPermission {
     /**
      * Approve chore completions in the household.
      */
-    CHORE_APPROVE_COMPLETION
+    CHORE_APPROVE_COMPLETION,
+    /** Also requires CHORE_APPROVE_COMPLETION. */
+    CHORE_SELF_APPROVE_COMPLETION
 }

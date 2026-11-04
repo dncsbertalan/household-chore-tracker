@@ -131,6 +131,18 @@ final class HouseholdStore: HouseholdRepositoryProtocol, ChoreRepositoryProtocol
         return result
     }
 
+    func perform(id: UUID, accountId: UUID, action: ChoreAction, request: ChoreActionRequest, requestId: UUID) async throws -> ChoreResponse {
+        guard let choreRepository else { throw APIError.invalidResponse }
+        try Task.checkCancellation()
+        beginSession(accountId: accountId)
+        let session = session
+        let response = try await choreRepository.perform(id: id, accountId: accountId, action: action, request: request, requestId: requestId)
+        try verify(session, accountId: accountId)
+        replaceChore(response)
+        revision += 1
+        return response
+    }
+
     func record(_ household: HouseholdResponse) {
         households.removeAll { $0.id == household.id }
         households.append(household)

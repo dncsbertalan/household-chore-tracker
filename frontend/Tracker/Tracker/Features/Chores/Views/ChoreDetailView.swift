@@ -12,7 +12,7 @@ struct ChoreDetailView: View {
     }
 
     private var canEdit: Bool {
-        guard let chore = model.chore, chore.isEditable, let household else { return false }
+        guard !model.isActing, model.actionError == nil, let chore = model.chore, chore.isEditable, let household else { return false }
         return HouseholdAuthorizationService().hasPermission(.choreUpdate, in: household, userId: userId)
     }
 
@@ -44,6 +44,7 @@ struct ChoreDetailView: View {
                 }
             }
         }
+        .sensoryFeedback(.success, trigger: model.successRevision)
         .task { await reload() }
         .refreshable { await reload() }
         .sheet(isPresented: $isEditing) {
@@ -67,6 +68,7 @@ struct ChoreDetailView: View {
                 }
                 if let household { LabeledContent("chores.detail.household", value: household.name) }
             }
+            lifecycleActions(chore)
             Section("chores.schedule.title") {
                 LabeledContent("chores.schedule.pattern", value: chore.pattern.title)
                 if let schedule = chore.schedule {
@@ -134,6 +136,75 @@ struct ChoreDetailView: View {
         dateRow("chores.schedule.deadline", occurrence.dueAt)
         assignees(occurrence.assignedMemberIds)
         LabeledContent("chores.approvals.count", value: occurrence.requiredApprovalCount.formatted())
+        if let chore = model.chore {
+            ForEach((chore.completions ?? []).filter { $0.choreOccurrenceId == occurrence.id }) { completion in
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(completion.status.title).font(.headline)
+                    LabeledContent("chores.completion.submittedBy", value: memberName(completion.completedByHouseholdMemberId, index: 0))
+                    dateRow("chores.completion.submittedAt", completion.submittedAt)
+                    dateRow("chores.completion.resolvedAt", completion.resolvedAt)
+                    if completion.requiredApprovalCount > 0 {
+                        LabeledContent("chores.completion.progress", value: "\(completion.approvedCount) / \(completion.requiredApprovalCount)")
+                    }
+                    ForEach(completion.approvals) { approval in
+                        LabeledContent(memberName(approval.reviewedByHouseholdMemberId, index: 0), value: approval.decision.title)
+                        dateRow("chores.completion.reviewedAt", approval.reviewedAt)
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func lifecycleActions(_ chore: ChoreResponse) -> some View {
+        if chore.actions?.canComplete == true || chore.actions?.canApprove == true || chore.actions?.canReject == true
+            || chore.actions?.canCreateOccurrence == true || chore.pendingCompletion != nil
+            || model.actionError != nil || model.successMessage != nil {
+            Section {
+                if let success = model.successMessage {
+                    Label(success, systemImage: "checkmark.circle.fill").foregroundStyle(.green)
+                        .accessibilityIdentifier("choreActionSuccess")
+                }
+                if let pending = chore.pendingCompletion {
+                    LabeledContent("chores.completion.progress", value: "\(pending.approvedCount) / \(pending.requiredApprovalCount)")
+                        .accessibilityIdentifier("choreApprovalProgress")
+                    Text("chores.completion.awaitingApproval").foregroundStyle(.secondary)
+                }
+                if model.isActing {
+                    ProgressView("chores.completion.saving").accessibilityIdentifier("choreActionProgress")
+                }
+                if let actions = chore.actions {
+                    if actions.canCreateOccurrence {
+                        actionButton("chores.completion.start", action: .start, identifier: "startChoreOccurrence")
+                    }
+                    if actions.canComplete, let current = chore.occurrence {
+                        actionButton("chores.completion.complete", action: .complete(current.id), identifier: "completeChoreOccurrence")
+                    }
+                    if let pending = chore.pendingCompletion {
+                        if actions.canApprove {
+                            actionButton("chores.completion.approve", action: .approve(pending.id), identifier: "approveChoreCompletion")
+                        }
+                        if actions.canReject {
+                            actionButton("chores.completion.reject", action: .reject(pending.id), identifier: "rejectChoreCompletion", destructive: true)
+                        }
+                    }
+                }
+                if let error = model.actionError {
+                    Text(error).foregroundStyle(.red).accessibilityIdentifier("choreActionError")
+                    Button("chores.edit.reload") { Task { await reload() } }
+                        .disabled(model.isActing)
+                }
+            } header: { Text("chores.completion.title") }
+        }
+    }
+
+    private func actionButton(_ title: LocalizedStringKey, action: ChoreAction, identifier: String, destructive: Bool = false) -> some View {
+        Button(title, role: destructive ? .destructive : nil) {
+            Task { await model.perform(action, accountId: userId, store: store) }
+        }
+        .disabled(!model.canPerform(action))
+        .accessibilityIdentifier(identifier)
     }
 
     @ViewBuilder

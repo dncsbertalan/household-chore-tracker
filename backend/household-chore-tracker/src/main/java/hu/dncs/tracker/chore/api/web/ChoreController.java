@@ -1,5 +1,10 @@
 package hu.dncs.tracker.chore.api.web;
 
+import hu.dncs.tracker.chore.application.usecase.ChoreCompletionUseCase;
+import hu.dncs.tracker.chore.api.web.request.ChoreActionRequest;
+import hu.dncs.tracker.chore.application.command.ChoreActionCommand;
+import hu.dncs.tracker.chore.domain.model.ChoreApprovalDecision;
+
 import hu.dncs.tracker.chore.application.usecase.GetChoreUseCase;
 import hu.dncs.tracker.chore.application.usecase.UpdateChoreUseCase;
 import hu.dncs.tracker.chore.api.web.request.UpdateChoreRequest;
@@ -34,6 +39,41 @@ class ChoreController {
 
     private final GetChoresUseCase getChores;
     private final UpdateChoreUseCase updateChore;
+
+    private final ChoreCompletionUseCase completion;
+
+    @PostMapping("/{id}/occurrences")
+    @Idempotent("chore.occurrence.start")
+    ChoreResponse start(@PathVariable UUID id, @Valid @RequestBody ChoreActionRequest request, Authentication auth) {
+        return ChoreResponse.from(completion.start(id, action(request), UUID.fromString(auth.getName())));
+    }
+
+    @PostMapping("/{id}/occurrences/{occurrenceId}/complete")
+    @Idempotent("chore.complete")
+    ChoreResponse complete(@PathVariable UUID id, @PathVariable UUID occurrenceId,
+            @Valid @RequestBody ChoreActionRequest request, Authentication auth) {
+        return ChoreResponse.from(completion.complete(id, occurrenceId, action(request), UUID.fromString(auth.getName())));
+    }
+
+    @PostMapping("/{id}/completions/{completionId}/approve")
+    @Idempotent("chore.completion.approve")
+    ChoreResponse approve(@PathVariable UUID id, @PathVariable UUID completionId,
+            @Valid @RequestBody ChoreActionRequest request, Authentication auth) {
+        return ChoreResponse.from(completion.review(id, completionId, ChoreApprovalDecision.APPROVED,
+                action(request), UUID.fromString(auth.getName())));
+    }
+
+    @PostMapping("/{id}/completions/{completionId}/reject")
+    @Idempotent("chore.completion.reject")
+    ChoreResponse reject(@PathVariable UUID id, @PathVariable UUID completionId,
+            @Valid @RequestBody ChoreActionRequest request, Authentication auth) {
+        return ChoreResponse.from(completion.review(id, completionId, ChoreApprovalDecision.REJECTED,
+                action(request), UUID.fromString(auth.getName())));
+    }
+
+    private ChoreActionCommand action(ChoreActionRequest request) {
+        return new ChoreActionCommand(request.version(), request.occurrenceVersion(), request.completionVersion());
+    }
 
     @PutMapping("/{id}")
     @Idempotent("chore.update")
