@@ -1,5 +1,7 @@
 package hu.dncs.tracker.chore.api.web.response;
 
+import hu.dncs.tracker.chore.application.model.ChoreDetails;
+
 import hu.dncs.tracker.chore.application.model.CreatedChore;
 import hu.dncs.tracker.chore.domain.model.*;
 import java.time.Instant;
@@ -9,7 +11,8 @@ public record ChoreResponse(
         UUID choreId, UUID householdId, String title, String description, UUID createdByUserId,
         Instant createdAt, Long version, List<UUID> assignedMemberIds, int requiredApprovalCount,
         Schedule schedule, Occurrence occurrence,
-        UUID createdByHouseholdMemberId, UUID updatedByHouseholdMemberId, Instant updatedAt
+        UUID createdByHouseholdMemberId, UUID updatedByHouseholdMemberId, Instant updatedAt,
+        List<Occurrence> occurrences
 ) {
     public static ChoreResponse from(CreatedChore created) {
         var chore = created.chore();
@@ -17,7 +20,15 @@ public record ChoreResponse(
                 chore.getCreatedByUserId(), chore.getCreatedAt(), chore.getVersion(), sorted(chore.getAssignedMemberIds()),
                 chore.getRequiredApprovalCount(), created.schedule() == null ? null : Schedule.from(created.schedule()),
                 created.occurrence() == null ? null : Occurrence.from(created.occurrence()),
-                chore.getCreatedByHouseholdMemberId(), chore.getUpdatedByHouseholdMemberId(), chore.getUpdatedAt());
+                chore.getCreatedByHouseholdMemberId(), chore.getUpdatedByHouseholdMemberId(), chore.getUpdatedAt(), null);
+    }
+
+    public static ChoreResponse from(ChoreDetails details) {
+        var response = from(details.current());
+        return new ChoreResponse(response.choreId(), response.householdId(), response.title(), response.description(),
+                response.createdByUserId(), response.createdAt(), response.version(), response.assignedMemberIds(),
+                response.requiredApprovalCount(), response.schedule(), response.occurrence(), response.createdByHouseholdMemberId(),
+                response.updatedByHouseholdMemberId(), response.updatedAt(), details.occurrences().stream().map(Occurrence::from).toList());
     }
 
     private static List<UUID> sorted(Set<UUID> ids) {

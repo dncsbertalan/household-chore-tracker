@@ -32,7 +32,7 @@ public class GetChoresUseCase {
         var latest = new HashMap<UUID, ChoreOccurrence>();
         for (var occurrence : occurrences.findAllByChoreIdIn(ids)) {
             latest.merge(occurrence.getChoreId(), occurrence, (a, b) ->
-                    Comparator.comparing(ChoreOccurrence::getCreatedAt).thenComparing(ChoreOccurrence::getChoreOccurrenceId).compare(a, b) >= 0 ? a : b);
+                    Comparator.comparing(ChoreOccurrence::getCreatedAt).thenComparing(o -> o.getChoreOccurrenceId().toString()).compare(a, b) >= 0 ? a : b);
         }
         return visible.stream().map(c -> new CreatedChore(c, byChore.get(c.getChoreId()), latest.get(c.getChoreId()))).toList();
     }

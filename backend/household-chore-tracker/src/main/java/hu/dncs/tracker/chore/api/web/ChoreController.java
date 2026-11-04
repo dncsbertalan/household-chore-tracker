@@ -1,5 +1,11 @@
 package hu.dncs.tracker.chore.api.web;
 
+import hu.dncs.tracker.chore.application.usecase.GetChoreUseCase;
+import hu.dncs.tracker.chore.application.usecase.UpdateChoreUseCase;
+import hu.dncs.tracker.chore.api.web.request.UpdateChoreRequest;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+
 import hu.dncs.tracker.chore.application.usecase.GetChoresUseCase;
 import org.springframework.web.bind.annotation.GetMapping;
 import java.util.List;
@@ -27,6 +33,23 @@ class ChoreController {
     private final CreateChoreUseCase createChoreUseCase;
 
     private final GetChoresUseCase getChores;
+    private final UpdateChoreUseCase updateChore;
+
+    @PutMapping("/{id}")
+    @Idempotent("chore.update")
+    ChoreResponse update(@PathVariable UUID id,
+                         @Valid @RequestBody UpdateChoreRequest request,
+                         Authentication authentication) {
+        return ChoreResponse.from(updateChore.execute(id, request.toCommand(), UUID.fromString(authentication.getName())));
+    }
+
+    private final GetChoreUseCase getChore;
+
+    @GetMapping("/{id}")
+    ChoreResponse one(@PathVariable UUID id, Authentication authentication) {
+        return ChoreResponse.from(getChore.execute(id, UUID.fromString(authentication.getName())));
+    }
+
 
     @GetMapping
     List<ChoreResponse> all(Authentication authentication) {

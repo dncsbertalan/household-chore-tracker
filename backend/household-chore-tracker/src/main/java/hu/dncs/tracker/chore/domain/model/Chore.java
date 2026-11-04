@@ -77,4 +77,16 @@ public class Chore {
         this.assignedMemberIds.addAll(assignedMemberIds);
         this.requiredApprovalCount = requiredApprovalCount;
     }
+
+    public void update(String title, String description, Collection<UUID> assignees, int approvalCount, UUID actor) {
+        this.title = title;
+        this.description = description;
+        this.assignedMemberIds.clear();
+        this.assignedMemberIds.addAll(assignees);
+        this.requiredApprovalCount = approvalCount;
+        this.updatedByHouseholdMemberId = Objects.requireNonNull(actor);
+        // Also version the aggregate when only its schedule or occurrence changes.
+        this.updatedAt = Instant.now();
+    }
+
 }

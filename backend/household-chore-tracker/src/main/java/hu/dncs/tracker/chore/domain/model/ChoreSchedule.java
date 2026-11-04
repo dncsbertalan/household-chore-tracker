@@ -82,6 +82,22 @@ public class ChoreSchedule {
         this.updatedByHouseholdMemberId = createdByHouseholdMemberId;
     }
 
+    public void update(ChoreScheduleType type, ChoreRecurrenceUnit unit, int interval,
+                       Instant startsAt, String zone, UUID actor) {
+        this.scheduleType = type;
+        this.recurrenceUnit = unit;
+        this.recurrenceInterval = interval;
+        this.timeZoneIdentifier = zone;
+        this.startsAt = null;
+        this.startsAtOffsetSeconds = null;
+        if (startsAt != null) {
+            var start = startsAt.atZone(ZoneId.of(zone));
+            this.startsAt = start.toLocalDateTime();
+            this.startsAtOffsetSeconds = start.getOffset().getTotalSeconds();
+        }
+        this.updatedByHouseholdMemberId = Objects.requireNonNull(actor);
+    }
+
     /**
      * The API and initial occurrence retain the exact instant selected by the caller.
      */

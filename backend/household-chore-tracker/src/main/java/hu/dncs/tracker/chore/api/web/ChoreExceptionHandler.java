@@ -8,9 +8,23 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @RestControllerAdvice(assignableTypes = ChoreController.class)
 class ChoreExceptionHandler extends ResponseEntityExceptionHandler {
+    @ExceptionHandler(ChoreNotFoundException.class)
+    ProblemDetail notFound(ChoreNotFoundException exception) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());
+    }
+
     @ExceptionHandler(InvalidChoreException.class)
     ProblemDetail invalid(InvalidChoreException exception) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, exception.getMessage());
+    }
+
+    @ExceptionHandler({ChoreUpdateConflictException.class, org.springframework.orm.ObjectOptimisticLockingFailureException.class})
+    ProblemDetail updateConflict(Exception exception) {
+        var detail = exception instanceof ChoreUpdateConflictException ? exception.getMessage()
+                : "This chore has changed. Reload it before editing.";
+        var problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, detail);
+        problem.setProperty("code", "chore_edit_conflict");
+        return problem;
     }
 
     @ExceptionHandler(ChoreCreationConflictException.class)

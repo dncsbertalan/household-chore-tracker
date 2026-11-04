@@ -77,4 +77,22 @@ public class ChoreOccurrence {
         this.createdByHouseholdMemberId = Objects.requireNonNull(createdByHouseholdMemberId);
         this.updatedByHouseholdMemberId = createdByHouseholdMemberId;
     }
+    public boolean isEditable() {
+        return occurrenceStatus == ChoreOccurrenceStatus.PENDING || occurrenceStatus == ChoreOccurrenceStatus.IN_PROGRESS;
+    }
+
+    public void update(String title, String description, Collection<UUID> assignees, int approvalCount,
+                       Instant scheduledAt, Instant dueAt, UUID actor) {
+        if (!isEditable()) throw new IllegalStateException("Closed chore occurrences cannot be edited.");
+        this.title = title;
+        this.description = description;
+        var assignments = new HashSet<>(assignees);
+        this.assignedMemberIds.clear();
+        this.assignedMemberIds.addAll(assignments);
+        this.requiredApprovalCount = approvalCount;
+        this.scheduledAt = scheduledAt;
+        this.dueAt = dueAt;
+        this.updatedByHouseholdMemberId = Objects.requireNonNull(actor);
+    }
+
 }
