@@ -35,16 +35,6 @@
 			path = Tracker;
 			sourceTree = "<group>";
 		};
-		73AE57353075995E00ABB69D /* TrackerTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = TrackerTests;
-			sourceTree = "<group>";
-		};
-		73AE573F3075995E00ABB69D /* TrackerUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = TrackerUITests;
-			sourceTree = "<group>";
-		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,8 +60,6 @@
 			isa = PBXGroup;
 			children = (
 				73AE57253075995D00ABB69D /* Tracker */,
-				73AE57353075995E00ABB69D /* TrackerTests */,
-				73AE573F3075995E00ABB69D /* TrackerUITests */,
 				73AE57243075995D00ABB69D /* Products */,
 			);
 			sourceTree = "<group>";
@@ -120,9 +108,6 @@
 			dependencies = (
 				73AE57343075995E00ABB69D /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				73AE57353075995E00ABB69D /* TrackerTests */,
-			);
 			name = TrackerTests;
 			productName = TrackerTests;
 			productReference = 73AE57323075995E00ABB69D /* TrackerTests.xctest */;
@@ -140,9 +125,6 @@
 			);
 			dependencies = (
 				73AE573E3075995E00ABB69D /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				73AE573F3075995E00ABB69D /* TrackerUITests */,
 			);
 			name = TrackerUITests;
 			productName = TrackerUITests;
