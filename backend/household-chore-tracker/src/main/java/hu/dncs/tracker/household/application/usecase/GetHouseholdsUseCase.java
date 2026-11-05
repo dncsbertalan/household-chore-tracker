@@ -29,9 +29,14 @@ public class GetHouseholdsUseCase {
         var household = caller.getHousehold();
         var id = household.getHouseholdId();
         var grants = caller.getHouseholdRole().getPermissions().stream().map(Permission::getName).toList();
-        boolean viewMembers = grants.contains(HouseholdPermission.HOUSEHOLD_MEMBER_VIEW.name());
+        boolean viewMembers = grants.contains(HouseholdPermission.HOUSEHOLD_MEMBER_VIEW.name())
+                || grants.contains(HouseholdPermission.HOUSEHOLD_MEMBER_ASSIGN_ROLE.name())
+                || grants.contains(HouseholdPermission.HOUSEHOLD_MEMBER_REMOVE.name());
         boolean viewRoles = viewMembers || grants.contains(HouseholdPermission.HOUSEHOLD_ROLE_VIEW.name())
-                || grants.contains(HouseholdPermission.HOUSEHOLD_MEMBER_INVITE.name());
+                || grants.contains(HouseholdPermission.HOUSEHOLD_MEMBER_INVITE.name())
+                || grants.contains(HouseholdPermission.HOUSEHOLD_ROLE_CREATE.name())
+                || grants.contains(HouseholdPermission.HOUSEHOLD_ROLE_UPDATE.name())
+                || grants.contains(HouseholdPermission.HOUSEHOLD_ROLE_DELETE.name());
         return new HouseholdDetails(household,
                 viewRoles ? roles.findAllByHouseholdIdOrderByCreatedAtAscHouseholdRoleIdAsc(id) : List.of(caller.getHouseholdRole()),
                 viewMembers ? members.findAllByHousehold_HouseholdId(id) : List.of(caller));

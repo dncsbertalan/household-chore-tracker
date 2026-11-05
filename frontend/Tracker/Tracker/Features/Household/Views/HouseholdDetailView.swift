@@ -7,6 +7,8 @@ struct HouseholdDetailView: View {
     @Environment(HouseholdRouter.self) private var router
     let householdId: UUID
     @Environment(HouseholdStore.self) private var store
+    @State private var editingHousehold: HouseholdResponse?
+    @State private var deletion = HouseholdDeletionViewModel()
     @State private var isLoading = false
     @State private var errorMessage: String?
     private var householdChores: [ChoreResponse] { store.chores.filter { $0.householdId == householdId } }
@@ -37,6 +39,14 @@ struct HouseholdDetailView: View {
                         }
                     }
                     Section("household.roles") {
+                        if [.roleView, .roleCreate, .roleUpdate, .roleDelete, .memberAssignRole, .memberRemove].contains(where: {
+                            authorization.hasPermission($0, in: household, userId: userId)
+                        }) {
+                            NavigationLink(value: HouseholdRoute.roles(householdId: householdId)) {
+                                Label("roles.title", systemImage: "person.badge.key")
+                            }
+                            .accessibilityIdentifier("manageHouseholdRoles")
+                        }
                         ForEach(household.roles.filter { role in
                             authorization.hasPermission(.roleView, in: household, userId: userId)
                                 || authorization.hasPermission(.memberInvite, in: household, userId: userId)
@@ -79,9 +89,35 @@ struct HouseholdDetailView: View {
                             }
                         }
                     }
+                    if authorization.hasPermission(.delete, in: household, userId: userId) {
+                        Section {
+                            Button(role: .destructive) {
+                                deletion.requestConfirmation(for: household, accountId: userId)
+                            } label: {
+                                if deletion.isDeleting { ProgressView() }
+                                else { Label("household.delete", systemImage: "trash") }
+                            }
+                            .disabled(deletion.isDeleting || deletion.needsReload)
+                            .accessibilityIdentifier("deleteHousehold")
+                            if let error = deletion.errorMessage {
+                                Text(error).foregroundStyle(.red).accessibilityIdentifier("deleteHouseholdError")
+                                if deletion.needsReload {
+                                    Button("household.delete.reload") { Task { await refresh() } }
+                                }
+                            }
+                        } footer: { Text("household.delete.help") }
+                    }
                 }
                 .navigationTitle(household.name)
                 .toolbar {
+                    if authorization.hasPermission(.update, in: household, userId: userId) {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button { editingHousehold = household } label: {
+                                Label("household.edit.action", systemImage: "pencil")
+                            }
+                            .accessibilityIdentifier("editHousehold")
+                        }
+                    }
                     if authorization.hasPermission(.choreCreate, in: household, userId: userId) {
                         ToolbarItem(placement: .topBarTrailing) {
                             Button {
@@ -100,18 +136,40 @@ struct HouseholdDetailView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
+        .disabled(deletion.isDeleting)
+        .confirmationDialog("household.delete.confirmTitle", isPresented: $deletion.isShowingConfirmation, titleVisibility: .visible) {
+            Button("household.delete", role: .destructive) {
+                Task { await deletion.confirmDeletion(accountId: userId, using: store) }
+            }
+            Button("common.cancel", role: .cancel) { deletion.cancelConfirmation() }
+        } message: {
+            if let household = deletion.pendingHousehold {
+                Text(String(format: AppLocalization.string("household.delete.confirmMessage"), household.name))
+            }
+        }
+        .sheet(item: $editingHousehold) { household in
+            EditHouseholdView(household: household, userId: userId, onSaved: { deletion.didReload() },
+                              onReload: { Task { await refresh() } })
+        }
+        .onChange(of: deletion.didDelete) { _, deleted in
+            if deleted {
+                invitationRepository?.removeHousehold(householdId)
+                router.popToRoot()
+            }
+        }
         .task { await refresh() }
         .refreshable { await refresh() }
     }
 
     private func refresh() async {
-        guard !isLoading else { return }
+        guard !isLoading, !deletion.isDeleting else { return }
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
         do {
             _ = try await store.household(id: householdId, accountId: userId)
             _ = try await store.chores(accountId: userId, householdId: householdId)
+            deletion.didReload()
         } catch is CancellationError { }
         catch { errorMessage = error.localizedDescription }
     }

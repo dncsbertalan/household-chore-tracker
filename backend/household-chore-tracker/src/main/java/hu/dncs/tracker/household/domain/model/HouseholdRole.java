@@ -59,6 +59,25 @@ public class HouseholdRole {
         this.isSystemRole = isSystemRole;
     }
 
+    public static String normalizedName(String value) {
+        if (value == null) return "";
+        int start = 0, end = value.length();
+        while (start < end && isSpace(value.charAt(start))) start++;
+        while (end > start && isSpace(value.charAt(end - 1))) end--;
+        return value.substring(start, end);
+    }
+    private static boolean isSpace(char value) {
+        return Character.isWhitespace(value) || Character.isSpaceChar(value) || value == '\u0085' || value == '\u200B';
+    }
+
+    public void update(String name, java.util.Collection<Permission> permissions) {
+        if (Boolean.TRUE.equals(isSystemRole)) throw new IllegalStateException("System roles are read-only.");
+        this.name = name;
+        this.permissions.clear();
+        this.permissions.addAll(permissions);
+        this.updatedAt = Instant.now();
+    }
+
     public Boolean isIsSystemRole() {
         return isSystemRole;
     }

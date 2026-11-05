@@ -1,7 +1,7 @@
 import Foundation
 
 @MainActor
-struct RemoteHouseholdRepository: HouseholdRepositoryProtocol {
+struct RemoteHouseholdRepository: HouseholdRepositoryProtocol, HouseholdDeletionRepositoryProtocol, HouseholdUpdateRepositoryProtocol {
     let client: any APIClientProtocol
 
     func households(accountId: UUID) async throws -> [HouseholdResponse] {
@@ -14,6 +14,21 @@ struct RemoteHouseholdRepository: HouseholdRepositoryProtocol {
         var endpoint = APIEndpoint(path: "households/\(id)")
         endpoint.expectedAccountId = accountId
         return try await client.send(endpoint, as: HouseholdResponse.self)
+    }
+
+    func updateHousehold(id: UUID, accountId: UUID, request: UpdateHouseholdRequest, requestId: UUID) async throws -> HouseholdResponse {
+        var endpoint = APIEndpoint(path: "households/\(id)", method: .put,
+            headers: ["Idempotency-Key": requestId.uuidString], body: try JSONEncoder().encode(request))
+        endpoint.expectedAccountId = accountId
+        return try await client.send(endpoint, as: HouseholdResponse.self)
+    }
+
+    func deleteHousehold(id: UUID, version: Int64, accountId: UUID, requestId: UUID) async throws {
+        var endpoint = APIEndpoint(path: "households/\(id)", method: .delete,
+            queryItems: [URLQueryItem(name: "version", value: String(version)), URLQueryItem(name: "confirmed", value: "true")],
+            headers: ["Idempotency-Key": requestId.uuidString])
+        endpoint.expectedAccountId = accountId
+        try await client.sendWithoutResponse(endpoint)
     }
 
     func create(_ creation: HouseholdCreation) async throws -> HouseholdResponse {

@@ -1,6 +1,9 @@
 package hu.dncs.tracker.household.domain.model;
 
 public enum HouseholdPermission {
+    /** Edit the household name and description. */
+    HOUSEHOLD_UPDATE,
+
     /**
      * Delete the household.
      */

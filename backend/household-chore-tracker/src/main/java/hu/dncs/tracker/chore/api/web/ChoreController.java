@@ -6,6 +6,10 @@ import hu.dncs.tracker.chore.application.command.ChoreActionCommand;
 import hu.dncs.tracker.chore.domain.model.ChoreApprovalDecision;
 
 import hu.dncs.tracker.chore.application.usecase.GetChoreUseCase;
+import hu.dncs.tracker.chore.application.usecase.DeleteChoreUseCase;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import jakarta.validation.constraints.Min;
 import hu.dncs.tracker.chore.application.usecase.UpdateChoreUseCase;
 import hu.dncs.tracker.chore.api.web.request.UpdateChoreRequest;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -84,6 +88,15 @@ class ChoreController {
     }
 
     private final GetChoreUseCase getChore;
+    private final DeleteChoreUseCase deleteChore;
+
+    @DeleteMapping("/{id}")
+    @Idempotent("chore.delete")
+    ResponseEntity<Void> delete(@PathVariable UUID id, @RequestParam @Min(0) Long version,
+            @RequestParam(defaultValue = "false") boolean confirmed, Authentication authentication) {
+        deleteChore.execute(id, version, confirmed, UUID.fromString(authentication.getName()));
+        return ResponseEntity.noContent().build();
+    }
 
     @GetMapping("/{id}")
     ChoreResponse one(@PathVariable UUID id, Authentication authentication) {

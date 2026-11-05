@@ -44,6 +44,9 @@ public class HouseholdMember {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
+    @Column(name = "removed_at")
+    private Instant removedAt;
+
     @Version
     private Long version;
 
@@ -62,4 +65,26 @@ public class HouseholdMember {
 
         this.joinedAt = Instant.now();
     }
+    public void remove(Instant now) {
+        if (removedAt != null) throw new IllegalStateException("Membership is already removed.");
+        removedAt = Objects.requireNonNull(now);
+        updatedAt = now;
+    }
+
+    public void rejoin(HouseholdRole role, Instant now) {
+        if (removedAt == null) throw new IllegalStateException("Membership is already active.");
+        assignRole(role);
+        removedAt = null;
+        joinedAt = now;
+        updatedAt = now;
+    }
+
+    public void assignRole(HouseholdRole role) {
+        if (!household.getHouseholdId().equals(role.getHouseholdId())) {
+            throw new IllegalArgumentException("Member role must belong to the same household.");
+        }
+        householdRole = role;
+        updatedAt = Instant.now();
+    }
+
 }

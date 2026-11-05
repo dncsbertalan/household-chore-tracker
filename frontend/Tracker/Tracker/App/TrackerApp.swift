@@ -17,6 +17,19 @@ struct TrackerApp: App {
         let state = AppState()
         _appState = StateObject(wrappedValue: state)
         #if DEBUG
+        if HouseholdRoleUITestFixture.isEnabled {
+            let repository = HouseholdRoleUITestRepository()
+            _store = State(initialValue: HouseholdStore(households: repository, chores: repository, roles: repository))
+            state.isAuthenticated = true
+            state.isOnline = true
+            registrationService = nil
+            loginService = nil
+            logoutService = nil
+            currentUserService = HouseholdRoleUITestUserService()
+            tokenStore = nil
+            invitationRepository = nil
+            return
+        }
         if ChoreUITestFixture.isEnabled {
             let repository = ChoreUITestRepository()
             _store = State(initialValue: HouseholdStore(households: repository, chores: repository))
@@ -57,7 +70,8 @@ struct TrackerApp: App {
             let authenticatedClient = AuthenticatedAPIClient(client: client, session: session)
             currentUserService = CurrentUserService(client: authenticatedClient)
             let store = HouseholdStore(households: RemoteHouseholdRepository(client: authenticatedClient),
-                                       chores: RemoteChoreRepository(client: authenticatedClient))
+                                       chores: RemoteChoreRepository(client: authenticatedClient),
+                                       roles: RemoteHouseholdRoleRepository(client: authenticatedClient))
             _store = State(initialValue: store)
             invitationRepository = HouseholdInvitationRepository(
                 service: HouseholdInvitationService(client: authenticatedClient), store: store)
@@ -81,7 +95,7 @@ struct TrackerApp: App {
             .environment(store)
             .task {
                 #if DEBUG
-                if InvitationUITestFixture.isEnabled || ChoreUITestFixture.isEnabled { return }
+                if InvitationUITestFixture.isEnabled || ChoreUITestFixture.isEnabled || HouseholdRoleUITestFixture.isEnabled { return }
                 #endif
                 // Connectivity is informational; failed requests use the normal API error path.
                 connectivityMonitor.start { appState.isOnline = $0 }

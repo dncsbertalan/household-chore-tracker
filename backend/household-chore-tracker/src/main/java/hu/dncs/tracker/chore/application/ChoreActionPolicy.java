@@ -11,7 +11,7 @@ import static hu.dncs.tracker.household.domain.model.HouseholdPermission.*;
 public class ChoreActionPolicy {
     public ChoreActions actions(Chore chore, ChoreSchedule schedule, ChoreOccurrence current,
                                 ChoreCompletion pending, List<ChoreApproval> reviews, HouseholdMember actor, List<ChoreOccurrence> history) {
-        if (!actor.getHouseholdRole().getHouseholdId().equals(chore.getHouseholdId())) {
+        if (actor.getRemovedAt() != null || !actor.getHouseholdRole().getHouseholdId().equals(chore.getHouseholdId())) {
             return new ChoreActions(false, false, false, false);
         }
         var grants = actor.getHouseholdRole().getPermissions().stream().map(Permission::getName).toList();

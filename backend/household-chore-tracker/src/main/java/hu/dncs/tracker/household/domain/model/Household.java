@@ -68,6 +68,29 @@ public class Household {
         return description;
     }
 
+    /** Match Swift's CharacterSet.whitespacesAndNewlines, including NBSP, NEL, and zero-width space. */
+    public static String trimmedText(String value) {
+        if (value == null) return "";
+        int start = 0, end = value.length();
+        while (start < end && isSpace(value.charAt(start))) start++;
+        while (end > start && isSpace(value.charAt(end - 1))) end--;
+        return value.substring(start, end);
+    }
+
+    private static boolean isSpace(char value) {
+        return (value >= '\t' && value <= '\r') || Character.isSpaceChar(value)
+                || value == '\u0085' || value == '\u200B';
+    }
+
+    public void updateDetails(String name, String description) {
+        var nextName = validateName(trimmedText(name));
+        var nextDescription = trimmedText(description);
+        validateDescription(nextDescription);
+        this.name = nextName;
+        this.description = nextDescription.isEmpty() ? null : nextDescription;
+        this.updatedAt = Instant.now();
+    }
+
     public void rename(String newName) {
         this.name = validateName(newName);
         this.updatedAt = Instant.now();

@@ -1,6 +1,13 @@
 package hu.dncs.tracker.household.api.web;
 
 import hu.dncs.tracker.household.application.usecase.GetHouseholdsUseCase;
+import hu.dncs.tracker.household.application.usecase.UpdateHouseholdUseCase;
+import hu.dncs.tracker.household.api.web.request.UpdateHouseholdRequest;
+import org.springframework.web.bind.annotation.PutMapping;
+import hu.dncs.tracker.household.application.usecase.DeleteHouseholdUseCase;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import jakarta.validation.constraints.Min;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import java.util.List;
@@ -30,6 +37,22 @@ class HouseholdController {
     private final CreateHouseholdUseCase createHouseholdUseCase;
 
     private final GetHouseholdsUseCase getHouseholds;
+    private final DeleteHouseholdUseCase deleteHousehold;
+    private final UpdateHouseholdUseCase updateHousehold;
+
+    @PutMapping("/{id}")
+    @Idempotent("household.update")
+    HouseholdResponse update(@PathVariable UUID id, @Valid @RequestBody UpdateHouseholdRequest request, Authentication authentication) {
+        return HouseholdResponse.from(updateHousehold.execute(id, request.toCommand(), UUID.fromString(authentication.getName())));
+    }
+
+    @DeleteMapping("/{id}")
+    @Idempotent("household.delete")
+    ResponseEntity<Void> delete(@PathVariable UUID id, @RequestParam @Min(0) Long version,
+            @RequestParam(defaultValue = "false") boolean confirmed, Authentication authentication) {
+        deleteHousehold.execute(id, version, confirmed, UUID.fromString(authentication.getName()));
+        return ResponseEntity.noContent().build();
+    }
 
     @GetMapping
     List<HouseholdResponse> all(Authentication authentication) {

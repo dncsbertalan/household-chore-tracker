@@ -6,6 +6,7 @@ import hu.dncs.tracker.chore.application.model.ChoreDetails;
 import hu.dncs.tracker.chore.domain.model.*;
 import hu.dncs.tracker.chore.infrastructure.persistence.*;
 import hu.dncs.tracker.household.application.HouseholdAuthorizationService;
+import hu.dncs.tracker.chore.application.ChoreWriteLock;
 import hu.dncs.tracker.household.domain.model.HouseholdMember;
 import hu.dncs.tracker.household.infrastructure.persistence.HouseholdMemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class ChoreCompletionUseCase {
     private final ChoreCompletionRepository completions;
     private final ChoreApprovalRepository approvals;
     private final HouseholdMemberRepository members;
+    private final ChoreWriteLock writeLock;
     private final HouseholdAuthorizationService authorization;
     private final GetChoreUseCase getChore;
     private final Clock clock;
@@ -108,7 +110,7 @@ public class ChoreCompletionUseCase {
         }
     }
 
-    private Chore lock(UUID id) { return chores.findForUpdate(id).orElseThrow(ChoreNotFoundException::new); }
+    private Chore lock(UUID id) { return writeLock.chore(id); }
     private HouseholdMember actor(Chore chore, UUID userId) {
         return members.findByHousehold_HouseholdIdAndUserId(chore.getHouseholdId(), userId)
                 .orElseThrow(() -> new AccessDeniedException("Household membership is required."));

@@ -72,6 +72,8 @@ struct HouseholdCoordinatorView: View {
     @ViewBuilder
     private func destination(for route: HouseholdRoute) -> some View {
         switch route {
+        case .roles(let householdId):
+            if let userId = model.userId { HouseholdRolesView(householdId: householdId, userId: userId) }
         case .choreDetail(let choreId):
             if let userId = model.userId {
                 ChoreDetailView(choreId: choreId, userId: userId)

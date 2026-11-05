@@ -8,6 +8,14 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @RestControllerAdvice(assignableTypes = ChoreController.class)
 class ChoreExceptionHandler extends ResponseEntityExceptionHandler {
+    @ExceptionHandler(ChoreDeletionException.class)
+    ProblemDetail deletion(ChoreDeletionException exception) {
+        var status = exception.reason() == ChoreDeletionException.Reason.STALE ? HttpStatus.CONFLICT : HttpStatus.BAD_REQUEST;
+        var problem = ProblemDetail.forStatusAndDetail(status, exception.getMessage());
+        problem.setProperty("code", "chore_delete_" + exception.reason().name().toLowerCase(java.util.Locale.ROOT));
+        return problem;
+    }
+
     @ExceptionHandler(ChoreNotFoundException.class)
     ProblemDetail notFound(ChoreNotFoundException exception) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, exception.getMessage());

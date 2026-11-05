@@ -11,6 +11,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface HouseholdInvitationRepository extends JpaRepository<HouseholdInvitation, UUID> {
+    boolean existsByHouseholdRole_HouseholdRoleId(UUID roleId);
+
     @Query("select invitation.household.householdId from HouseholdInvitation invitation where invitation.householdInvitationId = :id")
     Optional<UUID> findHouseholdId(@Param("id") UUID id);
 

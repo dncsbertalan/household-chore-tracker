@@ -11,6 +11,7 @@ import hu.dncs.tracker.chore.infrastructure.persistence.ChoreOccurrenceRepositor
 import hu.dncs.tracker.chore.infrastructure.persistence.ChoreRepository;
 import hu.dncs.tracker.chore.infrastructure.persistence.ChoreScheduleRepository;
 import hu.dncs.tracker.household.application.HouseholdAuthorizationService;
+import hu.dncs.tracker.chore.application.ChoreWriteLock;
 import hu.dncs.tracker.household.domain.model.HouseholdPermission;
 import hu.dncs.tracker.household.infrastructure.persistence.HouseholdMemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class CreateChoreUseCase {
+    private final ChoreWriteLock writeLock;
     private final HouseholdAuthorizationService householdAuthorizationService;
     private final HouseholdMemberRepository householdMemberRepository;
     private final ChoreRepository choreRepository;
@@ -35,6 +37,7 @@ public class CreateChoreUseCase {
 
     @Transactional
     public CreatedChore execute(CreateChoreCommand command, UUID authenticatedUserId) {
+        writeLock.household(command.householdId());
         householdAuthorizationService.requirePermission(command.householdId(), authenticatedUserId, HouseholdPermission.CHORE_CREATE);
         var actor = householdMemberRepository.findByHousehold_HouseholdIdAndUserId(command.householdId(), authenticatedUserId)
                 .orElseThrow(() -> new AccessDeniedException("Household membership is required."));

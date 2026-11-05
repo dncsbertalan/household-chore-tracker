@@ -49,5 +49,15 @@ final class InvitationLists {
         }
     }
 
+    func removeHousehold(_ householdId: UUID) {
+        for account in Array(contents.accounts.keys) {
+            contents.accounts[account]?.removeValue(forKey: householdId.uuidString)
+            for scope in Array((contents.accounts[account] ?? [:]).keys) {
+                guard let old = contents.accounts[account]?[scope] else { continue }
+                contents.accounts[account]?[scope] = Snapshot(invitations: old.invitations.filter { $0.householdId != householdId }, fetchedAt: old.fetchedAt)
+            }
+        }
+    }
+
     func clear() { contents = Contents() }
 }

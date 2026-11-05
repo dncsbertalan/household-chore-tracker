@@ -78,6 +78,12 @@ public class Chore {
         this.requiredApprovalCount = requiredApprovalCount;
     }
 
+    public boolean removeAssignee(UUID memberId, UUID actor, Instant now) {
+        if (!assignedMemberIds.remove(memberId)) return false;
+        recordActivity(actor, now);
+        return true;
+    }
+
     public void recordActivity(UUID actor, Instant now) {
         updatedByHouseholdMemberId = Objects.requireNonNull(actor);
         updatedAt = now;

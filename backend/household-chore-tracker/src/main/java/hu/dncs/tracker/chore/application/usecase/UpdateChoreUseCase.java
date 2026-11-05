@@ -14,6 +14,7 @@ import hu.dncs.tracker.chore.infrastructure.persistence.ChoreOccurrenceRepositor
 import hu.dncs.tracker.chore.infrastructure.persistence.ChoreRepository;
 import hu.dncs.tracker.chore.infrastructure.persistence.ChoreScheduleRepository;
 import hu.dncs.tracker.household.application.HouseholdAuthorizationService;
+import hu.dncs.tracker.chore.application.ChoreWriteLock;
 import hu.dncs.tracker.household.infrastructure.persistence.HouseholdMemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,13 +34,14 @@ public class UpdateChoreUseCase {
     private final ChoreScheduleRepository schedules;
     private final ChoreOccurrenceRepository occurrences;
     private final HouseholdMemberRepository members;
+    private final ChoreWriteLock writeLock;
     private final HouseholdAuthorizationService authorization;
     private final ChoreInputValidator validator;
     private final GetChoreUseCase getChore;
 
     @Transactional
     public ChoreDetails execute(UUID id, UpdateChoreCommand command, UUID userId) {
-        var chore = chores.findForUpdate(id).orElseThrow(ChoreNotFoundException::new);
+        var chore = writeLock.chore(id);
         authorization.requirePermission(chore.getHouseholdId(), userId, CHORE_UPDATE);
 
         var actor = members.findByHousehold_HouseholdIdAndUserId(chore.getHouseholdId(), userId).orElseThrow().getHouseholdMemberId();

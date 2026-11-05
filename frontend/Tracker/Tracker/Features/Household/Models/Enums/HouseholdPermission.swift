@@ -2,6 +2,9 @@ import Foundation
 
 /// Stable names from the backend's HouseholdPermission catalog; server IDs are not local IDs.
 nonisolated enum HouseholdPermission: String, Codable, CaseIterable, Identifiable, Sendable {
+    /// Edit the household name and description.
+    case update = "HOUSEHOLD_UPDATE"
+
     /// Delete the household.
     case delete = "HOUSEHOLD_DELETE"
 
@@ -44,6 +47,7 @@ nonisolated enum HouseholdPermission: String, Codable, CaseIterable, Identifiabl
 
     var title: String {
         switch self {
+        case .update: AppLocalization.string("household.permission.update")
         case .delete: AppLocalization.string("household.permission.delete")
         case .memberView: AppLocalization.string("household.permission.memberView")
         case .memberInvite: AppLocalization.string("household.permission.memberInvite")

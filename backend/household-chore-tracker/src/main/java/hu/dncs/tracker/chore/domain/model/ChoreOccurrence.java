@@ -102,6 +102,14 @@ public class ChoreOccurrence {
         return occurrenceStatus == ChoreOccurrenceStatus.PENDING || occurrenceStatus == ChoreOccurrenceStatus.IN_PROGRESS;
     }
 
+    public boolean removeActiveAssignee(UUID memberId, UUID actor, Instant now) {
+        if (!(isEditable() || occurrenceStatus == ChoreOccurrenceStatus.AWAITING_APPROVAL)
+                || !assignedMemberIds.remove(memberId)) return false;
+        updatedByHouseholdMemberId = Objects.requireNonNull(actor);
+        updatedAt = now;
+        return true;
+    }
+
     public void update(String title, String description, Collection<UUID> assignees, int approvalCount,
                        Instant scheduledAt, Instant dueAt, UUID actor) {
         if (!isEditable()) throw new IllegalStateException("Closed chore occurrences cannot be edited.");

@@ -59,9 +59,8 @@ public class HouseholdInvitationService {
     public HouseholdInvitationDetails invite(UUID householdId, InviteHouseholdMemberCommand command, UUID callerId) {
         requireEmail(callerId);
 
-        householdAuthorizationService.requirePermission(householdId, callerId, HOUSEHOLD_MEMBER_INVITE);
-
         var household = lockHousehold(householdId);
+        householdAuthorizationService.requirePermission(householdId, callerId, HOUSEHOLD_MEMBER_INVITE);
         var role = householdRoleRepository.findById(command.householdRoleId())
                 .filter(candidate -> householdId.equals(candidate.getHouseholdId()))
                 .orElseThrow(() -> new HouseholdInvitationException(INVALID_REQUEST, "The invited role must belong to this household."));
@@ -115,8 +114,11 @@ public class HouseholdInvitationService {
         var household = invitation.getHousehold();
         requireNotMember(household.getHouseholdId(), callerId);
 
-        var membership = householdMemberRepository.saveAndFlush(new HouseholdMember(UUID.randomUUID(), household,
-                callerId, invitation.getHouseholdRole()));
+        // Reuse the historical identity, including self-approval attribution, on an explicit re-invitation.
+        var membership = householdMemberRepository.findIncludingRemoved(household.getHouseholdId(), callerId)
+                .map(previous -> { previous.rejoin(invitation.getHouseholdRole(), now); return previous; })
+                .orElseGet(() -> new HouseholdMember(UUID.randomUUID(), household, callerId, invitation.getHouseholdRole()));
+        householdMemberRepository.saveAndFlush(membership);
         invitation.respond(ACCEPTED, now);
         householdInvitationRepository.flush();
 
@@ -142,9 +144,8 @@ public class HouseholdInvitationService {
     public void revoke(UUID householdId, UUID invitationId, UUID callerId) {
         requireEmail(callerId);
 
-        householdAuthorizationService.requirePermission(householdId, callerId, HOUSEHOLD_MEMBER_INVITE);
-
         lockHousehold(householdId);
+        householdAuthorizationService.requirePermission(householdId, callerId, HOUSEHOLD_MEMBER_INVITE);
 
         var invitation = householdInvitationRepository.findById(invitationId)
                 .filter(candidate -> householdId.equals(candidate.getHousehold().getHouseholdId()))

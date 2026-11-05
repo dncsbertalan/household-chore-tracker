@@ -29,7 +29,7 @@ final class HouseholdInvitationRepository: HouseholdInvitationRepositoryProtocol
         else { result = try await service.inbox(accountId: accountId) }
         try Task.checkCancellation()
         guard self.session == session, action == actionRevision else { throw CancellationError() }
-        lists.save(result, accountId: accountId, householdId: householdId)
+        lists.save(result.filter { !store.isHouseholdDeleted($0.householdId) }, accountId: accountId, householdId: householdId)
         revision += 1
     }
 
@@ -42,6 +42,11 @@ final class HouseholdInvitationRepository: HouseholdInvitationRepositoryProtocol
             guard self.session == session, !Task.isCancelled else { return }
             try? await load(accountId: accountId, householdId: id, refresh: true)
         }
+    }
+
+    func removeHousehold(_ householdId: UUID) {
+        lists.removeHousehold(householdId)
+        didMutate()
     }
 
     func clearSession() {
@@ -63,6 +68,7 @@ final class HouseholdInvitationRepository: HouseholdInvitationRepositoryProtocol
                                                 accountId: accountId, requestId: requestId)
         try Task.checkCancellation()
         guard self.session == session else { throw CancellationError() }
+        guard !store.isHouseholdDeleted(response.householdId) else { throw CancellationError() }
         lists.record(response, accountId: accountId)
         didMutate()
         return response
@@ -73,6 +79,7 @@ final class HouseholdInvitationRepository: HouseholdInvitationRepositoryProtocol
         let response = try await service.accept(invitation, accountId: accountId, requestId: requestId)
         try Task.checkCancellation()
         guard self.session == session else { throw CancellationError() }
+        guard !store.isHouseholdDeleted(response.householdId) else { throw CancellationError() }
         store.record(HouseholdResponse(householdId: response.householdId, name: response.name,
             description: response.description, createdByUserId: response.createdByUserId, version: response.version,
             roles: response.roles, creatorMembership: nil, members: [response.membership]))
@@ -85,6 +92,7 @@ final class HouseholdInvitationRepository: HouseholdInvitationRepositoryProtocol
         let response = try await service.decline(invitation, accountId: accountId, requestId: requestId)
         try Task.checkCancellation()
         guard self.session == session else { throw CancellationError() }
+        guard !store.isHouseholdDeleted(response.householdId) else { throw CancellationError() }
         lists.record(response, accountId: accountId)
         didMutate()
     }
