@@ -34,6 +34,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/households")
 @RequiredArgsConstructor
 class HouseholdController {
+    private final HouseholdResponseMapper responses;
     private final CreateHouseholdUseCase createHouseholdUseCase;
 
     private final GetHouseholdsUseCase getHouseholds;
@@ -43,7 +44,7 @@ class HouseholdController {
     @PutMapping("/{id}")
     @Idempotent("household.update")
     HouseholdResponse update(@PathVariable UUID id, @Valid @RequestBody UpdateHouseholdRequest request, Authentication authentication) {
-        return HouseholdResponse.from(updateHousehold.execute(id, request.toCommand(), UUID.fromString(authentication.getName())));
+        return responses.from(updateHousehold.execute(id, request.toCommand(), UUID.fromString(authentication.getName())));
     }
 
     @DeleteMapping("/{id}")
@@ -56,12 +57,12 @@ class HouseholdController {
 
     @GetMapping
     List<HouseholdResponse> all(Authentication authentication) {
-        return getHouseholds.all(UUID.fromString(authentication.getName())).stream().map(HouseholdResponse::from).toList();
+        return responses.from(getHouseholds.all(UUID.fromString(authentication.getName())));
     }
 
     @GetMapping("/{id}")
     HouseholdResponse one(@PathVariable UUID id, Authentication authentication) {
-        return HouseholdResponse.from(getHouseholds.one(id, UUID.fromString(authentication.getName())));
+        return responses.from(getHouseholds.one(id, UUID.fromString(authentication.getName())));
     }
 
     @PostMapping
@@ -77,6 +78,6 @@ class HouseholdController {
         );
 
         return ResponseEntity.created(URI.create("/api/v1/households/" + created.household().getHouseholdId()))
-                .body(HouseholdResponse.from(created));
+                .body(responses.from(created));
     }
 }

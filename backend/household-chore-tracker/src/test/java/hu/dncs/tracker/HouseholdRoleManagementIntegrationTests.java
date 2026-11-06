@@ -52,6 +52,12 @@ class HouseholdRoleManagementIntegrationTests {
     @Test void roleEditorCanGrantTheNewPermissionAndThenApproveTheirPendingCompletion() throws Exception {
         var f = admin();
         var original = read(f);
+        var userInfo = original.household().members().getFirst().userInfo();
+        var account = users.findById(f.user).orElseThrow();
+        assertThat(userInfo.userId()).isEqualTo(f.user);
+        assertThat(userInfo.email()).isEqualTo(account.getEmail());
+        assertThat(userInfo.firstName()).isEqualTo(account.getFirstName());
+        assertThat(userInfo.lastName()).isEqualTo(account.getLastName());
         assertThat(original.permissions()).extracting(PermissionResponse::name).contains("CHORE_SELF_APPROVE_COMPLETION");
         assertThat(role(original, f.role).permissions()).extracting(PermissionResponse::name).doesNotContain("CHORE_SELF_APPROVE_COMPLETION");
         var choreId = UUID.randomUUID();

@@ -29,7 +29,7 @@ struct ProfileView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 32) {
-                connectionStatus
+                ConnectionStatusView(isOnline: isOnline)
 
                 if !isAuthenticated {
                     ContentUnavailableView(
@@ -113,20 +113,6 @@ struct ProfileView: View {
         }
     }
 
-    private var connectionStatus: some View {
-        let color: Color = isOnline ? .green : .red
-        let title: LocalizedStringKey = isOnline
-            ? "profile.connection.connected" : "profile.connection.notConnected"
-
-        return Label(title, systemImage: isOnline ? "wifi" : "wifi.slash")
-            .font(.caption.weight(.semibold))
-            .foregroundStyle(color)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(color.opacity(0.12), in: Capsule())
-            .accessibilityIdentifier("profile.connectionStatus")
-    }
-
     private func profileHeader(for user: CurrentUser) -> some View {
         var name = PersonNameComponents()
         name.givenName = user.firstName
@@ -138,21 +124,7 @@ struct ProfileView: View {
             .uppercased()
 
         return VStack(spacing: 16) {
-            Circle()
-                .fill(LinearGradient(
-                    colors: [Color(.systemGray3), Color(.systemGray)],
-                    startPoint: .top, endPoint: .bottom
-                ))
-                .frame(width: 104, height: 104)
-                .overlay {
-                    Text(initials)
-                        .font(.system(size: 40, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white)
-                        .minimumScaleFactor(0.5)
-                        .lineLimit(1)
-                        .padding(12)
-                }
-                .accessibilityHidden(true)
+            AvatarView(firstName: user.firstName, lastName: user.lastName, size: 104)
 
             Text(displayName)
                 .font(.title.bold())

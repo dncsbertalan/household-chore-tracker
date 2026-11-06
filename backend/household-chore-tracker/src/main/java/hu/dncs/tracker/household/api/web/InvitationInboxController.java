@@ -15,6 +15,7 @@ import java.util.UUID;
 @RequestMapping("/api/v1/household-invitations")
 @RequiredArgsConstructor
 class InvitationInboxController {
+    private final HouseholdResponseMapper responses;
     private final HouseholdInvitationService householdInvitationService;
 
     @GetMapping
@@ -30,7 +31,7 @@ class InvitationInboxController {
     @PostMapping("/{invitationId}/accept")
     @Idempotent("household.invitation.accept")
     JoinedHouseholdResponse accept(@PathVariable UUID invitationId, @CurrentUserId UUID userId) {
-        return JoinedHouseholdResponse.from(householdInvitationService.accept(invitationId, userId));
+        return responses.from(householdInvitationService.accept(invitationId, userId));
     }
 
     @PostMapping("/{invitationId}/decline")

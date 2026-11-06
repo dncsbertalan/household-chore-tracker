@@ -23,3 +23,7 @@ struct SuccessToast: View {
         .allowsHitTesting(false)
     }
 }
+
+#Preview {
+    SuccessToast(title: "Hello")
+}

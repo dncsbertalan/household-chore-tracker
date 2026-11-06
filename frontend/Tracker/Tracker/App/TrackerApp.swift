@@ -8,7 +8,7 @@ struct TrackerApp: App {
     private let loginService: (any LoginServiceProtocol)?
     private let logoutService: (any LogoutServiceProtocol)?
     private let currentUserService: (any CurrentUserServiceProtocol)?
-    private let roleRepository: (any HouseholdRoleRepositoryProtocol)?
+    private let roleRepository: OfflineFirstHouseholdRoleRepository?
     private let invitationRepository: HouseholdInvitationRepository?
     private let tokenStore: KeychainTokenStore?
     private let connectivityMonitor = NetworkConnectivityMonitor()
@@ -30,7 +30,9 @@ struct TrackerApp: App {
             let session = TokenRefreshService(client: client, tokenStore: tokens)
             let authenticatedClient = AuthenticatedAPIClient(client: client, session: session)
             currentUserService = CurrentUserService(client: authenticatedClient)
-            roleRepository = RemoteHouseholdRoleRepository(client: authenticatedClient)
+            roleRepository = OfflineFirstHouseholdRoleRepository(
+                remote: RemoteHouseholdRoleRepository(client: authenticatedClient),
+                local: FileHouseholdRoleStore(namespace: configuration.baseURL.absoluteString))
             let store = HouseholdStore(households: RemoteHouseholdRepository(client: authenticatedClient),
                                        chores: RemoteChoreRepository(client: authenticatedClient))
             _store = State(initialValue: store)
@@ -55,6 +57,9 @@ struct TrackerApp: App {
                      invitationRepository: invitationRepository, roleRepository: roleRepository)
             .environmentObject(appState)
             .environment(store)
+            .onChange(of: appState.sessionRevision) { _, _ in
+                roleRepository?.invalidateSession()
+            }
             .task {
                 // Connectivity is informational; failed requests use the normal API error path.
                 connectivityMonitor.start { appState.isOnline = $0 }

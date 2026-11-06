@@ -49,6 +49,38 @@ class HouseholdEditingIntegrationTests {
     @Autowired UserRepository users;
     @Autowired PlatformTransactionManager transactions;
 
+    @Test void creationAndReadsIncludeUserInfoForEveryMembership() throws Exception {
+        var user = users.saveAndFlush(new User(UUID.randomUUID() + "@example.com", "Ada", "Lovelace"));
+        var householdId = UUID.randomUUID();
+        var roleId = UUID.randomUUID();
+        var payload = Map.of("householdId", householdId, "name", "Home", "roles",
+                List.of(Map.of("householdRoleId", roleId, "name", "Member", "permissions", List.of())),
+                "creatorRoleId", roleId, "householdMemberId", UUID.randomUUID());
+        var created = mvc.perform(post("/api/v1/households")
+                .with(jwt().jwt(j -> j.subject(user.getId().toString())))
+                .header("Idempotency-Key", UUID.randomUUID()).contentType(APPLICATION_JSON)
+                .content(mapper.writeValueAsString(payload)))
+                .andExpect(status().isCreated()).andReturn();
+        for (var path : List.of("$.creatorMembership.userInfo", "$.members[0].userInfo")) {
+            assertUserInfo(created, path, user);
+        }
+        var detail = mvc.perform(get("/api/v1/households/" + householdId)
+                .with(jwt().jwt(j -> j.subject(user.getId().toString()))))
+                .andExpect(status().isOk()).andReturn();
+        assertUserInfo(detail, "$.members[0].userInfo", user);
+        var listing = mvc.perform(get("/api/v1/households")
+                .with(jwt().jwt(j -> j.subject(user.getId().toString()))))
+                .andExpect(status().isOk()).andReturn();
+        assertUserInfo(listing, "$[0].members[0].userInfo", user);
+    }
+
+    private void assertUserInfo(MvcResult response, String path, User user) throws Exception {
+        jsonPath(path + ".userId").value(user.getId().toString()).match(response);
+        jsonPath(path + ".email").value(user.getEmail()).match(response);
+        jsonPath(path + ".firstName").value(user.getFirstName()).match(response);
+        jsonPath(path + ".lastName").value(user.getLastName()).match(response);
+    }
+
     @Test void updateGrantAloneEditsOnlyDetailsAndReturnsOnlyVisibleRolesAndMembers() throws Exception {
         var f = fixture(Set.of(HOUSEHOLD_UPDATE));
         person(f, Set.of(CHORE_COMPLETE));

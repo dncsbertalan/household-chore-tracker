@@ -108,6 +108,10 @@ class HouseholdInvitationIntegrationTests {
         jsonPath("$.name").value("Our home").match(accepted);
         jsonPath("$.roles.length()").value(2).match(accepted);
         jsonPath("$.membership.userId").value(recipient.toString()).match(accepted);
+        jsonPath("$.membership.userInfo.userId").value(recipient.toString()).match(accepted);
+        jsonPath("$.membership.userInfo.email").value(recipientEmail).match(accepted);
+        jsonPath("$.membership.userInfo.firstName").value("Test").match(accepted);
+        jsonPath("$.membership.userInfo.lastName").value("User").match(accepted);
         jsonPath("$.membership.householdRole.householdRoleId").value(memberRoleId.toString()).match(accepted);
         jsonPath("$.membership.householdRole.permissions[0].name").value("CHORE_CREATE").match(accepted);
         jsonPath("$.membership.joinedAt").exists().match(accepted);
