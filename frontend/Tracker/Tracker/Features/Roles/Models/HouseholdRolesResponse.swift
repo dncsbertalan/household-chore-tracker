@@ -1,16 +1,16 @@
 import Foundation
 
-nonisolated struct HouseholdRolesResponse: Decodable, Sendable {
-    let household: HouseholdResponse
+nonisolated struct HouseholdRolesResponse: Codable, Sendable {
+    let household: Household
     let permissions: [CatalogPermission]
     let actions: Actions
 
-    struct CatalogPermission: Decodable, Sendable, Identifiable {
+    struct CatalogPermission: Codable, Sendable, Identifiable {
         var id: HouseholdPermission { name }
         let name: HouseholdPermission
         let description: String?
     }
-    struct Actions: Decodable, Sendable {
+    struct Actions: Codable, Sendable {
         let canView: Bool
         let canCreate: Bool
         let canUpdate: Bool
@@ -33,19 +33,4 @@ nonisolated struct HouseholdRolesResponse: Decodable, Sendable {
             canRemoveMembers = try values.decodeIfPresent(Bool.self, forKey: .canRemoveMembers) ?? false
         }
     }
-}
-
-nonisolated struct SaveHouseholdRoleRequest: Encodable, Equatable, Sendable {
-    let name: String
-    let permissions: [HouseholdPermission]
-}
-nonisolated struct UpdateHouseholdRoleRequest: Encodable, Equatable, Sendable {
-    let name: String
-    let permissions: [HouseholdPermission]
-    let version: Int64
-}
-nonisolated struct AssignHouseholdRoleRequest: Encodable, Equatable, Sendable {
-    let roleId: UUID
-    let memberVersion: Int64
-    let roleVersion: Int64
 }

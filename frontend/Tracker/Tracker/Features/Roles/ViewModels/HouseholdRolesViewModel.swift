@@ -5,72 +5,116 @@ import Observation
 @Observable
 final class HouseholdRolesViewModel {
     private(set) var data: HouseholdRolesResponse?
-    private(set) var isLoading = false
+    private(set) var isRefreshing = false
+    private(set) var loadError: String?
+    private(set) var actionFailure: HouseholdRoleError?
+    private(set) var busyRoleId: UUID?
     private(set) var busyMemberId: UUID?
     private(set) var hasLeftHousehold = false
     var isBusy: Bool { busyRoleId != nil || busyMemberId != nil }
-    private var removal: (id: UUID, version: Int64, requestId: UUID)?
-    private(set) var busyRoleId: UUID?
-    private(set) var errorMessage: String?
-    private(set) var actionError: String?
-    private(set) var needsReload = false
+    var isLoading: Bool { data == nil && isRefreshing }
+    var needsReload: Bool { actionFailure?.needsReload == true }
+    private var revision = 0
     private var deletion: (id: UUID, version: Int64, requestId: UUID)?
+    private var removal: (id: UUID, version: Int64, requestId: UUID)?
 
-    func load(householdId: UUID, accountId: UUID, using store: HouseholdStore) async {
-        guard !isLoading, !isBusy else { return }
-        isLoading = true
-        errorMessage = nil
-        defer { isLoading = false }
-        do { apply(try await store.roles(householdId: householdId, accountId: accountId)) }
-        catch is CancellationError { }
-        catch { errorMessage = HouseholdRoleError(error).message }
+    func load(householdId: UUID, accountId: UUID, using repository: any HouseholdRoleRepositoryProtocol) async {
+        guard !isRefreshing, !isBusy, !hasLeftHousehold else { return }
+        isRefreshing = true
+        loadError = nil
+        let revision = revision
+        defer { isRefreshing = false }
+        if data == nil {
+            let cached = await repository.cachedRoles(householdId: householdId, accountId: accountId)
+            guard !Task.isCancelled, self.revision == revision else { return }
+            data = cached
+        }
+        do {
+            let response = try await repository.roles(householdId: householdId, accountId: accountId)
+            try Task.checkCancellation()
+            guard self.revision == revision else { return }
+            accept(response)
+        } catch {
+            guard self.revision == revision, !HouseholdRoleFailure.isCancellation(error) else { return }
+            if HouseholdRoleFailure.invalidatesSnapshot(error) { data = nil }
+            // Keep the offline snapshot visible only for connection/server failures.
+            if data == nil { loadError = HouseholdRoleError(error).message }
+            else if !HouseholdRoleFailure.canUseCachedData(after: error) {
+                actionFailure = HouseholdRoleError(error)
+            }
+        }
     }
-    func apply(_ response: HouseholdRolesResponse) {
+
+    func accept(_ response: HouseholdRolesResponse) {
+        revision += 1
         data = response
-        actionError = nil
-        needsReload = false
+        loadError = nil
+        actionFailure = nil
+        resetAttempts()
+    }
+
+    func delete(_ role: HouseholdRole, accountId: UUID, using repository: any HouseholdRoleRepositoryProtocol) async {
+        guard data?.actions.canDelete == true, !role.isSystemRole, !isBusy, !isLoading, !needsReload else { return }
+        busyRoleId = role.householdRoleId
+        actionFailure = nil
+        revision += 1
+        defer { busyRoleId = nil }
+        do {
+            let response = try await deletionOperation(role, accountId: accountId, using: repository)()
+            try Task.checkCancellation()
+            accept(response)
+        } catch { recordFailure(error) }
+    }
+
+    func remove(_ member: HouseholdMember, accountId: UUID, using repository: any HouseholdRoleRepositoryProtocol) async {
+        guard data?.actions.canRemoveMembers == true, !isBusy, !isLoading, !needsReload, !hasLeftHousehold else { return }
+        busyMemberId = member.householdMemberId
+        actionFailure = nil
+        revision += 1
+        defer { busyMemberId = nil }
+        do {
+            let response = try await removalOperation(member, accountId: accountId, using: repository)()
+            try Task.checkCancellation()
+            if let management = response.management { accept(management) }
+            else { data = nil; hasLeftHousehold = true }
+        } catch { recordFailure(error) }
+    }
+
+    private func recordFailure(_ error: Error) {
+        guard !HouseholdRoleFailure.isCancellation(error) else { return }
+        actionFailure = HouseholdRoleError(error)
+        if HouseholdRoleFailure.invalidatesSnapshot(error) {
+            data = nil
+            loadError = actionFailure?.message
+        }
+    }
+
+    func resetAttempts() {
         deletion = nil
         removal = nil
     }
-    func delete(_ role: HouseholdResponse.Role, accountId: UUID, using store: HouseholdStore) async {
-        guard data?.actions.canDelete == true, !role.isSystemRole, !isBusy, !needsReload else { return }
+
+    func deletionOperation(_ role: HouseholdRole, accountId: UUID,
+                           using repository: any HouseholdRoleRepositoryProtocol) -> () async throws -> HouseholdRolesResponse {
         if deletion?.id != role.householdRoleId || deletion?.version != role.version {
             deletion = (role.householdRoleId, role.version, UUID())
         }
-        guard let deletion else { return }
-        busyRoleId = role.householdRoleId
-        actionError = nil
-        defer { busyRoleId = nil }
-        do {
-            apply(try await store.deleteRole(householdId: role.householdId, roleId: role.householdRoleId,
-                version: role.version, accountId: accountId, requestId: deletion.requestId))
-        } catch is CancellationError { }
-        catch {
-            let failure = HouseholdRoleError(error)
-            actionError = failure.message
-            needsReload = failure.needsReload
+        let requestId = deletion!.requestId
+        return {
+            try await repository.deleteRole(householdId: role.householdId, roleId: role.householdRoleId,
+                version: role.version, accountId: accountId, requestId: requestId)
         }
     }
 
-    func remove(_ member: HouseholdResponse.Member, accountId: UUID, using store: HouseholdStore) async {
-        guard data?.actions.canRemoveMembers == true, !isBusy, !isLoading, !needsReload, !hasLeftHousehold else { return }
+    func removalOperation(_ member: HouseholdMember, accountId: UUID,
+                          using repository: any HouseholdRoleRepositoryProtocol) -> () async throws -> HouseholdMemberRemovalResponse {
         if removal?.id != member.householdMemberId || removal?.version != member.version {
             removal = (member.householdMemberId, member.version, UUID())
         }
-        guard let removal else { return }
-        busyMemberId = member.householdMemberId
-        actionError = nil
-        defer { busyMemberId = nil }
-        do {
-            let response = try await store.removeMember(householdId: member.householdId, memberId: member.householdMemberId,
-                version: member.version, accountId: accountId, requestId: removal.requestId)
-            if let management = response.management { apply(management) }
-            else { data = nil; hasLeftHousehold = true }
-        } catch is CancellationError { }
-        catch {
-            let failure = HouseholdRoleError(error)
-            actionError = failure.message
-            needsReload = failure.needsReload
+        let requestId = removal!.requestId
+        return {
+            try await repository.removeMember(householdId: member.householdId, memberId: member.householdMemberId,
+                version: member.version, accountId: accountId, requestId: requestId)
         }
     }
 }

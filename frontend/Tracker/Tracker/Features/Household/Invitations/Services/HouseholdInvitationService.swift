@@ -58,7 +58,7 @@ nonisolated struct HouseholdInvitationService: HouseholdInvitationServiceProtoco
                                              as: JoinedHouseholdResponse.self)
         let member = response.membership
         guard response.householdId == invitation.householdId,
-              member.householdId == response.householdId, member.userId == accountId,
+              member.householdId == response.householdId, member.userInfo.userId == accountId,
               member.householdRole.householdRoleId == invitation.householdRoleId,
               response.version >= 0, member.version >= 0,
               Set(response.roles.map(\.householdRoleId)).count == response.roles.count,

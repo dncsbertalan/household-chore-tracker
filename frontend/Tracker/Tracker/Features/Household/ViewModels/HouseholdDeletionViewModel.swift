@@ -5,14 +5,14 @@ import Observation
 @Observable
 final class HouseholdDeletionViewModel {
     var isShowingConfirmation = false
-    private(set) var pendingHousehold: HouseholdResponse?
+    private(set) var pendingHousehold: Household?
     private(set) var isDeleting = false
     private(set) var didDelete = false
     private(set) var errorMessage: String?
     private(set) var needsReload = false
     private var attempt: (id: UUID, version: Int64, key: UUID)?
 
-    func requestConfirmation(for household: HouseholdResponse, accountId: UUID) {
+    func requestConfirmation(for household: Household, accountId: UUID) {
         guard !isDeleting, !didDelete, !needsReload,
               HouseholdAuthorizationService().hasPermission(.delete, in: household, userId: accountId) else { return }
         pendingHousehold = household

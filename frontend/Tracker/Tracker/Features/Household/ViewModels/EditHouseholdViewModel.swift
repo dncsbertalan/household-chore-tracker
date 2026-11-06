@@ -4,7 +4,7 @@ import Observation
 @MainActor
 @Observable
 final class EditHouseholdViewModel {
-    let household: HouseholdResponse
+    let household: Household
     let accountId: UUID
     var name: String
     var description: String
@@ -13,7 +13,7 @@ final class EditHouseholdViewModel {
     private(set) var needsReload = false
     private var attempt: (request: UpdateHouseholdRequest, id: UUID)?
 
-    init(household: HouseholdResponse, accountId: UUID) {
+    init(household: Household, accountId: UUID) {
         self.household = household; self.accountId = accountId
         name = household.name; description = household.description ?? ""
     }
@@ -27,7 +27,7 @@ final class EditHouseholdViewModel {
     var hasChanges: Bool { request.name != household.name || request.description != household.description }
     var canSave: Bool { isEditable && hasValidDetails && hasChanges && !isSaving && !needsReload }
 
-    func save(using store: HouseholdStore) async -> HouseholdResponse? {
+    func save(using store: HouseholdStore) async -> Household? {
         guard canSave else { return nil }
         guard let current = store.household(id: household.id),
               HouseholdAuthorizationService().hasPermission(.update, in: current, userId: accountId) else {

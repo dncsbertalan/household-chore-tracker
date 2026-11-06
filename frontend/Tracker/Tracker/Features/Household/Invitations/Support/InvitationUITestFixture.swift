@@ -8,16 +8,18 @@ enum InvitationUITestFixture {
     static let userId = UUID(uuidString: "0A460DB1-9970-48EA-A93B-C08A66FA6701")!
     static let householdId = UUID(uuidString: "0A460DB1-9970-48EA-A93B-C08A66FA6702")!
 
-    static var household: HouseholdResponse {
+    static var household: Household {
         let arguments = ProcessInfo.processInfo.arguments
         let grants: [HouseholdPermission] = arguments.contains("--ui-test-no-invite-permission") ? [] : [.memberInvite]
-        let administrator = HouseholdResponse.Role(householdRoleId: UUID(), householdId: householdId,
+        let administrator = HouseholdRole(householdRoleId: UUID(), householdId: householdId,
             name: "Administrator", isSystemRole: false, permissions: grants.map { .init(name: $0) }, version: 0)
-        let role = HouseholdResponse.Role(householdRoleId: UUID(), householdId: householdId,
+        let role = HouseholdRole(householdRoleId: UUID(), householdId: householdId,
             name: "Member", isSystemRole: false, permissions: [.init(name: .choreCreate), .init(name: .choreComplete)], version: 0)
-        let member = HouseholdResponse.Member(householdMemberId: UUID(), householdId: householdId,
-            userId: userId, nickname: nil, householdRole: administrator, joinedAt: "2026-10-27T12:00:00Z", version: 0)
-        return HouseholdResponse(householdId: householdId, name: "Maple House", description: "Our shared home",
+        let member = HouseholdMember(householdMemberId: UUID(), householdId: householdId,
+            nickname: nil,
+            userInfo: .init(userId: userId, email: "alex@example.com", firstName: "Alex", lastName: "Example"),
+            householdRole: administrator, joinedAt: "2026-10-27T12:00:00Z", version: 0)
+        return Household(householdId: householdId, name: "Maple House", description: "Our shared home",
             createdByUserId: arguments.contains("--ui-test-inviter-is-member") ? UUID() : userId, version: 0,
             roles: [administrator, role], creatorMembership: nil, members: [member])
     }
@@ -31,9 +33,9 @@ struct InvitationUITestHouseholdRepository: HouseholdRepositoryProtocol, ChoreRe
     func chores(accountId: UUID, householdId: UUID?) async throws -> [ChoreResponse] { [] }
     func create(_ creation: ChoreCreation) async throws -> ChoreResponse { throw APIError.invalidResponse }
     private let response = InvitationUITestFixture.household
-    func households(accountId: UUID) async throws -> [HouseholdResponse] { [response] }
-    func household(id: UUID, accountId: UUID) async throws -> HouseholdResponse { response }
-    func create(_ creation: HouseholdCreation) async throws -> HouseholdResponse { throw APIError.invalidResponse }
+    func households(accountId: UUID) async throws -> [Household] { [response] }
+    func household(id: UUID, accountId: UUID) async throws -> Household { response }
+    func create(_ creation: HouseholdCreation) async throws -> Household { throw APIError.invalidResponse }
 }
 
 nonisolated struct InvitationUITestUserService: CurrentUserServiceProtocol {

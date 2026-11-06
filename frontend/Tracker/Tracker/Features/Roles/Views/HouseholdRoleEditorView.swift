@@ -2,14 +2,16 @@ import SwiftUI
 
 struct HouseholdRoleEditorView: View {
     let userId: UUID
-    let onSaved: (HouseholdRolesResponse) -> Void
+    let onSaved: (HouseholdRolesResponse) async -> Void
     let onReload: () -> Void
-    @Environment(HouseholdStore.self) private var store
+    let repository: any HouseholdRoleRepositoryProtocol
     @Environment(\.dismiss) private var dismiss
     @State private var model: HouseholdRoleEditorViewModel
 
-    init(data: HouseholdRolesResponse, role: HouseholdResponse.Role?, userId: UUID,
-         onSaved: @escaping (HouseholdRolesResponse) -> Void, onReload: @escaping () -> Void) {
+    init(data: HouseholdRolesResponse, role: HouseholdRole?, userId: UUID,
+         repository: any HouseholdRoleRepositoryProtocol,
+         onSaved: @escaping (HouseholdRolesResponse) async -> Void, onReload: @escaping () -> Void) {
+        self.repository = repository
         self.userId = userId; self.onSaved = onSaved; self.onReload = onReload
         _model = State(initialValue: HouseholdRoleEditorViewModel(data: data, role: role))
     }
@@ -32,14 +34,15 @@ struct HouseholdRoleEditorView: View {
                     if model.role?.isSystemRole == true { Text("roles.systemRole") }
                     else { Text("roles.appliesToMembers") }
                 }
-                if let error = model.errorMessage {
+                if let error = model.mutation.roleError?.message {
                     Section {
                         Text(error).foregroundStyle(.red).accessibilityIdentifier("saveRoleError")
-                        if model.needsReload {
+                        if model.mutation.roleError?.needsReload == true {
                             Button("roles.reload") { dismiss(); onReload() }
                         }
                     }
                 }
+
                 Section("household.permissions") {
                     ForEach(catalog) { permission in
                         Toggle(permission.title, isOn: Binding(
@@ -53,30 +56,55 @@ struct HouseholdRoleEditorView: View {
                     }
                 }
             }
-            .disabled(model.isSaving)
+            .disabled(model.mutation.isPending)
             .navigationTitle(model.role == nil ? "roles.create" : "roles.details")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("common.cancel") { dismiss() }.disabled(model.isSaving)
+                    Button { dismiss() } label: { Image(systemName: "xmark") }
+                        .disabled(model.mutation.isPending)
                 }
                 if model.isEditable {
                     ToolbarItem(placement: .confirmationAction) {
                         Button {
                             Task {
-                                if let response = await model.save(accountId: userId, using: store) {
-                                    onSaved(response); dismiss()
-                                }
+                                await save()
                             }
                         } label: {
-                            if model.isSaving { ProgressView() } else { Text("common.save") }
+                            if model.mutation.isPending { ProgressView() } else { Image(systemName: "checkmark") }
                         }
-                        .disabled(!model.canSave)
+                        .buttonStyle(.borderedProminent)
+                        .tint(.accentColor)
+                        .disabled(!model.canSave || model.mutation.isPending || model.mutation.roleError?.needsReload == true)
                         .accessibilityIdentifier("saveHouseholdRole")
                     }
                 }
             }
         }
-        .interactiveDismissDisabled(model.isSaving)
+        .interactiveDismissDisabled(model.mutation.isPending)
     }
+    private func save() async {
+        if let response = await model.save(accountId: userId, using: repository) {
+            await onSaved(response)
+            dismiss()
+        }
+    }
+
 }
+
+#if DEBUG
+#Preview("Create role") {
+    HouseholdRoleEditorView(data: HouseholdRolesPreview.data, role: nil,
+        userId: HouseholdRolesPreview.accountId, repository: HouseholdRolesPreview.repository(), onSaved: { _ in }, onReload: {})
+}
+
+#Preview("Edit role") {
+    HouseholdRoleEditorView(data: HouseholdRolesPreview.data, role: HouseholdRolesPreview.data.household.roles[1],
+        userId: HouseholdRolesPreview.accountId, repository: HouseholdRolesPreview.repository(), onSaved: { _ in }, onReload: {})
+}
+
+#Preview("System role") {
+    HouseholdRoleEditorView(data: HouseholdRolesPreview.data, role: HouseholdRolesPreview.data.household.roles[0],
+        userId: HouseholdRolesPreview.accountId, repository: HouseholdRolesPreview.repository(), onSaved: { _ in }, onReload: {})
+}
+#endif

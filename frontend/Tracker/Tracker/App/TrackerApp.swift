@@ -8,6 +8,7 @@ struct TrackerApp: App {
     private let loginService: (any LoginServiceProtocol)?
     private let logoutService: (any LogoutServiceProtocol)?
     private let currentUserService: (any CurrentUserServiceProtocol)?
+    private let roleRepository: (any HouseholdRoleRepositoryProtocol)?
     private let invitationRepository: HouseholdInvitationRepository?
     private let tokenStore: KeychainTokenStore?
     private let connectivityMonitor = NetworkConnectivityMonitor()
@@ -16,52 +17,12 @@ struct TrackerApp: App {
     init() {
         let state = AppState()
         _appState = StateObject(wrappedValue: state)
-        #if DEBUG
-        if HouseholdRoleUITestFixture.isEnabled {
-            let repository = HouseholdRoleUITestRepository()
-            _store = State(initialValue: HouseholdStore(households: repository, chores: repository, roles: repository))
-            state.isAuthenticated = true
-            state.isOnline = true
-            registrationService = nil
-            loginService = nil
-            logoutService = nil
-            currentUserService = HouseholdRoleUITestUserService()
-            tokenStore = nil
-            invitationRepository = nil
-            return
-        }
-        if ChoreUITestFixture.isEnabled {
-            let repository = ChoreUITestRepository()
-            _store = State(initialValue: HouseholdStore(households: repository, chores: repository))
-            state.isAuthenticated = true
-            state.isOnline = true
-            registrationService = nil
-            loginService = nil
-            logoutService = nil
-            currentUserService = ChoreUITestUserService()
-            tokenStore = nil
-            invitationRepository = nil
-            return
-        }
-        if InvitationUITestFixture.isEnabled {
-            let store = HouseholdStore(households: InvitationUITestHouseholdRepository(), chores: InvitationUITestHouseholdRepository())
-            _store = State(initialValue: store)
-            state.isAuthenticated = true
-            state.isOnline = true
-            registrationService = nil
-            loginService = nil
-            logoutService = nil
-            currentUserService = InvitationUITestUserService()
-            tokenStore = nil
-            invitationRepository = HouseholdInvitationRepository(service: InvitationUITestService(), store: store)
-            return
-        }
-        #endif
+
         if let configuration = try? APIConfiguration.from() {
             let client = APIClient(configuration: configuration)
             registrationService = RegistrationService(client: client)
             let tokens = KeychainTokenStore(service:
-                "\(Bundle.main.bundleIdentifier ?? "hu.dncs.Tracker").auth.\(configuration.baseURL.absoluteString)")
+                                                "\(Bundle.main.bundleIdentifier ?? "hu.dncs.Tracker").auth.\(configuration.baseURL.absoluteString)")
             tokenStore = tokens
             let login = LoginService(client: client, tokenStore: tokens)
             loginService = login
@@ -69,9 +30,9 @@ struct TrackerApp: App {
             let session = TokenRefreshService(client: client, tokenStore: tokens)
             let authenticatedClient = AuthenticatedAPIClient(client: client, session: session)
             currentUserService = CurrentUserService(client: authenticatedClient)
+            roleRepository = RemoteHouseholdRoleRepository(client: authenticatedClient)
             let store = HouseholdStore(households: RemoteHouseholdRepository(client: authenticatedClient),
-                                       chores: RemoteChoreRepository(client: authenticatedClient),
-                                       roles: RemoteHouseholdRoleRepository(client: authenticatedClient))
+                                       chores: RemoteChoreRepository(client: authenticatedClient))
             _store = State(initialValue: store)
             invitationRepository = HouseholdInvitationRepository(
                 service: HouseholdInvitationService(client: authenticatedClient), store: store)
@@ -81,6 +42,7 @@ struct TrackerApp: App {
             loginService = nil
             logoutService = nil
             currentUserService = nil
+            roleRepository = nil
             invitationRepository = nil
             tokenStore = nil
         }
@@ -90,13 +52,10 @@ struct TrackerApp: App {
         WindowGroup {
             RootView(registrationService: registrationService, loginService: loginService,
                      currentUserService: currentUserService, logoutService: logoutService,
-                     invitationRepository: invitationRepository)
+                     invitationRepository: invitationRepository, roleRepository: roleRepository)
             .environmentObject(appState)
             .environment(store)
             .task {
-                #if DEBUG
-                if InvitationUITestFixture.isEnabled || ChoreUITestFixture.isEnabled || HouseholdRoleUITestFixture.isEnabled { return }
-                #endif
                 // Connectivity is informational; failed requests use the normal API error path.
                 connectivityMonitor.start { appState.isOnline = $0 }
                 if let tokenStore { await appState.restoreAuthentication(from: tokenStore) }

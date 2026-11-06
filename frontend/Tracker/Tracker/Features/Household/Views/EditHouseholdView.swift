@@ -7,7 +7,7 @@ struct EditHouseholdView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var model: EditHouseholdViewModel
 
-    init(household: HouseholdResponse, userId: UUID, onSaved: @escaping () -> Void, onReload: @escaping () -> Void) {
+    init(household: Household, userId: UUID, onSaved: @escaping () -> Void, onReload: @escaping () -> Void) {
         self.onSaved = onSaved; self.onReload = onReload
         _model = State(initialValue: EditHouseholdViewModel(household: household, accountId: userId))
     }

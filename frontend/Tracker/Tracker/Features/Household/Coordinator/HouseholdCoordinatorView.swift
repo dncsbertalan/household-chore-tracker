@@ -3,6 +3,7 @@ import SwiftUI
 struct HouseholdCoordinatorView: View {
     var currentUserService: (any CurrentUserServiceProtocol)? = nil
     var invitationRepository: HouseholdInvitationRepository? = nil
+    var roleRepository: (any HouseholdRoleRepositoryProtocol)? = nil
     @EnvironmentObject private var appState: AppState
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var invitationWasSent = false
@@ -73,7 +74,12 @@ struct HouseholdCoordinatorView: View {
     private func destination(for route: HouseholdRoute) -> some View {
         switch route {
         case .roles(let householdId):
-            if let userId = model.userId { HouseholdRolesView(householdId: householdId, userId: userId) }
+            if let userId = model.userId, let roleRepository {
+                HouseholdRolesView(householdId: householdId, userId: userId, repository: roleRepository)
+            } else {
+                ContentUnavailableView("configuration.required", systemImage: "network",
+                                       description: Text("configuration.instructions"))
+            }
         case .choreDetail(let choreId):
             if let userId = model.userId {
                 ChoreDetailView(choreId: choreId, userId: userId)

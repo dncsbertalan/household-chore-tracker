@@ -6,7 +6,7 @@ struct ChoresView: View {
     @Environment(HouseholdStore.self) private var store
     @State private var isLoading = false
     @State private var errorMessage: String?
-    private var households: [HouseholdResponse] { store.households }
+    private var households: [Household] { store.households }
     private var chores: [ChoreResponse] { store.chores }
 
     var body: some View {

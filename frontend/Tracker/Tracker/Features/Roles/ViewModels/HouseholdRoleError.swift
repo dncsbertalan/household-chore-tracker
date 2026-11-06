@@ -6,7 +6,8 @@ struct HouseholdRoleError {
     let needsReload: Bool
     init(_ error: Error) {
         needsReload = switch error {
-        case APIError.http(let status, let problem): status == 403 || status == 404 || problem?.code == "household_role_stale" || problem?.code == "household_role_system_role"
+        case APIError.http(let status, let problem): status == 401 || status == 403 || status == 404 || (status == 409 && problem?.code == nil) || problem?.code == "household_role_stale" || problem?.code == "household_role_system_role"
+        case is SessionError: true
         default: false
         }
         switch error {

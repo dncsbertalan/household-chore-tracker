@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct EditChoreView: View {
-    let household: HouseholdResponse
+    let household: Household
     let userId: UUID
     let onSaved: (ChoreResponse) -> Void
     let onReload: () -> Void
@@ -9,7 +9,7 @@ struct EditChoreView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var model: EditChoreViewModel
 
-    init(chore: ChoreResponse, household: HouseholdResponse, userId: UUID,
+    init(chore: ChoreResponse, household: Household, userId: UUID,
          onSaved: @escaping (ChoreResponse) -> Void, onReload: @escaping () -> Void) {
         self.household = household
         self.userId = userId
@@ -21,7 +21,7 @@ struct EditChoreView: View {
     private var canAssign: Bool {
         HouseholdAuthorizationService().hasPermission(.choreAssignMember, in: household, userId: userId)
     }
-    private var members: [HouseholdResponse.Member] {
+    private var members: [HouseholdMember] {
         household.members.sorted { $0.householdMemberId.uuidString < $1.householdMemberId.uuidString }
     }
 

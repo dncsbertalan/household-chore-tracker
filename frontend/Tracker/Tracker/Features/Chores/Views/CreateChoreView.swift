@@ -5,7 +5,7 @@ struct CreateChoreView: View {
     @Environment(HouseholdStore.self) private var store
     @Environment(\.dismiss) private var dismiss
     let householdId: UUID
-    private var household: HouseholdResponse? { store.household(id: householdId) }
+    private var household: Household? { store.household(id: householdId) }
     @State private var model: CreateChoreViewModel
     @State private var path: [Step] = []
     @FocusState private var isTitleFocused: Bool
@@ -20,7 +20,7 @@ struct CreateChoreView: View {
         self.householdId = householdId
     }
 
-    private var members: [HouseholdResponse.Member] {
+    private var members: [HouseholdMember] {
         (household?.members ?? []).sorted { $0.householdMemberId.uuidString < $1.householdMemberId.uuidString }
     }
 
@@ -234,11 +234,11 @@ struct CreateChoreView: View {
         }
     }
 
-    private func memberName(_ member: HouseholdResponse.Member, index: Int) -> String {
+    private func memberName(_ member: HouseholdMember, index: Int) -> String {
         if let nickname = member.nickname?.trimmingCharacters(in: .whitespacesAndNewlines), !nickname.isEmpty {
             return nickname
         }
-        if member.userId == userId { return AppLocalization.string("chores.assignees.you") }
+        if member.userInfo.userId == userId { return AppLocalization.string("chores.assignees.you") }
         return String(format: AppLocalization.string("chores.assignees.memberFormat"), index + 1)
     }
 

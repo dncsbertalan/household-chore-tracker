@@ -4,35 +4,32 @@ import Observation
 @MainActor
 @Observable
 final class HouseholdRoleAssignmentViewModel {
+    let mutation = HouseholdRoleRequestState()
     let data: HouseholdRolesResponse
-    let member: HouseholdResponse.Member
+    let member: HouseholdMember
     var selectedRoleId: UUID
-    private(set) var isSaving = false
-    private(set) var errorMessage: String?
-    private(set) var needsReload = false
     private var attempt: (request: AssignHouseholdRoleRequest, id: UUID)?
 
-    init(data: HouseholdRolesResponse, member: HouseholdResponse.Member) {
+    init(data: HouseholdRolesResponse, member: HouseholdMember) {
         self.data = data; self.member = member; selectedRoleId = member.householdRole.householdRoleId
     }
-    var canSave: Bool { data.actions.canAssignRoles && !isSaving && !needsReload
+    var canSave: Bool { data.actions.canAssignRoles
         && selectedRoleId != member.householdRole.householdRoleId
         && data.household.roles.contains { $0.householdRoleId == selectedRoleId } }
-    func save(accountId: UUID, using store: HouseholdStore) async -> HouseholdRolesResponse? {
+    func save(accountId: UUID, using repository: any HouseholdRoleRepositoryProtocol) async -> HouseholdRolesResponse? {
+        guard let operation = submission(accountId: accountId, using: repository) else { return nil }
+        return await mutation.run(operation)
+    }
+
+    func submission(accountId: UUID, using repository: any HouseholdRoleRepositoryProtocol) -> (() async throws -> HouseholdRolesResponse)? {
         guard canSave, let role = data.household.roles.first(where: { $0.householdRoleId == selectedRoleId }) else { return nil }
         let request = AssignHouseholdRoleRequest(roleId: selectedRoleId, memberVersion: member.version, roleVersion: role.version)
         if attempt?.request != request { attempt = (request, UUID()) }
         guard let attempt else { return nil }
-        isSaving = true; errorMessage = nil
-        defer { isSaving = false }
-        do {
-            return try await store.assignRole(householdId: member.householdId, memberId: member.householdMemberId,
+        let member = member
+        return {
+            try await repository.assignRole(householdId: member.householdId, memberId: member.householdMemberId,
                 accountId: accountId, request: request, requestId: attempt.id)
-        } catch is CancellationError { return nil }
-        catch {
-            let failure = HouseholdRoleError(error)
-            errorMessage = failure.message; needsReload = failure.needsReload
-            return nil
         }
     }
 }

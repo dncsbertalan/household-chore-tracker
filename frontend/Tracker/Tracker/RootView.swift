@@ -6,6 +6,7 @@ struct RootView: View {
     let currentUserService: (any CurrentUserServiceProtocol)?
     let logoutService: (any LogoutServiceProtocol)?
     var invitationRepository: HouseholdInvitationRepository? = nil
+    var roleRepository: (any HouseholdRoleRepositoryProtocol)? = nil
     @AppStorage(AppLanguage.storageKey) private var language: AppLanguage = .system
     @State private var isShowingRegistration = false
     @State private var isShowingLogin = false
@@ -18,7 +19,8 @@ struct RootView: View {
     
     var body: some View {
         TabView(selection: $appState.selectedTab) {
-            HouseholdCoordinatorView(currentUserService: currentUserService, invitationRepository: invitationRepository)
+            HouseholdCoordinatorView(currentUserService: currentUserService, invitationRepository: invitationRepository,
+                                     roleRepository: roleRepository)
                 .id(appState.sessionRevision)
                 .tabItem { Label("household.tabName", systemImage: "house") }
                 .tag(AppState.Tab.household)

@@ -80,7 +80,7 @@ final class HouseholdInvitationRepository: HouseholdInvitationRepositoryProtocol
         try Task.checkCancellation()
         guard self.session == session else { throw CancellationError() }
         guard !store.isHouseholdDeleted(response.householdId) else { throw CancellationError() }
-        store.record(HouseholdResponse(householdId: response.householdId, name: response.name,
+        store.record(Household(householdId: response.householdId, name: response.name,
             description: response.description, createdByUserId: response.createdByUserId, version: response.version,
             roles: response.roles, creatorMembership: nil, members: [response.membership]))
         lists.remove(id: invitation.id, accountId: accountId)

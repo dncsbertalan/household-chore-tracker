@@ -17,16 +17,16 @@ struct SendHouseholdInvitationView: View {
         self.householdId = householdId
     }
 
-    private var household: HouseholdResponse? { store.household(id: householdId) }
+    private var household: Household? { store.household(id: householdId) }
     private var canInvite: Bool {
         household.map { HouseholdAuthorizationService().hasPermission(.memberInvite, in: $0, userId: userId) } ?? false
     }
-    private var roles: [HouseholdResponse.Role] {
+    private var roles: [HouseholdRole] {
         (household?.roles ?? [])
             .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
     }
     private var roleIds: [UUID] { roles.map(\.householdRoleId) }
-    private var selectedRole: HouseholdResponse.Role? { roles.first { $0.householdRoleId == model.selectedRoleId } }
+    private var selectedRole: HouseholdRole? { roles.first { $0.householdRoleId == model.selectedRoleId } }
 
     var body: some View {
         NavigationStack {
@@ -68,7 +68,7 @@ struct SendHouseholdInvitationView: View {
         }
     }
 
-    private func invitationForm(_ household: HouseholdResponse) -> some View {
+    private func invitationForm(_ household: Household) -> some View {
         Form {
             if model.isSending {
                 Section {

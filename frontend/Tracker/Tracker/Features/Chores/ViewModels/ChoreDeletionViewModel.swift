@@ -12,7 +12,7 @@ final class ChoreDeletionViewModel {
     private(set) var needsReload = false
     private var attempt: (id: UUID, version: Int64, key: UUID)?
 
-    func requestConfirmation(for chore: ChoreResponse, household: HouseholdResponse, accountId: UUID) {
+    func requestConfirmation(for chore: ChoreResponse, household: Household, accountId: UUID) {
         guard !isDeleting, !didDelete, !needsReload, chore.householdId == household.id,
               HouseholdAuthorizationService().hasPermission(.choreDelete, in: household, userId: accountId) else { return }
         pendingChore = chore

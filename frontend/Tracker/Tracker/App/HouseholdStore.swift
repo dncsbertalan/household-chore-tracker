@@ -8,7 +8,7 @@ final class HouseholdStore: HouseholdRepositoryProtocol, ChoreRepositoryProtocol
     private let householdRepository: (any HouseholdRepositoryProtocol)?
     private let roleRepository: (any HouseholdRoleRepositoryProtocol)?
     private let choreRepository: (any ChoreRepositoryProtocol)?
-    private(set) var households: [HouseholdResponse] = []
+    private(set) var households: [Household] = []
     private(set) var chores: [ChoreResponse] = []
     private var accountId: UUID?
     private var session = UUID()
@@ -43,9 +43,9 @@ final class HouseholdStore: HouseholdRepositoryProtocol, ChoreRepositoryProtocol
         }
     }
 
-    func household(id: UUID) -> HouseholdResponse? { households.first { $0.id == id } }
+    func household(id: UUID) -> Household? { households.first { $0.id == id } }
 
-    func households(accountId: UUID) async throws -> [HouseholdResponse] {
+    func households(accountId: UUID) async throws -> [Household] {
         guard let householdRepository else { throw APIError.invalidResponse }
         try Task.checkCancellation()
         beginSession(accountId: accountId)
@@ -60,7 +60,7 @@ final class HouseholdStore: HouseholdRepositoryProtocol, ChoreRepositoryProtocol
         return households
     }
 
-    func household(id: UUID, accountId: UUID) async throws -> HouseholdResponse {
+    func household(id: UUID, accountId: UUID) async throws -> Household {
         guard let householdRepository else { throw APIError.invalidResponse }
         try Task.checkCancellation()
         beginSession(accountId: accountId)
@@ -90,7 +90,7 @@ final class HouseholdStore: HouseholdRepositoryProtocol, ChoreRepositoryProtocol
         return result
     }
 
-    func create(_ creation: HouseholdCreation) async throws -> HouseholdResponse {
+    func create(_ creation: HouseholdCreation) async throws -> Household {
         guard let householdRepository else { throw APIError.invalidResponse }
         try Task.checkCancellation()
         beginSession(accountId: creation.creatorUserId)
@@ -220,7 +220,7 @@ final class HouseholdStore: HouseholdRepositoryProtocol, ChoreRepositoryProtocol
         return response
     }
 
-    func updateHousehold(id: UUID, accountId: UUID, request: UpdateHouseholdRequest, requestId: UUID) async throws -> HouseholdResponse {
+    func updateHousehold(id: UUID, accountId: UUID, request: UpdateHouseholdRequest, requestId: UUID) async throws -> Household {
         guard let updating = householdRepository as? any HouseholdUpdateRepositoryProtocol else { throw APIError.invalidResponse }
         try Task.checkCancellation()
         beginSession(accountId: accountId)
@@ -277,12 +277,12 @@ final class HouseholdStore: HouseholdRepositoryProtocol, ChoreRepositoryProtocol
         revision += 1
         return response
     }
-    private func replaceHousehold(_ household: HouseholdResponse) {
+    private func replaceHousehold(_ household: Household) {
         if let index = households.firstIndex(where: { $0.id == household.id }) { households[index] = household }
         else { households.append(household) }
     }
 
-    func record(_ household: HouseholdResponse) {
+    func record(_ household: Household) {
         guard !deletedHouseholds.contains(household.id) else { return }
         households.removeAll { $0.id == household.id }
         households.append(household)

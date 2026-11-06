@@ -7,7 +7,7 @@ struct HouseholdDetailView: View {
     @Environment(HouseholdRouter.self) private var router
     let householdId: UUID
     @Environment(HouseholdStore.self) private var store
-    @State private var editingHousehold: HouseholdResponse?
+    @State private var editingHousehold: Household?
     @State private var deletion = HouseholdDeletionViewModel()
     @State private var isLoading = false
     @State private var errorMessage: String?
@@ -50,7 +50,7 @@ struct HouseholdDetailView: View {
                         ForEach(household.roles.filter { role in
                             authorization.hasPermission(.roleView, in: household, userId: userId)
                                 || authorization.hasPermission(.memberInvite, in: household, userId: userId)
-                                || household.members.contains { $0.userId == userId && $0.householdRole.householdRoleId == role.householdRoleId }
+                                || household.members.contains { $0.userInfo.userId == userId && $0.householdRole.householdRoleId == role.householdRoleId }
                         }, id: \.householdRoleId) { role in
                             Text(role.name)
                         }

@@ -2,7 +2,7 @@ import Foundation
 
 @MainActor
 protocol HouseholdRepositoryProtocol {
-    func households(accountId: UUID) async throws -> [HouseholdResponse]
-    func household(id: UUID, accountId: UUID) async throws -> HouseholdResponse
-    func create(_ creation: HouseholdCreation) async throws -> HouseholdResponse
+    func households(accountId: UUID) async throws -> [Household]
+    func household(id: UUID, accountId: UUID) async throws -> Household
+    func create(_ creation: HouseholdCreation) async throws -> Household
 }

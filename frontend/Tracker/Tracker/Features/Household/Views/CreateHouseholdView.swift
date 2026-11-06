@@ -164,9 +164,9 @@ struct CreateHouseholdView: View {
             Button(action: action) {
                 if model.isSaving { ProgressView() } else { Text(title) }
             }
-                .buttonStyle(.borderedProminent)
-                .tint(.accentColor)
-                .disabled(!isEnabled)
+            .buttonStyle(.borderedProminent)
+            .tint(.accentColor)
+            .disabled(!isEnabled)
         }
     }
 }

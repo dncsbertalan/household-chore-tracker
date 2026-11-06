@@ -3,12 +3,36 @@ import SwiftUI
 struct HouseholdRolesView: View {
     let householdId: UUID
     let userId: UUID
-    @Environment(HouseholdStore.self) private var store
+    let repository: any HouseholdRoleRepositoryProtocol
+
+    var body: some View {
+        HouseholdRolesContent(householdId: householdId, userId: userId, repository: repository)
+            .id(HouseholdRolesScope(householdId: householdId, accountId: userId))
+    }
+}
+
+private struct HouseholdRolesContent: View {
+    let householdId: UUID
+    let userId: UUID
+    let repository: any HouseholdRoleRepositoryProtocol
     @State private var model = HouseholdRolesViewModel()
+
+    init(householdId: UUID, userId: UUID, repository: any HouseholdRoleRepositoryProtocol) {
+        self.householdId = householdId
+        self.userId = userId
+        self.repository = repository
+    }
+
+    private var data: HouseholdRolesResponse? { model.data }
+    private var isLoading: Bool { model.isLoading }
+    private var loadError: String? { model.loadError }
+    private var actionFailure: HouseholdRoleError? { model.actionFailure }
+    private var needsReload: Bool { model.needsReload }
+
     @State private var sheet: RoleSheet?
     @Environment(HouseholdRouter.self) private var router
-    @State private var removing: HouseholdResponse.Member?
-    @State private var deleting: HouseholdResponse.Role?
+    @State private var removing: HouseholdMember?
+    @State private var deleting: HouseholdRole?
 
     private enum RoleSheet: Identifiable {
         case create
@@ -25,27 +49,27 @@ struct HouseholdRolesView: View {
 
     var body: some View {
         Group {
-            if model.isLoading {
+            if isLoading {
                 ProgressView()
-            } else if let error = model.errorMessage {
+            } else if let error = loadError {
                 ContentUnavailableView {
                     Label("roles.title", systemImage: "person.badge.key")
                 } description: { Text(error) } actions: {
                     Button("household.retry") { Task { await reload() } }
                 }
-            } else if let data = model.data, data.actions.canView {
+            } else if let data = data, data.actions.canView {
                 roleList(data)
             } else {
                 ContentUnavailableView("roles.unavailable", systemImage: "lock", description: Text("roles.error.permission"))
             }
         }
         .navigationTitle("roles.title")
-        .navigationBarTitleDisplayMode(.inline)
+        //.navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            if model.errorMessage == nil, model.data?.actions.canCreate == true {
+            if loadError == nil, data?.actions.canCreate == true {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { sheet = .create } label: { Label("roles.create", systemImage: "plus") }
-                        .disabled(model.isBusy || model.needsReload)
+                        .disabled(model.isBusy || needsReload)
                         .accessibilityIdentifier("createHouseholdRole")
                 }
             }
@@ -56,17 +80,17 @@ struct HouseholdRolesView: View {
         .task { await reload() }
         .refreshable { await reload() }
         .sheet(item: $sheet) { selection in
-            if let data = model.data {
+            if let data = data {
                 switch selection {
                 case .create:
-                    HouseholdRoleEditorView(data: data, role: nil, userId: userId, onSaved: model.apply, onReload: { Task { await reload() } })
+                    HouseholdRoleEditorView(data: data, role: nil, userId: userId, repository: repository, onSaved: acceptResponse, onReload: { Task { await reload() } })
                 case .role(let id):
                     if let role = data.household.roles.first(where: { $0.householdRoleId == id }) {
-                        HouseholdRoleEditorView(data: data, role: role, userId: userId, onSaved: model.apply, onReload: { Task { await reload() } })
+                        HouseholdRoleEditorView(data: data, role: role, userId: userId, repository: repository, onSaved: acceptResponse, onReload: { Task { await reload() } })
                     }
                 case .member(let id):
                     if let member = data.household.members.first(where: { $0.householdMemberId == id }) {
-                        HouseholdRoleAssignmentView(data: data, member: member, userId: userId, onSaved: model.apply, onReload: { Task { await reload() } })
+                        HouseholdRoleAssignmentView(data: data, member: member, userId: userId, repository: repository, onSaved: acceptResponse, onReload: { Task { await reload() } })
                     }
                 }
             }
@@ -75,7 +99,7 @@ struct HouseholdRolesView: View {
             if let role = deleting {
                 Button("roles.delete", role: .destructive) {
                     deleting = nil
-                    Task { await model.delete(role, accountId: userId, using: store) }
+                    Task { await delete(role) }
                 }
             }
             Button("common.cancel", role: .cancel) { deleting = nil }
@@ -84,7 +108,7 @@ struct HouseholdRolesView: View {
             if let member = removing {
                 Button("members.remove", role: .destructive) {
                     removing = nil
-                    Task { await model.remove(member, accountId: userId, using: store) }
+                    Task { await remove(member) }
                 }
             }
             Button("common.cancel", role: .cancel) { removing = nil }
@@ -97,7 +121,7 @@ struct HouseholdRolesView: View {
 
     private func roleList(_ data: HouseholdRolesResponse) -> some View {
         List {
-            if let error = model.actionError {
+            if let error = actionFailure?.message {
                 Section {
                     Text(error).foregroundStyle(.red).accessibilityIdentifier("roleManagementError")
                     Button("roles.reload") { Task { await reload() } }
@@ -118,11 +142,11 @@ struct HouseholdRolesView: View {
                         }
                     }
                     .accessibilityIdentifier("householdRole-\(role.householdRoleId.uuidString)")
-                    .disabled(model.isBusy || model.needsReload)
+                    .disabled(model.isBusy || needsReload)
                     .swipeActions {
                         if data.actions.canDelete && !role.isSystemRole {
                             Button("roles.delete", role: .destructive) { deleting = role }
-                                .disabled(model.isBusy || model.needsReload)
+                                .disabled(model.isBusy || needsReload)
                         }
                     }
                 }
@@ -149,7 +173,7 @@ struct HouseholdRolesView: View {
                                 .accessibilityIdentifier("removeHouseholdMember-\(member.householdMemberId.uuidString)")
                             }
                         }
-                        .disabled(model.isBusy || model.needsReload)
+                        .disabled(model.isBusy || needsReload)
                     }
                 } header: { Text("roles.memberRoles") } footer: {
                     if data.actions.canAssignRoles { Text("roles.assignmentHelp") }
@@ -159,14 +183,39 @@ struct HouseholdRolesView: View {
         }
     }
 
-    private func removalName(_ member: HouseholdResponse.Member) -> String {
-        let index = model.data?.household.members.firstIndex { $0.householdMemberId == member.householdMemberId } ?? 0
+    private func removalName(_ member: HouseholdMember) -> String {
+        let index = data?.household.members.firstIndex { $0.householdMemberId == member.householdMemberId } ?? 0
         return memberName(member, index: index)
     }
-    private func memberName(_ member: HouseholdResponse.Member, index: Int) -> String {
+    private func memberName(_ member: HouseholdMember, index: Int) -> String {
         if let nickname = member.nickname, !nickname.isEmpty { return nickname }
-        if member.userId == userId { return AppLocalization.string("chores.assignees.you") }
+        if member.userInfo.userId == userId { return AppLocalization.string("chores.assignees.you") }
         return String(format: AppLocalization.string("chores.assignees.memberFormat"), index + 1)
     }
-    private func reload() async { await model.load(householdId: householdId, accountId: userId, using: store) }
+    private func reload() async {
+        await model.load(householdId: householdId, accountId: userId, using: repository)
+    }
+
+    private func acceptResponse(_ response: HouseholdRolesResponse) async {
+        model.accept(response)
+    }
+
+    private func delete(_ role: HouseholdRole) async {
+        await model.delete(role, accountId: userId, using: repository)
+    }
+
+    private func remove(_ member: HouseholdMember) async {
+        await model.remove(member, accountId: userId, using: repository)
+    }
+
 }
+
+#if DEBUG
+#Preview("Roles and members") {
+    NavigationStack {
+        HouseholdRolesView(householdId: HouseholdRolesPreview.householdId, userId: HouseholdRolesPreview.accountId,
+            repository: HouseholdRolesPreview.repository())
+    }
+    .environment(HouseholdRouter())
+}
+#endif

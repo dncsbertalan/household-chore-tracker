@@ -6,6 +6,6 @@ nonisolated struct JoinedHouseholdResponse: Decodable, Sendable {
     let description: String?
     let createdByUserId: UUID
     let version: Int64
-    let roles: [HouseholdResponse.Role]
-    let membership: HouseholdResponse.Member
+    let roles: [HouseholdRole]
+    let membership: HouseholdMember
 }

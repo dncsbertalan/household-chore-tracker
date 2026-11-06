@@ -9,7 +9,7 @@ struct ChoreDetailView: View {
     @State private var deletion = ChoreDeletionViewModel()
     @Environment(\.dismiss) private var dismiss
     
-    private var household: HouseholdResponse? {
+    private var household: Household? {
         model.chore.flatMap { store.household(id: $0.householdId) }
     }
     
@@ -272,9 +272,9 @@ struct ChoreDetailView: View {
 
 @MainActor
 enum ChoreMemberName {
-    static func name(id: UUID, members: [HouseholdResponse.Member], userId: UUID, index: Int) -> String {
+    static func name(id: UUID, members: [HouseholdMember], userId: UUID, index: Int) -> String {
         if let member = members.first(where: { $0.householdMemberId == id }) {
-            if member.userId == userId { return AppLocalization.string("chores.assignees.you") }
+            if member.userInfo.userId == userId { return AppLocalization.string("chores.assignees.you") }
             if let nickname = member.nickname?.trimmingCharacters(in: .whitespacesAndNewlines), !nickname.isEmpty {
                 return nickname
             }
