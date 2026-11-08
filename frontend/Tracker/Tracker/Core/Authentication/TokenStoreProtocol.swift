@@ -7,8 +7,8 @@
 
 import Foundation
 
-protocol TokenStoreProtocol: Sendable {
-    func save(_ tokens: AuthTokens) async throws
-    func load() async throws -> AuthTokens?
+nonisolated protocol TokenStoreProtocol: Sendable {
+    func save(_ tokens: StoredTokens) async throws
+    func load() async throws -> StoredTokens?
     func clear() async throws
 }

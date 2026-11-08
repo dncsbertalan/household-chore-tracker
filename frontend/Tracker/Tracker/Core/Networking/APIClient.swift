@@ -14,21 +14,22 @@ final class APIClient: Sendable {
     private let decoder: JSONDecoder
     private let encoder: JSONEncoder
     private let baseURL: URL
+    private let tokenStore: any TokenStoreProtocol
 
     init(
-        baseURL: URL = URL(string: "https://api.example.com/v1")!,
-        session: URLSession = .shared
+        baseURL: URL = URL(string: "http://localhost:8080")!,
+        session: URLSession = .shared,
+        tokenStore: any TokenStoreProtocol = KeychainTokenStore.shared
     ) {
         self.baseURL = baseURL
         self.session = session
+        self.tokenStore = tokenStore
 
         self.decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
-        decoder.keyDecodingStrategy = .convertFromSnakeCase
 
         self.encoder = JSONEncoder()
         encoder.dateEncodingStrategy = .iso8601
-        encoder.keyEncodingStrategy = .convertToSnakeCase
     }
 
     // MARK: - Core request method
@@ -54,8 +55,8 @@ final class APIClient: Sendable {
         urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
 
         // Inject auth token if available
-        if let token = await TokenStore.shared.accessToken {
-            urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        if let tokens = try await tokenStore.load() {
+            urlRequest.setValue("Bearer \(tokens.accessToken)", forHTTPHeaderField: "Authorization")
         }
 
         // Merge custom headers

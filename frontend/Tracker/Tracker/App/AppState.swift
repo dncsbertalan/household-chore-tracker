@@ -13,9 +13,23 @@ import Observation
 final class AppState {
     var selectedTab: Tab = .household
     var selectedHouseholdId: UUID? = nil
+    
     var sessionRevision = 0
     var isAuthenticated = false
+    
     var isOnline = false
+    
+    func authenticationSucceeded() {
+        sessionRevision += 1
+        isAuthenticated = true
+    }
+    
+    func authenticationEnded() {
+        sessionRevision += 1
+        isAuthenticated = false
+        selectedHouseholdId = nil
+        selectedTab = .household
+    }
 
     func restoreAuthentication(from tokenStore: any TokenStoreProtocol) async {
         let revision = sessionRevision
@@ -29,6 +43,9 @@ final class AppState {
             } ?? false
         } catch {
             // An unavailable Keychain does not establish a session.
+            guard revision == sessionRevision else { return }
+
+            isAuthenticated = false
         }
     }
     

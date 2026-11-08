@@ -23,7 +23,9 @@ struct TrackerApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
-                .environment(appState)
+                .task {
+                    await appState.restoreAuthentication(from: KeychainTokenStore.shared)
+                }
         }
         .environment( \.locale, selectedLanguage.locale)
         .environment(appState)

@@ -14,7 +14,7 @@ struct ProfileView: View {
     var body: some View {
 
         if appState.isAuthenticated {
-            Text("Hello, World!")
+            CurrentUserView(appState: appState)
         } else {
             ContentUnavailableView {
                 Label("auth.not_logged_in.label", systemImage: "person")
