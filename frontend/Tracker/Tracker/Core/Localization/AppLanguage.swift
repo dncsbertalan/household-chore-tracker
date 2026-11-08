@@ -1,28 +1,34 @@
+//
+//  AppLanguage.swift
+//  Tracker
+//
+//  Created by Dancs Bertalan on 2026. 11. 07..
+//
+
 import Foundation
 
-nonisolated enum AppLanguage: String, CaseIterable, Identifiable, Sendable {
+enum AppLanguage: String, CaseIterable, Identifiable {
     case system
     case english = "en"
     case hungarian = "hu"
-
+    
     static let storageKey = "app.language"
-
+    
     var id: String { rawValue }
-
-    static func selected(in defaults: UserDefaults = .standard) -> AppLanguage {
-        defaults.string(forKey: storageKey).flatMap(AppLanguage.init(rawValue:))
-            ?? .system
+    
+    var displayName: String {
+        switch self {
+        case .system: "System Default"
+        case .english: "English"
+        case .hungarian: "Magyar"
+        }
     }
-
+    
     var locale: Locale {
-        self == .system ? .current : Locale(identifier: rawValue)
-    }
-
-    var bundle: Bundle {
-        guard self != .system,
-            let path = Bundle.main.path(forResource: rawValue, ofType: "lproj"),
-            let bundle = Bundle(path: path)
-        else { return .main }
-        return bundle
+        switch self {
+        case .system: .autoupdatingCurrent
+        case .english: Locale(identifier: "en")
+        case .hungarian: Locale(identifier: "hu")
+        }
     }
 }

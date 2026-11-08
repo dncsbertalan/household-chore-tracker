@@ -1,13 +1,21 @@
-import Combine
+//
+//  AppState.swift
+//  Tracker
+//
+//  Created by Dancs Bertalan on 2026. 11. 07..
+//
+
 import Foundation
+import Observation
 
 @MainActor
-final class AppState: ObservableObject {
-    @Published var selectedTab: Tab = .household
-    @Published var selectedHouseholdId: UUID? = nil
-    @Published var sessionRevision = 0
-    @Published var isAuthenticated = false
-    @Published var isOnline = false
+@Observable
+final class AppState {
+    var selectedTab: Tab = .household
+    var selectedHouseholdId: UUID? = nil
+    var sessionRevision = 0
+    var isAuthenticated = false
+    var isOnline = false
 
     func restoreAuthentication(from tokenStore: any TokenStoreProtocol) async {
         let revision = sessionRevision

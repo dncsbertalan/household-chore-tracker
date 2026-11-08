@@ -1,140 +1,40 @@
+//
+//  RootView.swift
+//  Tracker
+//
+//  Created by Dancs Bertalan on 2026. 11. 07..
+//
+
 import SwiftUI
+import SwiftData
 
 struct RootView: View {
-    let registrationService: (any RegistrationServiceProtocol)?
-    let loginService: (any LoginServiceProtocol)?
-    let currentUserService: (any CurrentUserServiceProtocol)?
-    let logoutService: (any LogoutServiceProtocol)?
-    var invitationRepository: HouseholdInvitationRepository? = nil
-    var roleRepository: (any HouseholdRoleRepositoryProtocol)? = nil
-    @AppStorage(AppLanguage.storageKey) private var language: AppLanguage = .system
-    @State private var isShowingRegistration = false
-    @State private var isShowingLogin = false
-    @State private var isLoggingOut = false
-    @State private var logoutMessage: String?
-    @State private var isShowingLogoutMessage = false
-    
-    @EnvironmentObject private var appState: AppState
-    @Environment(HouseholdStore.self) private var store
-    
-    var body: some View {
-        TabView(selection: $appState.selectedTab) {
-            HouseholdCoordinatorView(currentUserService: currentUserService, invitationRepository: invitationRepository,
-                                     roleRepository: roleRepository)
-                .id(appState.sessionRevision)
-                .tabItem { Label("household.tabName", systemImage: "house") }
-                .tag(AppState.Tab.household)
+    @Environment(AppState.self) private var appState
+    @Environment(\.locale) private var locale
 
-            ChoresCoordinatorView(currentUserService: currentUserService)
-                .id(appState.sessionRevision)
-                .tabItem { Label("chores.title", systemImage: "checklist") }
+
+    var body: some View {
+        @Bindable var appState = appState
+
+        TabView(selection: $appState.selectedTab) {
+            Text("faza")
+                .tabItem { Label("tab.name.household", systemImage: "house") }
+                .tag(AppState.Tab.household)
+            
+            Text("faza")
+                .tabItem { Label("tab.name.chores", systemImage: "checklist") }
                 .tag(AppState.Tab.chores)
             
-            NavigationStack {
-                Group {
-                    if let currentUserService {
-                        ProfileView(
-                            service: currentUserService,
-                            isAuthenticated: appState.isAuthenticated,
-                            isOnline: appState.isOnline,
-                            isLoggingOut: isLoggingOut,
-                            canLogOut: logoutService != nil,
-                            onLogout: logout
-                        )
-                    } else {
-                        ContentUnavailableView(
-                            "configuration.required", systemImage: "network",
-                            description: Text("configuration.instructions")
-                        )
-                    }
-                }
-                .navigationTitle("profile.title")
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        Button {
-                            isShowingLogin = true
-                        } label: {
-                            Label("auth.signIn", systemImage: "person.crop.circle")
-                        }
-                    }
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        Button {
-                            isShowingRegistration = true
-                        } label: {
-                            Label("auth.register", systemImage: "person.badge.plus")
-                        }
-                    }
-                }
-            }
-            .id(appState.sessionRevision)
-            .tabItem { Label("profile.title", systemImage: "person") }
-            .tag(AppState.Tab.profile)
+            ProfileTabView()
+                .tabItem { Label("tab.name.profile", systemImage: "person") }
+                .tag(AppState.Tab.profile)
         }
         // Recreate screen models so stored validation messages also use the new language.
-        .id(language)
-        .sheet(isPresented: $isShowingRegistration) {
-            if let registrationService {
-                RegistrationView(service: registrationService)
-            } else {
-                ContentUnavailableView(
-                    "configuration.required",
-                    systemImage: "network",
-                    description: Text("configuration.instructions")
-                )
-            }
-        }
-        .sheet(isPresented: $isShowingLogin) {
-            if let loginService {
-                LoginView(service: loginService) {
-                    store.clearSession()
-                    invitationRepository?.clearSession()
-                    appState.isAuthenticated = true
-                    appState.sessionRevision += 1
-                }
-            } else {
-                ContentUnavailableView(
-                    "configuration.required", systemImage: "network",
-                    description: Text("configuration.instructions")
-                )
-            }
-        }
-        .alert("auth.signOut", isPresented: $isShowingLogoutMessage) {
-            Button("common.ok", role: .cancel) { }
-        } message: {
-            Text(logoutMessage ?? "")
-        }
-        .environment(\.locale, language.locale)
-    }
-
-    private func logout() {
-        guard let logoutService, !isLoggingOut else { return }
-        isLoggingOut = true
-        Task {
-            defer { isLoggingOut = false }
-            do {
-                try await logoutService.logout()
-                invitationRepository?.clearSession()
-                store.clearSession()
-                appState.selectedHouseholdId = nil
-                appState.isAuthenticated = false
-                appState.sessionRevision += 1
-                isShowingLogin = false
-                logoutMessage = AppLocalization.string("auth.signedOut")
-            } catch {
-                logoutMessage = AppLocalization.string("auth.signOutFailed", defaultValue: "Could not sign out: \(error.localizedDescription)")
-            }
-            isShowingLogoutMessage = true
-        }
+        .id(locale)
     }
 }
 
-#if DEBUG
 #Preview {
-    RootView(
-        registrationService: RegistrationPreviewService(), loginService: LoginPreviewService(),
-        currentUserService: CurrentUserPreviewService(), logoutService: LogoutPreviewService()
-    )
-    .environmentObject(AppState())
-    .environment(HouseholdStore())
+    RootView()
+        .environment(AppState())
 }
-#endif
