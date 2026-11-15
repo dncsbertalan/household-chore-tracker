@@ -58,9 +58,9 @@ struct RegisterView: View {
         .alert("login.signIn.unable.label",isPresented: $viewModel.showError) {
             Button("common.ok", role: .cancel) {}
         } message: {
-            Text(viewModel.errorMessage ?? "Please try again.")
+            Text(viewModel.errorMessage ?? "common.tryAgain.please Please try again.")
         }
-        .interactiveDismissDisabled(viewModel.isLoggingIn)
+        .interactiveDismissDisabled(viewModel.isRegistering)
     }
     
     private var header: some View {
@@ -75,11 +75,12 @@ struct RegisterView: View {
                 )
             
             VStack(spacing: Theme.Spacing.sm) {
-                Text("Welcome back")
+                Text("register.welcome")
                     .font(.system(size: 32, weight: .bold))
+                    .fontDesign(.rounded)
                     .tracking(-0.8)
                 
-                Text("Sign in to continue to your household.")
+                Text("register.label")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -90,6 +91,28 @@ struct RegisterView: View {
     
     private var form: some View {
         VStack(spacing: Theme.Spacing.md) {
+            TextField("common.firstName",text: $viewModel.firstName)
+                .textContentType(.givenName)
+                .textInputAutocapitalization(.sentences)
+                .autocorrectionDisabled()
+                .submitLabel(.next)
+                .modifier(LoginFieldStyle())
+                .focused($focusedField, equals: .firstName)
+                .onSubmit {
+                    focusedField = .lastName
+                }
+            
+            TextField("common.lastName",text: $viewModel.lastName)
+                .textContentType(.familyName)
+                .textInputAutocapitalization(.sentences)
+                .autocorrectionDisabled()
+                .submitLabel(.next)
+                .modifier(LoginFieldStyle())
+                .focused($focusedField, equals: .lastName)
+                .onSubmit {
+                    focusedField = .email
+                }
+            
             TextField("common.emailAddress",text: $viewModel.email)
                 .textContentType(.emailAddress)
                 .keyboardType(.emailAddress)
@@ -108,7 +131,7 @@ struct RegisterView: View {
                 .modifier(LoginFieldStyle())
                 .focused($focusedField, equals: .password)
                 .onSubmit {
-                    Task { await viewModel.login() }
+                    Task { await viewModel.register() }
                     focusedField = nil
                 }
         }
@@ -118,14 +141,14 @@ struct RegisterView: View {
     private var footer: some View {
         VStack(spacing: Theme.Spacing.lg) {
             Button {
-                Task { await viewModel.login() }
+                Task { await viewModel.register() }
             } label: {
                 HStack(spacing: Theme.Spacing.md) {
-                    if viewModel.isLoggingIn {
+                    if viewModel.isRegistering {
                         ProgressView()
                             .tint(.white)
                     } else {
-                        Text("common.signIn")
+                        Text("common.signUp")
                     }
                 }
                 .font(.headline)
@@ -133,19 +156,7 @@ struct RegisterView: View {
                 .frame(height: 50)
             }
             .buttonStyle(.glassProminent)
-            .disabled(viewModel.canLogin)
-            
-            HStack(spacing: Theme.Spacing.xs) {
-                Text("common.noAccount.question")
-                    .foregroundStyle(.secondary)
-                
-                Button("common.noAccount.createAccount") {
-                    // Navigate to registration
-                }
-                .fontWeight(.semibold)
-            }
-            .font(.subheadline)
-            .frame(maxWidth: .infinity)
+            .disabled(!viewModel.canRegister)
         }
     }
 }

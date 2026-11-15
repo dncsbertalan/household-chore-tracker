@@ -75,6 +75,7 @@ struct LoginView: View {
             VStack(spacing: Theme.Spacing.sm) {
                 Text("Welcome back")
                     .font(.system(size: 32, weight: .bold))
+                    .fontDesign(.rounded)
                     .tracking(-0.8)
                 
                 Text("Sign in to continue to your household.")
@@ -131,7 +132,7 @@ struct LoginView: View {
                 .frame(height: 50)
             }
             .buttonStyle(.glassProminent)
-            .disabled(viewModel.canLogin)
+            .disabled(!viewModel.canLogin)
             
             HStack(spacing: Theme.Spacing.xs) {
                 Text("common.noAccount.question")

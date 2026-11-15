@@ -31,7 +31,7 @@ final class RegisterViewModel {
         !isRegistering && !email.trimmingCharacters(in: .whitespaces).isEmpty && !password.isEmpty && !firstName.isEmpty && !lastName.isEmpty
     }
 
-    func login() async {
+    func register() async {
         guard canRegister else { return }
         
         isRegistering = true

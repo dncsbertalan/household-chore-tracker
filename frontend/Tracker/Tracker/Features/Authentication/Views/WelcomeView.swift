@@ -31,28 +31,28 @@ struct WelcomeView: View {
                     
                     Text("welcome.label")
                         .font(.system(size: 20))
+                        .foregroundStyle(.secondary)
                 }
                 
                 Spacer()
                                 
-                VStack(spacing: Theme.Spacing.lg) {
-                    Button {
+                VStack(spacing: Theme.Spacing.lg) {                    
+                    NavigationLink {
+                        RegisterView(authService: container.authService)
                     } label: {
-                        HStack(spacing: Theme.Spacing.md) {
-                                Text("common.signUp")
-                        }
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 50)
+                        Text("common.signUp")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 50)
                     }
                     .buttonStyle(.glassProminent)
-                    
+
                     HStack(spacing: Theme.Spacing.xs) {
                         Text("common.alreadyHasAccount.question")
                             .foregroundStyle(.secondary)
                         
                         NavigationLink {
-                            LoginView(authService: container.authService,appState: appState)
+                            LoginView(authService: container.authService, appState: appState)
                         } label: {
                             Text("common.alreadyHasAccount.signIn")
                         }
