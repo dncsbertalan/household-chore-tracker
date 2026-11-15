@@ -38,7 +38,20 @@ struct RootView: View {
     }
 }
 
+private let previewAppState: AppState = {
+    let appState = AppState()
+    appState.isAuthenticated = true
+    return appState
+}()
+
+#Preview("logged in") {
+    RootView()
+        .environment(previewAppState)
+        .environment(\.container, DependencyContainer.mock())
+}
+
 #Preview {
     RootView()
         .environment(AppState())
+        .environment(\.container, DependencyContainer.mock())
 }

@@ -83,17 +83,6 @@ struct CurrentUserView: View {
     }
 }
 
-private struct PreviewCurrentUserRepository: CurrentUserRepositoryProtocol {
-    func getCurrentUser() async throws -> CurrentUser {
-        CurrentUser(
-            id: UUID(),
-            email: "alex.morgan@example.com",
-            firstName: "Alex",
-            lastName: "Morgan"
-        )
-    }
-}
-
 private let previewAppState: AppState = {
     let appState = AppState()
     appState.isAuthenticated = true
@@ -103,4 +92,5 @@ private let previewAppState: AppState = {
 #Preview {
     CurrentUserWrapperView()
         .environment(previewAppState)
+        .environment(\.container, DependencyContainer.mock())
 }

@@ -12,29 +12,7 @@ struct ProfileView: View {
     @Environment(ProfileRouter.self) private var router
 
     var body: some View {
-
-        if appState.isAuthenticated {
             CurrentUserWrapperView()
-        } else {
-            ContentUnavailableView {
-                Label("auth.not_logged_in.label", systemImage: "person")
-            } description: {
-                Text("auth.not_logged_in.description")
-            } actions: {
-                Button("register") {
-                    router.sheet = .register
-                }
-                .buttonSizing(.flexible)
-                .buttonStyle(.bordered)
-                
-                Button("login") {
-                    router.sheet = .login
-                }
-                .buttonSizing(.flexible)
-                .frame(minWidth: 150)
-                .buttonStyle(.borderedProminent)
-            }
-        }
     }
 }
 

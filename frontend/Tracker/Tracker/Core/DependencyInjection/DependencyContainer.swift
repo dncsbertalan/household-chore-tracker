@@ -8,21 +8,41 @@
 import Foundation
 
 @MainActor
-final class DependencyContainer: Sendable {
-    let apiClient: APIClient
-    let currentUserRepository: CurrentUserRepositoryProtocol
-    let tokenStore: TokenStoreProtocol
-    let authService: AuthenticationServiceProtocol
+final class DependencyContainer {
 
-    init() {
-        self.tokenStore = KeychainTokenStore()
-        self.apiClient = APIClient(tokenStore: tokenStore)
-        self.authService = AuthenticationService(apiClient: apiClient, tokenStore: tokenStore)
-        self.currentUserRepository = CurrentUserRepository(apiClient: apiClient)
+    let apiClient: APIClient
+    let currentUserRepository: any CurrentUserRepositoryProtocol
+    let tokenStore: any TokenStoreProtocol
+    let authService: any AuthenticationServiceProtocol
+
+    init(
+        tokenStore: (any TokenStoreProtocol)? = nil,
+        apiClient: APIClient? = nil,
+        authService: (any AuthenticationServiceProtocol)? = nil,
+        currentUserRepository: (any CurrentUserRepositoryProtocol)? = nil
+    ) {
+        let resolvedTokenStore = tokenStore ?? KeychainTokenStore()
+        let resolvedAPIClient = apiClient
+            ?? APIClient(tokenStore: resolvedTokenStore)
+
+        self.tokenStore = resolvedTokenStore
+        self.apiClient = resolvedAPIClient
+
+        self.authService = authService
+            ?? AuthenticationService(
+                apiClient: resolvedAPIClient,
+                tokenStore: resolvedTokenStore
+            )
+
+        self.currentUserRepository = currentUserRepository
+            ?? CurrentUserRepository(apiClient: resolvedAPIClient)
     }
 
-    /// Creates a container with mock implementations for previews and tests
-    static func mock() -> DependencyContainer? {
-        nil
+    // MARK: - Mock
+
+    static func mock() -> DependencyContainer {
+        DependencyContainer(
+            currentUserRepository: PreviewCurrentUserRepository()
+        )
     }
 }
