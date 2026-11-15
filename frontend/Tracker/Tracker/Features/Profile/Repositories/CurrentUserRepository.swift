@@ -6,11 +6,11 @@
 //
 
 nonisolated struct CurrentUserRepository: CurrentUserRepositoryProtocol {
-    private let api: APIClient
+    private let apiClient: APIClient
 
-    init(api: APIClient) { self.api = api }
+    init(apiClient: APIClient) { self.apiClient = apiClient }
 
     func getCurrentUser() async throws -> CurrentUser {
-        try await api.request(endpoint: "api/v1/users/me")
+        try await apiClient.request(endpoint: "api/v1/users/me")
     }
 }

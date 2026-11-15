@@ -18,16 +18,18 @@ struct TrackerApp: App {
     }
     
     @State var appState: AppState = AppState()
+    @State var container: DependencyContainer = DependencyContainer()
     
     
     var body: some Scene {
         WindowGroup {
             RootView()
                 .task {
-                    await appState.restoreAuthentication(from: KeychainTokenStore.shared)
+                    await appState.restoreAuthentication(from: container.tokenStore)
                 }
         }
-        .environment( \.locale, selectedLanguage.locale)
+        .environment(\.locale, selectedLanguage.locale)
+        .environment(\.container, container)
         .environment(appState)
     }
 }

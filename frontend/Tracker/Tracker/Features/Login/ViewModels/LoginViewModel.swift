@@ -14,7 +14,7 @@ final class LoginViewModel {
     var email = ""
     var password = ""
 
-    private(set) var isLoading = false
+    private(set) var isLoggingIn = false
     var showError = false
     private(set) var errorMessage: String?
 
@@ -30,14 +30,14 @@ final class LoginViewModel {
     }
 
     var canLogin: Bool {
-        !isLoading && !email.trimmingCharacters(in: .whitespaces).isEmpty && !password.isEmpty
+        !isLoggingIn && !email.trimmingCharacters(in: .whitespaces).isEmpty && !password.isEmpty
     }
 
     func login() async {
         guard canLogin else { return }
         
-        isLoading = true
-        defer { isLoading = false }
+        isLoggingIn = true
+        defer { isLoggingIn = false }
         
         do {
             let result = try await authService.login(

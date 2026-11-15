@@ -8,8 +8,6 @@
 import Foundation
 
 actor KeychainTokenStore: TokenStoreProtocol {
-    static let shared = KeychainTokenStore()
-
     private let key = "auth.tokens"
 
     func save(_ tokens: StoredTokens) async throws {

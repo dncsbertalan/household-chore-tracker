@@ -14,7 +14,7 @@ struct ProfileView: View {
     var body: some View {
 
         if appState.isAuthenticated {
-            CurrentUserView(appState: appState)
+            CurrentUserWrapperView()
         } else {
             ContentUnavailableView {
                 Label("auth.not_logged_in.label", systemImage: "person")
@@ -24,9 +24,15 @@ struct ProfileView: View {
                 Button("register") {
                     router.sheet = .register
                 }
+                .buttonSizing(.flexible)
+                .buttonStyle(.bordered)
+                
                 Button("login") {
                     router.sheet = .login
                 }
+                .buttonSizing(.flexible)
+                .frame(minWidth: 150)
+                .buttonStyle(.borderedProminent)
             }
         }
     }

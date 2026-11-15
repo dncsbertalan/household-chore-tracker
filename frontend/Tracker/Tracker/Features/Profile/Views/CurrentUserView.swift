@@ -11,12 +11,8 @@ struct CurrentUserView: View {
     @Environment(AppState.self) private var appState
     @State private var viewModel: CurrentUserViewModel
     
-    init(
-        userRepository: any CurrentUserRepositoryProtocol = CurrentUserRepository(api: APIClient.shared), appState: AppState
-    ) {
-        _viewModel = State(
-            initialValue: CurrentUserViewModel(userRepository: userRepository, authService: AuthenticationService.shared, appState: appState)
-        )
+    init(viewModel: CurrentUserViewModel) {
+        _viewModel = State(initialValue: viewModel)
     }
     
     var body: some View {
@@ -29,6 +25,8 @@ struct CurrentUserView: View {
                 profileHeader(for: user)
                 
             }
+            
+            Spacer()
             
             if appState.isAuthenticated {
                 Button(role: .destructive, action: {
@@ -103,9 +101,6 @@ private let previewAppState: AppState = {
 }()
 
 #Preview {
-    CurrentUserView(
-        userRepository: PreviewCurrentUserRepository(),
-        appState: previewAppState
-    )
-    .environment(previewAppState)
+    CurrentUserWrapperView()
+        .environment(previewAppState)
 }

@@ -8,8 +8,6 @@
 import Foundation
 
 final class APIClient: Sendable {
-    static let shared = APIClient()
-
     private let session: URLSession
     private let decoder: JSONDecoder
     private let encoder: JSONEncoder
@@ -19,7 +17,7 @@ final class APIClient: Sendable {
     init(
         baseURL: URL = URL(string: "http://localhost:8080")!,
         session: URLSession = .shared,
-        tokenStore: any TokenStoreProtocol = KeychainTokenStore.shared
+        tokenStore: any TokenStoreProtocol
     ) {
         self.baseURL = baseURL
         self.session = session

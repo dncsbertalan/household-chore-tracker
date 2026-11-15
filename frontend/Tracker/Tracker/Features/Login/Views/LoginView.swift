@@ -9,7 +9,15 @@ import SwiftUI
 
 struct LoginView: View {
     @State private var viewModel: LoginViewModel
-
+    
+    //@Environment(\.dismiss) private var dismiss
+    @FocusState private var focusedField: Field?
+    
+    private enum Field: Int, Hashable {
+        case email
+        case password
+    }
+    
     init(authService: any AuthenticationServiceProtocol, appState: AppState) {
         _viewModel = State(
             initialValue: LoginViewModel(authService: authService, appState: appState)
@@ -21,14 +29,14 @@ struct LoginView: View {
             ScrollView {
                 VStack(spacing: 0) {
                     Spacer(minLength: 72)
-
+                    
                     header
                         .padding(.bottom, 48)
-
+                    
                     form
-
+                    
                     Spacer(minLength: 48)
-
+                    
                     footer
                 }
                 .frame(maxWidth: 400)
@@ -39,34 +47,36 @@ struct LoginView: View {
             .scrollDismissesKeyboard(.interactively)
             .background(Color(.systemBackground))
         }
-        //.navigationBarBackButtonHidden()
-        .alert(
-            "Unable to Sign In",
-            isPresented: $viewModel.showError
-        ) {
-            Button("OK", role: .cancel) {}
+        /*.toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button { dismiss() } label: { Image(systemName: "xmark") }
+                    .accessibilityLabel("common.close")
+            }
+        }*/
+        .alert("login.signIn.unable.label",isPresented: $viewModel.showError) {
+            Button("common.ok", role: .cancel) {}
         } message: {
             Text(viewModel.errorMessage ?? "Please try again.")
         }
-        
+        .interactiveDismissDisabled(viewModel.isLoggingIn)
     }
-
+    
     private var header: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: Theme.Spacing.xl) {
             Image(systemName: "house")
                 .font(.system(size: 36, weight: .medium))
-                .foregroundStyle(.primary)
+                .foregroundStyle(.tint)
                 .frame(width: 80, height: 80)
                 .background(
                     Color(.secondarySystemBackground),
                     in: RoundedRectangle(cornerRadius: 22)
                 )
-
-            VStack(spacing: 8) {
+            
+            VStack(spacing: Theme.Spacing.sm) {
                 Text("Welcome back")
                     .font(.system(size: 32, weight: .bold))
                     .tracking(-0.8)
-
+                
                 Text("Sign in to continue to your household.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
@@ -75,77 +85,66 @@ struct LoginView: View {
         }
         .frame(maxWidth: .infinity)
     }
-
+    
     private var form: some View {
-        VStack(spacing: 20) {
-            VStack(spacing: 12) {
-                TextField(
-                    "Email address",
-                    text: $viewModel.email
-                )
-                .textContentType(.username)
+        VStack(spacing: Theme.Spacing.md) {
+            TextField("common.emailAddress",text: $viewModel.email)
+                .textContentType(.emailAddress)
                 .keyboardType(.emailAddress)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .submitLabel(.next)
                 .modifier(LoginFieldStyle())
-
-                SecureField(
-                    "Password",
-                    text: $viewModel.password
-                )
+                .focused($focusedField, equals: .email)
+                .onSubmit {
+                    focusedField = .password
+                }
+            
+            SecureField("common.password",text: $viewModel.password)
                 .textContentType(.password)
-                .submitLabel(.go)
+                .submitLabel(.done)
                 .modifier(LoginFieldStyle())
+                .focused($focusedField, equals: .password)
                 .onSubmit {
                     Task { await viewModel.login() }
+                    focusedField = nil
                 }
-            }
-
-            Button("Forgot password?") {
-                // Navigate to password recovery
-            }
-            .font(.subheadline.weight(.medium))
-            .frame(maxWidth: .infinity, alignment: .trailing)
-
+        }
+    }
+    
+    
+    private var footer: some View {
+        VStack(spacing: Theme.Spacing.lg) {
             Button {
                 Task { await viewModel.login() }
             } label: {
-                HStack(spacing: 10) {
-                    if viewModel.isLoading {
+                HStack(spacing: Theme.Spacing.md) {
+                    if viewModel.isLoggingIn {
                         ProgressView()
                             .tint(.white)
                     } else {
-                        Text("Sign In")
+                        Text("common.signIn")
                     }
                 }
-                .font(.system(size: 16, weight: .semibold))
+                .font(.headline)
                 .frame(maxWidth: .infinity)
-                .frame(height: 54)
+                .frame(height: 50)
             }
-            .buttonStyle(.plain)
-            .foregroundStyle(.white)
-            .background(
-                Color.primary.opacity(0.92),
-                in: RoundedRectangle(cornerRadius: 14)
-            )
-            .disabled(!viewModel.canLogin)
-            .opacity(viewModel.canLogin ? 1 : 0.5)
-        }
-    }
-
-    private var footer: some View {
-        HStack(spacing: 5) {
-            Text("Don't have an account?")
-                .foregroundStyle(.secondary)
-
-            Button("Create account") {
-                // Navigate to registration
+            .buttonStyle(.glassProminent)
+            .disabled(viewModel.canLogin)
+            
+            HStack(spacing: Theme.Spacing.xs) {
+                Text("common.noAccount.question")
+                    .foregroundStyle(.secondary)
+                
+                Button("common.noAccount.createAccount") {
+                    // Navigate to registration
+                }
+                .fontWeight(.semibold)
             }
-            .fontWeight(.semibold)
+            .font(.subheadline)
+            .frame(maxWidth: .infinity)
         }
-        .font(.subheadline)
-        .frame(maxWidth: .infinity)
     }
 }
 
@@ -153,16 +152,38 @@ private struct LoginFieldStyle: ViewModifier {
     func body(content: Content) -> some View {
         content
             .font(.body)
-            .padding(.horizontal, 16)
+            .padding(.horizontal, Theme.Spacing.lg)
             .frame(height: 56)
             .background(
                 Color(.secondarySystemBackground),
-                in: RoundedRectangle(cornerRadius: 14)
+                in: RoundedRectangle(cornerRadius: Theme.CornerRadius.lg)
             )
     }
 }
 
 
+#Preview("full") {
+    let container = DependencyContainer()
+    
+    Color.gray.opacity(0.3)
+        .ignoresSafeArea()
+        .fullScreenCover(isPresented: .constant(true)) {
+            LoginView(authService: container.authService, appState: AppState())
+        }
+}
+
+#Preview("sheet") {
+    let container = DependencyContainer()
+    
+    Color.gray.opacity(0.3)
+        .ignoresSafeArea()
+        .sheet(isPresented: .constant(true)) {
+            LoginView(authService: container.authService, appState: AppState())
+        }
+}
+
 #Preview {
-    LoginView(authService: AuthenticationService.shared, appState: AppState())
+    let container = DependencyContainer()
+
+    LoginView(authService: container.authService, appState: AppState())
 }

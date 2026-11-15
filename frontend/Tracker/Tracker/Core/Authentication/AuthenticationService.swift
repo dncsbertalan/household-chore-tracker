@@ -15,13 +15,11 @@ protocol AuthenticationServiceProtocol: Sendable {
 }
 
 struct AuthenticationService: AuthenticationServiceProtocol {
-    static let shared = AuthenticationService()
-
-    private let api: APIClient
+    private let apiClient: APIClient
     private let tokenStore: any TokenStoreProtocol
 
-    init(api: APIClient = .shared, tokenStore: any TokenStoreProtocol = KeychainTokenStore.shared) {
-        self.api = api
+    init(apiClient: APIClient, tokenStore: any TokenStoreProtocol) {
+        self.apiClient = apiClient
         self.tokenStore = tokenStore
     }
 
@@ -30,7 +28,7 @@ struct AuthenticationService: AuthenticationServiceProtocol {
         let csrf = try await csrfToken()
         let issuedAt = Date()
         
-        let response: TokenResponse = try await api.request(
+        let response: TokenResponse = try await apiClient.request(
             endpoint: "api/v1/auth/login", method: .post,
             body: LoginRequest(email: email, password: password),
             headers: [csrf.headerName: csrf.token]
@@ -46,7 +44,7 @@ struct AuthenticationService: AuthenticationServiceProtocol {
     /// Creates an account. Call login separately to start an authenticated session.
     func register(email: String, password: String, firstName: String, lastName: String) async throws -> RegistrationResponse {
         let csrf = try await csrfToken()
-        return try await api.request(
+        return try await apiClient.request(
             endpoint: "api/v1/auth/register", method: .post,
             body: RegisterRequest(email: email, password: password, firstName: firstName, lastName: lastName),
             headers: [csrf.headerName: csrf.token]
@@ -56,7 +54,7 @@ struct AuthenticationService: AuthenticationServiceProtocol {
     // Spring requires a CSRF header plus the session cookie from this GET.
     // Both requests use the API client's same cookie-enabled URLSession.
     private func csrfToken() async throws -> CSRFResponse {
-        try await api.request(endpoint: "api/v1/auth/csrf")
+        try await apiClient.request(endpoint: "api/v1/auth/csrf")
     }
 
     /// Clears local credentials; the backend currently has no logout endpoint.

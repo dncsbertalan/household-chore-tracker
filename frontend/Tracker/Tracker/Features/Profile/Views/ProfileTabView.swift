@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ProfileTabView: View {
     @Environment(AppState.self) private var appState
+    @Environment(\.container) private var container
     @State private var router = ProfileRouter()
     
     var body: some View {
@@ -37,10 +38,10 @@ struct ProfileTabView: View {
         NavigationStack {
             switch sheet {
             case .login:
-                LoginView(authService: AuthenticationService.shared, appState: appState)
+                LoginView(authService: container.authService, appState: appState)
                 
             case .register:
-                LoginView(authService: AuthenticationService.shared, appState: appState)
+                LoginView(authService: container.authService, appState: appState)
             }
         }
     }
