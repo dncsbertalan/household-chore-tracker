@@ -164,7 +164,7 @@ struct RegisterView: View {
 
         if viewModel.registrationSucceeded {
             focusedField = nil
-            router.pop()
+            router.replace(with: .login)
         }
     }
 }

@@ -17,7 +17,7 @@ struct RootView: View {
         @Bindable var appState = appState
         
         if !appState.isAuthenticated {
-            WelcomeView()
+            WelcomeMainView()
         } else {
             TabView(selection: $appState.selectedTab) {
                 Text("faza")
