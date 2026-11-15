@@ -16,6 +16,7 @@ final class RegisterViewModel {
     var firstName = ""
     var lastName = ""
 
+    private(set) var registrationSucceeded = false
     private(set) var isRegistering = false
     var showError = false
     private(set) var errorMessage: String?
@@ -43,7 +44,10 @@ final class RegisterViewModel {
             )
             
             print(result)
+            
+            registrationSucceeded = true
         } catch {
+            registrationSucceeded = false
             errorMessage = error.localizedDescription
             showError = true
         }

@@ -7,9 +7,17 @@
 
 import SwiftUI
 
+private enum AuthRoute: Hashable {
+    case login
+    case register
+}
+
 struct WelcomeView: View {
     @Environment(\.container) private var container
     @Environment(AppState.self) private var appState
+    @Environment(WelcomeRouter.self) private var router
+    
+    @State private var path: [AuthRoute] = []
 
     var body: some View {
         NavigationStack {
@@ -37,8 +45,8 @@ struct WelcomeView: View {
                 Spacer()
                                 
                 VStack(spacing: Theme.Spacing.lg) {                    
-                    NavigationLink {
-                        RegisterView(authService: container.authService)
+                    Button {
+                        router.navigate(to: .register)
                     } label: {
                         Text("common.signUp")
                             .font(.headline)
@@ -51,8 +59,8 @@ struct WelcomeView: View {
                         Text("common.alreadyHasAccount.question")
                             .foregroundStyle(.secondary)
                         
-                        NavigationLink {
-                            LoginView(authService: container.authService, appState: appState)
+                        Button {
+                            router.navigate(to: .login)
                         } label: {
                             Text("common.alreadyHasAccount.signIn")
                         }
@@ -73,4 +81,5 @@ struct WelcomeView: View {
     WelcomeView()
         .environment(\.container, container)
         .environment(AppState())
+        .environment(WelcomeRouter())
 }

@@ -10,9 +10,9 @@ import SwiftUI
 struct RegisterView: View {
     @State private var viewModel: RegisterViewModel
     
-    //@Environment(\.dismiss) private var dismiss
+    @Environment(WelcomeRouter.self) private var router
     @FocusState private var focusedField: Field?
-    
+        
     private enum Field: Int, Hashable {
         case firstName
         case lastName
@@ -131,7 +131,6 @@ struct RegisterView: View {
                 .modifier(LoginFieldStyle())
                 .focused($focusedField, equals: .password)
                 .onSubmit {
-                    Task { await viewModel.register() }
                     focusedField = nil
                 }
         }
@@ -141,7 +140,7 @@ struct RegisterView: View {
     private var footer: some View {
         VStack(spacing: Theme.Spacing.lg) {
             Button {
-                Task { await viewModel.register() }
+                Task { await register() }
             } label: {
                 HStack(spacing: Theme.Spacing.md) {
                     if viewModel.isRegistering {
@@ -157,6 +156,15 @@ struct RegisterView: View {
             }
             .buttonStyle(.glassProminent)
             .disabled(!viewModel.canRegister)
+        }
+    }
+    
+    private func register() async {
+        await viewModel.register()
+
+        if viewModel.registrationSucceeded {
+            focusedField = nil
+            router.pop()
         }
     }
 }
@@ -178,4 +186,5 @@ private struct LoginFieldStyle: ViewModifier {
     let container = DependencyContainer()
 
     RegisterView(authService: container.authService)
+        .environment(WelcomeRouter())
 }
