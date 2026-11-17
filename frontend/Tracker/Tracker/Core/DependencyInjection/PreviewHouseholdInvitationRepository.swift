@@ -9,6 +9,10 @@ import Foundation
 
 struct PreviewHouseholdInvitationRepository: HouseholdInvitationRepositoryProtocol {
     
+    func accept(invitationId: UUID, idempotencyKey: UUID) async throws {}
+    
+    func decline(invitationId: UUID, idempotencyKey: UUID) async throws {}
+
     func getAllCurrentlyActive() async throws -> [HouseholdInvitationDto] {
         HouseholdInvitationDto.mockData2
     }
