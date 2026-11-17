@@ -11,6 +11,7 @@ import Foundation
 final class DependencyContainer {
 
     let apiClient: APIClient
+    let householdRepository: any HouseholdRepositoryProtocol
     let currentUserRepository: any CurrentUserRepositoryProtocol
     let tokenStore: any TokenStoreProtocol
     let authService: any AuthenticationServiceProtocol
@@ -19,7 +20,8 @@ final class DependencyContainer {
         tokenStore: (any TokenStoreProtocol)? = nil,
         apiClient: APIClient? = nil,
         authService: (any AuthenticationServiceProtocol)? = nil,
-        currentUserRepository: (any CurrentUserRepositoryProtocol)? = nil
+        currentUserRepository: (any CurrentUserRepositoryProtocol)? = nil,
+        householdRepository: (any HouseholdRepositoryProtocol)? = nil
     ) {
         let resolvedTokenStore = tokenStore ?? KeychainTokenStore()
         let resolvedAPIClient = apiClient
@@ -34,6 +36,9 @@ final class DependencyContainer {
                 tokenStore: resolvedTokenStore
             )
 
+        self.householdRepository = householdRepository
+            ?? HouseholdRepository(apiClient: resolvedAPIClient)
+
         self.currentUserRepository = currentUserRepository
             ?? CurrentUserRepository(apiClient: resolvedAPIClient)
     }
@@ -42,7 +47,8 @@ final class DependencyContainer {
 
     static func mock() -> DependencyContainer {
         DependencyContainer(
-            currentUserRepository: PreviewCurrentUserRepository()
+            currentUserRepository: PreviewCurrentUserRepository(),
+            householdRepository: PreviewHouseholdRepository()
         )
     }
 }
