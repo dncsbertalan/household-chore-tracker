@@ -5,15 +5,14 @@
 //  Created by Dancs Bertalan on 2026. 11. 07..
 //
 
-enum WelcomeRoute: Hashable {
-    case login
-    case register
+enum HouseholdRoute: Hashable {
+    case main
 }
 
-enum WelcomeSheet: String, Identifiable {
+enum HouseholdSheet: String, Identifiable {
     case forgotPassword
 
     var id: String { rawValue }
 }
 
-typealias WelcomeRouter = Router<WelcomeRoute, WelcomeSheet>
+typealias HouseholdRouter = Router<HouseholdRoute, HouseholdSheet>

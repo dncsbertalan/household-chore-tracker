@@ -8,8 +8,37 @@
 import SwiftUI
 
 struct HouseholdTabView: View {
+    @State private var router = HouseholdRouter()
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationStack(path: $router.path) {
+            HouseholdListView()
+                .navigationDestination(for: HouseholdRoute.self) { route in
+                    destination(for: route)
+                }
+        }
+        .sheet(item: $router.sheet) { sheet in
+            sheetDestination(for: sheet)
+        }
+        .environment(router)
+    }
+    
+    @ViewBuilder
+    private func destination(for route: HouseholdRoute) -> some View {
+        switch route {
+        case .main:
+            Text("faza")
+        }
+    }
+    
+    @ViewBuilder
+    private func sheetDestination(for sheet: HouseholdSheet) -> some View {
+        NavigationStack {
+            switch sheet {
+            case .forgotPassword:
+                Text("faza")
+            }
+        }
     }
 }
 

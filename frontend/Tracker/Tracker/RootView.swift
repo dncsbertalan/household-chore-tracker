@@ -20,7 +20,7 @@ struct RootView: View {
             WelcomeMainView()
         } else {
             TabView(selection: $appState.selectedTab) {
-                Text("faza")
+                HouseholdTabView()
                     .tabItem { Label("tab.name.household", systemImage: "house") }
                     .tag(AppState.Tab.household)
                 

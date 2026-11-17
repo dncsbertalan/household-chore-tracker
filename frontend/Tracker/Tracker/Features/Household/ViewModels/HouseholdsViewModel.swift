@@ -6,3 +6,10 @@
 //
 
 import Foundation
+import Observation
+
+@Observable
+@MainActor
+final class HouseholdsViewModel {
+    var households: [Int]?
+}
