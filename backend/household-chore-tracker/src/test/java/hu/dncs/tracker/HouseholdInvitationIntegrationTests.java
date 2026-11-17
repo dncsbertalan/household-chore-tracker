@@ -1,8 +1,8 @@
 package hu.dncs.tracker;
 
-import hu.dncs.tracker.household.application.command.CreateHouseholdCommand;
-import hu.dncs.tracker.household.application.command.CreateHouseholdRoleCommand;
-import hu.dncs.tracker.household.application.usecase.CreateHouseholdUseCase;
+import hu.dncs.tracker.household.application.createhousehold.CreateHouseholdCommand;
+import hu.dncs.tracker.household.application.createhousehold.CreateHouseholdRoleCommand;
+import hu.dncs.tracker.household.application.createhousehold.CreateHouseholdUseCase;
 import hu.dncs.tracker.household.domain.model.HouseholdPermission;
 import hu.dncs.tracker.identity.domain.model.User;
 import hu.dncs.tracker.identity.infrastructure.persistence.UserRepository;

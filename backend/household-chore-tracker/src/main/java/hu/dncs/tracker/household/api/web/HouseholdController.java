@@ -14,9 +14,9 @@ import java.util.List;
 
 import hu.dncs.tracker.household.api.web.request.CreateHouseholdRequest;
 import hu.dncs.tracker.household.api.web.response.HouseholdResponse;
-import hu.dncs.tracker.household.application.command.CreateHouseholdCommand;
-import hu.dncs.tracker.household.application.command.CreateHouseholdRoleCommand;
-import hu.dncs.tracker.household.application.usecase.CreateHouseholdUseCase;
+import hu.dncs.tracker.household.application.createhousehold.CreateHouseholdCommand;
+import hu.dncs.tracker.household.application.createhousehold.CreateHouseholdRoleCommand;
+import hu.dncs.tracker.household.application.createhousehold.CreateHouseholdUseCase;
 import hu.dncs.tracker.idempotency.api.web.Idempotent;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

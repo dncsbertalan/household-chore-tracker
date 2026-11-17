@@ -1,4 +1,4 @@
-package hu.dncs.tracker.household.application.command;
+package hu.dncs.tracker.household.application.createhousehold;
 
 import java.util.List;
 import java.util.UUID;

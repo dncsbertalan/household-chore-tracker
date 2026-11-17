@@ -4,7 +4,11 @@ import hu.dncs.tracker.household.api.web.response.HouseholdMemberRemovalResponse
 import hu.dncs.tracker.household.api.web.response.HouseholdResponse;
 import hu.dncs.tracker.household.api.web.response.HouseholdRolesResponse;
 import hu.dncs.tracker.household.api.web.response.JoinedHouseholdResponse;
-import hu.dncs.tracker.household.application.model.*;
+import hu.dncs.tracker.household.application.createhousehold.CreateHouseholdResult;
+import hu.dncs.tracker.household.application.model.HouseholdDetails;
+import hu.dncs.tracker.household.application.model.HouseholdMemberRemoval;
+import hu.dncs.tracker.household.application.model.HouseholdRoleManagement;
+import hu.dncs.tracker.household.application.model.JoinedHousehold;
 import hu.dncs.tracker.household.domain.model.HouseholdMember;
 import hu.dncs.tracker.identity.api.UserDirectory;
 import hu.dncs.tracker.identity.api.UserInfo;
@@ -29,7 +33,7 @@ class HouseholdResponseMapper {
         return HouseholdResponse.from(household, userInfo(household.members()));
     }
 
-    HouseholdResponse from(CreatedHousehold household) {
+    HouseholdResponse from(CreateHouseholdResult household) {
         return HouseholdResponse.from(household, userInfo(List.of(household.creatorMembership())));
     }
 

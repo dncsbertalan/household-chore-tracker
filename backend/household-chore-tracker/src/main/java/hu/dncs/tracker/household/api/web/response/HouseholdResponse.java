@@ -1,6 +1,6 @@
 package hu.dncs.tracker.household.api.web.response;
 
-import hu.dncs.tracker.household.application.model.CreatedHousehold;
+import hu.dncs.tracker.household.application.createhousehold.CreateHouseholdResult;
 import hu.dncs.tracker.household.application.model.HouseholdDetails;
 import hu.dncs.tracker.identity.api.UserInfo;
 
@@ -29,7 +29,7 @@ public record HouseholdResponse(
                 details.members().stream().map(member -> HouseholdMemberResponse.from(member, users.get(member.getUserId()))).toList());
     }
 
-    public static HouseholdResponse from(CreatedHousehold created, Map<UUID, UserInfo> users) {
+    public static HouseholdResponse from(CreateHouseholdResult created, Map<UUID, UserInfo> users) {
         var household = created.household();
         return new HouseholdResponse(household.getHouseholdId(), household.getName(), household.getDescription(),
                 household.getCreatedByUserId(), household.getCreatedAt(), household.getUpdatedAt(), household.getVersion(),

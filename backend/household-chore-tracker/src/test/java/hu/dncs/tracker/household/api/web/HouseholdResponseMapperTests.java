@@ -1,5 +1,6 @@
 package hu.dncs.tracker.household.api.web;
 
+import hu.dncs.tracker.household.application.createhousehold.CreateHouseholdResult;
 import hu.dncs.tracker.household.application.model.*;
 import hu.dncs.tracker.household.domain.model.Household;
 import hu.dncs.tracker.household.domain.model.HouseholdMember;
@@ -28,7 +29,7 @@ class HouseholdResponseMapperTests {
         var household = household(ada.userId());
         var member = household.members().getFirst();
         when(users.findUserInfoByIds(List.of(ada.userId()))).thenReturn(Map.of(ada.userId(), ada));
-        var created = responses.from(new CreatedHousehold(household.household(), household.roles(), member));
+        var created = responses.from(new CreateHouseholdResult(household.household(), household.roles(), member));
         var joined = responses.from(new JoinedHousehold(household.household(), household.roles(), member));
         var management = new HouseholdRoleManagement(household, List.of(),
                 new HouseholdRoleManagement.Actions(true, false, false, false, false, false));
