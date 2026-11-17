@@ -14,6 +14,7 @@ import java.util.List;
 
 import hu.dncs.tracker.household.api.web.request.CreateHouseholdRequest;
 import hu.dncs.tracker.household.api.web.response.HouseholdResponse;
+import hu.dncs.tracker.household.api.web.response.HouseholdSummaryResponse;
 import hu.dncs.tracker.household.application.createhousehold.CreateHouseholdCommand;
 import hu.dncs.tracker.household.application.createhousehold.CreateHouseholdRoleCommand;
 import hu.dncs.tracker.household.application.createhousehold.CreateHouseholdUseCase;
@@ -58,6 +59,11 @@ class HouseholdController {
     @GetMapping
     List<HouseholdResponse> all(Authentication authentication) {
         return householdResponseMapper.from(getHouseholdsUseCase.all(UUID.fromString(authentication.getName())));
+    }
+
+    @GetMapping("/summaries")
+    List<HouseholdSummaryResponse> summaries(Authentication authentication) {
+        return householdResponseMapper.summaries(getHouseholdsUseCase.all(UUID.fromString(authentication.getName())));
     }
 
     @GetMapping("/{id}")

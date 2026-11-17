@@ -54,7 +54,7 @@ class HouseholdRoleManagementIntegrationTests {
     @Test void roleEditorCanGrantTheNewPermissionAndThenApproveTheirPendingCompletion() throws Exception {
         var f = admin();
         var original = read(f);
-        var userInfo = original.household().members().getFirst().userInfo();
+        var userInfo = original.household().members().getFirst();
         var account = users.findById(f.user).orElseThrow();
         assertThat(userInfo.userId()).isEqualTo(f.user);
         assertThat(userInfo.email()).isEqualTo(account.getEmail());

@@ -41,11 +41,11 @@ class HouseholdResponseMapperTests {
                 removed.management().household().members().getFirst());
         for (var response : members) {
             var node = json.readTree(json.writeValueAsString(response));
-            assertThat(node.path("userInfo").size()).isEqualTo(4);
-            assertThat(node.at("/userInfo/userId").asString()).isEqualTo(ada.userId().toString());
-            assertThat(node.at("/userInfo/email").asString()).isEqualTo(ada.email());
-            assertThat(node.at("/userInfo/firstName").asString()).isEqualTo(ada.firstName());
-            assertThat(node.at("/userInfo/lastName").asString()).isEqualTo(ada.lastName());
+            assertThat(node.has("userInfo")).isFalse();
+            assertThat(node.at("/userId").asString()).isEqualTo(ada.userId().toString());
+            assertThat(node.at("/email").asString()).isEqualTo(ada.email());
+            assertThat(node.at("/firstName").asString()).isEqualTo(ada.firstName());
+            assertThat(node.at("/lastName").asString()).isEqualTo(ada.lastName());
             assertThat(node.path("userId").asString()).isEqualTo(ada.userId().toString());
         }
         assertThat(responses.from(new HouseholdMemberRemoval(household.household().getHouseholdId(),
@@ -58,8 +58,28 @@ class HouseholdResponseMapperTests {
         when(users.findUserInfoByIds(List.of(ada.userId(), grace.userId())))
                 .thenReturn(Map.of(ada.userId(), ada, grace.userId(), grace));
         var result = responses.from(households);
-        assertThat(result.stream().map(h -> h.members().getFirst().userInfo()).toList())
-                .containsExactly(ada, grace, ada);
+        assertThat(result.stream().map(h -> h.members().getFirst().email()).toList())
+                .containsExactly(ada.email(), grace.email(), ada.email());
+        verify(users).findUserInfoByIds(List.of(ada.userId(), grace.userId()));
+        verifyNoMoreInteractions(users);
+    }
+
+    @Test
+    void summariesContainListFieldsAndBatchUserProfiles() {
+        var first = household(ada.userId());
+        var second = household(grace.userId());
+        when(users.findUserInfoByIds(List.of(ada.userId(), grace.userId())))
+                .thenReturn(Map.of(ada.userId(), ada, grace.userId(), grace));
+        var result = responses.summaries(List.of(first, second, first));
+        assertThat(result).hasSize(3);
+        assertThat(result.getFirst().householdId()).isEqualTo(first.household().getHouseholdId());
+        assertThat(result.getFirst().name()).isEqualTo("Home");
+        assertThat(result.getFirst().description()).isNull();
+        assertThat(result.stream().map(h -> h.members().getFirst().email()).toList())
+                .containsExactly(ada.email(), grace.email(), ada.email());
+        var node = json.readTree(json.writeValueAsString(result.getFirst()));
+        assertThat(node.size()).isEqualTo(4);
+        assertThat(node.has("members")).isTrue();
         verify(users).findUserInfoByIds(List.of(ada.userId(), grace.userId()));
         verifyNoMoreInteractions(users);
     }

@@ -2,6 +2,7 @@ package hu.dncs.tracker.household.api.web;
 
 import hu.dncs.tracker.household.api.web.response.HouseholdMemberRemovalResponse;
 import hu.dncs.tracker.household.api.web.response.HouseholdResponse;
+import hu.dncs.tracker.household.api.web.response.HouseholdSummaryResponse;
 import hu.dncs.tracker.household.api.web.response.HouseholdRolesResponse;
 import hu.dncs.tracker.household.api.web.response.JoinedHouseholdResponse;
 import hu.dncs.tracker.household.application.createhousehold.CreateHouseholdResult;
@@ -27,6 +28,11 @@ class HouseholdResponseMapper {
     List<HouseholdResponse> from(List<HouseholdDetails> households) {
         var userInfo = userInfo(households.stream().flatMap(household -> household.members().stream()).toList());
         return households.stream().map(household -> HouseholdResponse.from(household, userInfo)).toList();
+    }
+
+    List<HouseholdSummaryResponse> summaries(List<HouseholdDetails> households) {
+        var userInfo = userInfo(households.stream().flatMap(household -> household.members().stream()).toList());
+        return households.stream().map(household -> HouseholdSummaryResponse.from(household, userInfo)).toList();
     }
 
     HouseholdResponse from(HouseholdDetails household) {

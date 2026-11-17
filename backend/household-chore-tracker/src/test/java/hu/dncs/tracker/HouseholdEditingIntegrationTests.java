@@ -63,20 +63,44 @@ class HouseholdEditingIntegrationTests {
                 .header("Idempotency-Key", UUID.randomUUID()).contentType(APPLICATION_JSON)
                 .content(mapper.writeValueAsString(payload)))
                 .andExpect(status().isCreated()).andReturn();
-        for (var path : List.of("$.creatorMembership.userInfo", "$.members[0].userInfo")) {
+        for (var path : List.of("$.creatorMembership", "$.members[0]")) {
             assertUserInfo(created, path, user);
         }
         var detail = mvc.perform(get("/api/v1/households/" + householdId)
                 .with(jwt().jwt(j -> j.subject(user.getId().toString()))))
                 .andExpect(status().isOk()).andReturn();
-        assertUserInfo(detail, "$.members[0].userInfo", user);
+        assertUserInfo(detail, "$.members[0]", user);
         var listing = mvc.perform(get("/api/v1/households")
                 .with(jwt().jwt(j -> j.subject(user.getId().toString()))))
                 .andExpect(status().isOk()).andReturn();
-        assertUserInfo(listing, "$[0].members[0].userInfo", user);
+        assertUserInfo(listing, "$[0].members[0]", user);
+    }
+
+    @Test void summariesOnlyIncludeJoinedHouseholdsAndVisibleMembers() throws Exception {
+        var f = fixture(Set.of(CHORE_COMPLETE));
+        person(f, Set.of(CHORE_COMPLETE));
+        fixture(EnumSet.allOf(HouseholdPermission.class));
+        var result = mvc.perform(get("/api/v1/households/summaries")
+                .with(jwt().jwt(j -> j.subject(f.user.toString()))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].householdId").value(f.home.toString()))
+                .andExpect(jsonPath("$[0].name").value("Original home"))
+                .andExpect(jsonPath("$[0].members.length()").value(1))
+                .andExpect(jsonPath("$[0].roles").doesNotExist())
+                .andExpect(jsonPath("$[0].createdByUserId").doesNotExist())
+                .andReturn();
+        assertUserInfo(result, "$[0].members[0]", users.findById(f.user).orElseThrow());
+        mvc.perform(get("/api/v1/households/summaries"))
+                .andExpect(status().isUnauthorized());
+        var outsider = users.saveAndFlush(new User(UUID.randomUUID() + "@example.com", "New", "User"));
+        mvc.perform(get("/api/v1/households/summaries")
+                .with(jwt().jwt(j -> j.subject(outsider.getId().toString()))))
+                .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(0));
     }
 
     private void assertUserInfo(MvcResult response, String path, User user) throws Exception {
+        jsonPath(path + ".userInfo").doesNotExist().match(response);
         jsonPath(path + ".userId").value(user.getId().toString()).match(response);
         jsonPath(path + ".email").value(user.getEmail()).match(response);
         jsonPath(path + ".firstName").value(user.getFirstName()).match(response);

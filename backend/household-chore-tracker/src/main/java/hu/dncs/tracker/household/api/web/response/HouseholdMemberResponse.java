@@ -11,7 +11,9 @@ public record HouseholdMemberResponse(
         UUID householdMemberId,
         UUID householdId,
         UUID userId,
-        UserInfo userInfo,
+        String email,
+        String firstName,
+        String lastName,
         String nickname,
         HouseholdRoleResponse householdRole,
         Instant joinedAt,
@@ -20,8 +22,9 @@ public record HouseholdMemberResponse(
         Long version
 ) {
     public static HouseholdMemberResponse from(HouseholdMember member, UserInfo userInfo) {
+        Objects.requireNonNull(userInfo, "Household member user info is required");
         return new HouseholdMemberResponse(member.getHouseholdMemberId(), member.getHousehold().getHouseholdId(), member.getUserId(),
-                Objects.requireNonNull(userInfo, "Household member user info is required"), member.getNickname(),
+                userInfo.email(), userInfo.firstName(), userInfo.lastName(), member.getNickname(),
                 HouseholdRoleResponse.from(member.getHouseholdRole()), member.getJoinedAt(),
                 member.getCreatedAt(), member.getUpdatedAt(), member.getVersion());
     }
