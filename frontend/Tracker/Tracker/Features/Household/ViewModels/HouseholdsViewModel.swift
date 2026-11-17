@@ -12,22 +12,35 @@ import Observation
 @MainActor
 final class HouseholdsViewModel {
     private(set) var householdSummaries: [HouseholdSummaryResponse] = []
+    private(set) var householdInvitations: [HouseholdInvitationDto] = []
 
-    private(set) var isLoading = false
-    var errorMessage: String?
+    private(set) var isLoadingInvitations = false
+    private(set) var isLoadingSummaries = false
+    var summariesErrorMessage: String?
+    var invitationsErrorMessage: String?
 
     @ObservationIgnored
     private let householdRepository: any HouseholdRepositoryProtocol
-
-    init(householdRepository: any HouseholdRepositoryProtocol) {
+    
+    @ObservationIgnored
+    private let householdInvitationRepository: any HouseholdInvitationRepositoryProtocol
+    
+    init(householdRepository: any HouseholdRepositoryProtocol, householdInvitationRepository: any HouseholdInvitationRepositoryProtocol) {
         self.householdRepository = householdRepository
+        self.householdInvitationRepository = householdInvitationRepository
     }
 
     func load() async {
-        guard !isLoading else { return }
-        isLoading = true
-        errorMessage = nil
-        defer { isLoading = false }
+        await loadSummaries()
+        await loadInvitations()
+    }
+    
+    func loadSummaries() async {
+        guard !isLoadingSummaries else { return }
+        
+        summariesErrorMessage = nil
+        isLoadingSummaries = true
+        defer { isLoadingSummaries = false }
 
         do {
             let summaries = try await householdRepository.getSummaries()
@@ -36,7 +49,25 @@ final class HouseholdsViewModel {
         } catch is CancellationError {
         } catch {
             guard !Task.isCancelled else { return }
-            errorMessage = error.localizedDescription
+            summariesErrorMessage = error.localizedDescription
+        }
+    }
+    
+    func loadInvitations() async {
+        guard !isLoadingInvitations else { return }
+        
+        invitationsErrorMessage = nil
+        isLoadingInvitations = true
+        defer { isLoadingInvitations = false }
+
+        do {
+            let invitations = try await householdInvitationRepository.getAllCurrentlyActive()
+            try Task.checkCancellation()
+            householdInvitations = invitations
+        } catch is CancellationError {
+        } catch {
+            guard !Task.isCancelled else { return }
+            invitationsErrorMessage = error.localizedDescription
         }
     }
 }

@@ -12,6 +12,7 @@ final class DependencyContainer {
 
     let apiClient: APIClient
     let householdRepository: any HouseholdRepositoryProtocol
+    let householdInvitationRepository: any HouseholdInvitationRepositoryProtocol
     let currentUserRepository: any CurrentUserRepositoryProtocol
     let tokenStore: any TokenStoreProtocol
     let authService: any AuthenticationServiceProtocol
@@ -21,7 +22,8 @@ final class DependencyContainer {
         apiClient: APIClient? = nil,
         authService: (any AuthenticationServiceProtocol)? = nil,
         currentUserRepository: (any CurrentUserRepositoryProtocol)? = nil,
-        householdRepository: (any HouseholdRepositoryProtocol)? = nil
+        householdRepository: (any HouseholdRepositoryProtocol)? = nil,
+        householdInvitationRepository: (any HouseholdInvitationRepositoryProtocol)? = nil
     ) {
         let resolvedTokenStore = tokenStore ?? KeychainTokenStore()
         let resolvedAPIClient = apiClient
@@ -38,6 +40,9 @@ final class DependencyContainer {
 
         self.householdRepository = householdRepository
             ?? HouseholdRepository(apiClient: resolvedAPIClient)
+        
+        self.householdInvitationRepository = householdInvitationRepository
+            ?? HouseholdInvitationRepository(apiClient: resolvedAPIClient)
 
         self.currentUserRepository = currentUserRepository
             ?? CurrentUserRepository(apiClient: resolvedAPIClient)
@@ -48,7 +53,8 @@ final class DependencyContainer {
     static func mock() -> DependencyContainer {
         DependencyContainer(
             currentUserRepository: PreviewCurrentUserRepository(),
-            householdRepository: PreviewHouseholdRepository()
+            householdRepository: PreviewHouseholdRepository(),
+            householdInvitationRepository: PreviewHouseholdInvitationRepository()
         )
     }
 }

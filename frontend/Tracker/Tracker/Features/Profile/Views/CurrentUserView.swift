@@ -28,6 +28,33 @@ struct CurrentUserView: View {
             
             Spacer()
             
+            Text("Authenticated: \(appState.isAuthenticated.description)")
+                .font(.title2.weight(.semibold))
+                .foregroundStyle(.green)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(
+                    Capsule().fill(.green.opacity(0.15))
+                )
+            
+            Text("Current user: \(appState.currentUserId)")
+                .font(.title2.weight(.semibold))
+                .foregroundStyle(.green)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(
+                    Capsule().fill(.green.opacity(0.15))
+                )
+            
+            Text("Current user error: \(appState.currentUserError?.localizedLowercase)")
+                .font(.title2.weight(.semibold))
+                .foregroundStyle(.green)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(
+                    Capsule().fill(.green.opacity(0.15))
+                )
+            
             if appState.isAuthenticated {
                 Button(role: .destructive, action: {
                     Task {

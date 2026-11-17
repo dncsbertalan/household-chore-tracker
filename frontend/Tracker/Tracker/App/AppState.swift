@@ -36,7 +36,6 @@ final class AppState {
         currentUser = nil
         currentUserError = nil
         selectedHouseholdId = nil
-        selectedTab = .household
     }
 
     func loadCurrentUser(from repository: any CurrentUserRepositoryProtocol) async {

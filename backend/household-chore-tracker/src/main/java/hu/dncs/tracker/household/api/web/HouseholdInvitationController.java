@@ -1,7 +1,7 @@
 package hu.dncs.tracker.household.api.web;
 
 import hu.dncs.tracker.household.api.web.request.InviteHouseholdMemberRequest;
-import hu.dncs.tracker.household.api.web.response.HouseholdInvitationResponse;
+import hu.dncs.tracker.household.api.web.response.HouseholdInvitationDto;
 import hu.dncs.tracker.household.application.HouseholdInvitationService;
 import hu.dncs.tracker.idempotency.api.web.Idempotent;
 import hu.dncs.tracker.identity.api.web.CurrentUserId;
@@ -23,17 +23,17 @@ class HouseholdInvitationController {
 
     @PostMapping
     @Idempotent("household.invitation.create")
-    ResponseEntity<HouseholdInvitationResponse> invite(@PathVariable UUID householdId,
-            @Valid @RequestBody InviteHouseholdMemberRequest request, @CurrentUserId UUID userId) {
+    ResponseEntity<HouseholdInvitationDto> invite(@PathVariable UUID householdId,
+                                                  @Valid @RequestBody InviteHouseholdMemberRequest request, @CurrentUserId UUID userId) {
         var invitation = householdInvitationService.invite(householdId, request.toCommand(), userId);
         return ResponseEntity.created(URI.create("/api/v1/household-invitations/" + invitation.householdInvitationId()))
-                .body(HouseholdInvitationResponse.from(invitation));
+                .body(HouseholdInvitationDto.from(invitation));
     }
 
     @GetMapping
-    List<HouseholdInvitationResponse> forHousehold(@PathVariable UUID householdId, @CurrentUserId UUID userId) {
+    List<HouseholdInvitationDto> forHousehold(@PathVariable UUID householdId, @CurrentUserId UUID userId) {
         return householdInvitationService.forHousehold(householdId, userId).stream()
-                .map(HouseholdInvitationResponse::from).toList();
+                .map(HouseholdInvitationDto::from).toList();
     }
 
     @DeleteMapping("/{invitationId}")

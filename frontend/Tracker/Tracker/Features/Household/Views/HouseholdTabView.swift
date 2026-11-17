@@ -14,7 +14,8 @@ struct HouseholdTabView: View {
     var body: some View {
         NavigationStack(path: $router.path) {
             HouseholdListView(viewModel: HouseholdsViewModel(
-                householdRepository: container.householdRepository
+                householdRepository: container.householdRepository,
+                householdInvitationRepository: container.householdInvitationRepository
             ))
                 .navigationDestination(for: HouseholdRoute.self) { route in
                     destination(for: route)

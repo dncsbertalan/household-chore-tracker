@@ -1,10 +1,6 @@
 package hu.dncs.tracker.household.api.web;
 
-import hu.dncs.tracker.household.api.web.response.HouseholdMemberRemovalResponse;
-import hu.dncs.tracker.household.api.web.response.HouseholdResponse;
-import hu.dncs.tracker.household.api.web.response.HouseholdSummaryResponse;
-import hu.dncs.tracker.household.api.web.response.HouseholdRolesResponse;
-import hu.dncs.tracker.household.api.web.response.JoinedHouseholdResponse;
+import hu.dncs.tracker.household.api.web.response.*;
 import hu.dncs.tracker.household.application.createhousehold.CreateHouseholdResult;
 import hu.dncs.tracker.household.application.model.HouseholdDetails;
 import hu.dncs.tracker.household.application.model.HouseholdMemberRemoval;

@@ -15,30 +15,12 @@ struct HouseholdListView: View {
     init(viewModel: HouseholdsViewModel) {
         _viewModel = State(initialValue: viewModel)
     }
-
+    
     var body: some View {
         ScrollView {
             VStack(alignment: .leading) {
                 ForEach(viewModel.householdSummaries) { household in
-                    
-                    VStack(alignment: .leading) {
-                        HStack {
-                            Text(household.name)
-                                .font(.title2.bold())
-                            
-                            Spacer()
-                        }
-                        
-                        Text("\(viewModel.householdSummaries.count) members")
-                        
-                        ForEach(household.members) { member in
-                            AvatarView(firstName: member.firstName, lastName: member.lastName, size: 32)
-                        }
-
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: Theme.CornerRadius.xl))
+                    HouseholdListItemView(household: household)
                 }
             }
             .padding()
@@ -47,18 +29,28 @@ struct HouseholdListView: View {
         .navigationTitle("household.households")
         .scrollEdgeEffectStyle(.soft, for: .top)
         .overlay {
-            if viewModel.isLoading && viewModel.householdSummaries.isEmpty {
+            if viewModel.isLoadingSummaries && viewModel.householdSummaries.isEmpty {
                 ProgressView()
             }
         }
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                NavigationLink {
+                    //HouseholdInvitationsView(accountId: userId, repository: invitationRepository)
+                    Text("hi")
+                } label: {
+                    Label("invitation.list.inbox", systemImage: "tray")
+                }
+                .badge(viewModel.householdInvitations.count)
+                .accessibilityIdentifier("invitationInbox")
+            }
+            
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
                     router.sheet = .createHousehold
                 } label: {
                     Label("household.create", systemImage: "plus")
                 }
-                .disabled(appState.currentUserId == nil)
                 .accessibilityIdentifier("addHousehold")
             }
         }
@@ -69,22 +61,29 @@ struct HouseholdListView: View {
             await viewModel.load()
         }
         .alert("Unable to load households", isPresented: Binding(
-            get: { viewModel.errorMessage != nil },
-            set: { if !$0 { viewModel.errorMessage = nil } }
+            get: { viewModel.summariesErrorMessage != nil },
+            set: { if !$0 { viewModel.summariesErrorMessage = nil } }
         )) {
-            Button("common.ok", role: .cancel) { viewModel.errorMessage = nil }
+            Button("common.ok", role: .cancel) { viewModel.summariesErrorMessage = nil }
         } message: {
-            Text(viewModel.errorMessage ?? "")
+            Text(viewModel.summariesErrorMessage ?? "")
         }
     }
 }
 
+private let previewAppState: AppState = {
+    let appState = AppState()
+    appState.isAuthenticated = true
+    return appState
+}()
+
 #Preview {
     NavigationStack {
         HouseholdListView(viewModel: HouseholdsViewModel(
-            householdRepository: PreviewHouseholdRepository()
+            householdRepository: PreviewHouseholdRepository(),
+            householdInvitationRepository: PreviewHouseholdInvitationRepository()
         ))
     }
     .environment(HouseholdRouter())
-    .environment(AppState())
+    .environment(previewAppState)
 }

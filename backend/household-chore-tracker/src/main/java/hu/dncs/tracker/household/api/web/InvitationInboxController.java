@@ -1,6 +1,6 @@
 package hu.dncs.tracker.household.api.web;
 
-import hu.dncs.tracker.household.api.web.response.HouseholdInvitationResponse;
+import hu.dncs.tracker.household.api.web.response.HouseholdInvitationDto;
 import hu.dncs.tracker.household.api.web.response.JoinedHouseholdResponse;
 import hu.dncs.tracker.household.application.HouseholdInvitationService;
 import hu.dncs.tracker.idempotency.api.web.Idempotent;
@@ -19,13 +19,13 @@ class InvitationInboxController {
     private final HouseholdInvitationService householdInvitationService;
 
     @GetMapping
-    List<HouseholdInvitationResponse> inbox(@CurrentUserId UUID userId) {
-        return householdInvitationService.inbox(userId).stream().map(HouseholdInvitationResponse::from).toList();
+    List<HouseholdInvitationDto> inbox(@CurrentUserId UUID userId) {
+        return householdInvitationService.inbox(userId).stream().map(HouseholdInvitationDto::from).toList();
     }
 
     @GetMapping("/{invitationId}")
-    HouseholdInvitationResponse get(@PathVariable UUID invitationId, @CurrentUserId UUID userId) {
-        return HouseholdInvitationResponse.from(householdInvitationService.get(invitationId, userId));
+    HouseholdInvitationDto get(@PathVariable UUID invitationId, @CurrentUserId UUID userId) {
+        return HouseholdInvitationDto.from(householdInvitationService.get(invitationId, userId));
     }
 
     @PostMapping("/{invitationId}/accept")
@@ -36,7 +36,7 @@ class InvitationInboxController {
 
     @PostMapping("/{invitationId}/decline")
     @Idempotent("household.invitation.decline")
-    HouseholdInvitationResponse decline(@PathVariable UUID invitationId, @CurrentUserId UUID userId) {
-        return HouseholdInvitationResponse.from(householdInvitationService.decline(invitationId, userId));
+    HouseholdInvitationDto decline(@PathVariable UUID invitationId, @CurrentUserId UUID userId) {
+        return HouseholdInvitationDto.from(householdInvitationService.decline(invitationId, userId));
     }
 }

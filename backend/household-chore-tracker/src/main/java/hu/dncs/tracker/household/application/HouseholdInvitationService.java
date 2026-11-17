@@ -12,6 +12,7 @@ import hu.dncs.tracker.household.infrastructure.persistence.HouseholdMemberRepos
 import hu.dncs.tracker.household.infrastructure.persistence.HouseholdRepository;
 import hu.dncs.tracker.household.infrastructure.persistence.HouseholdRoleRepository;
 import hu.dncs.tracker.identity.api.UserDirectory;
+import hu.dncs.tracker.identity.api.UserInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.stereotype.Service;
@@ -81,19 +82,19 @@ public class HouseholdInvitationService {
         var invitation = householdInvitationRepository.saveAndFlush(new HouseholdInvitation(UUID.randomUUID(), household,
                 command.email(), callerId, role, now, now.plus(INVITATION_TTL)));
 
-        return HouseholdInvitationDetails.from(invitation, now);
+        return HouseholdInvitationDetails.from(invitation, getUserInfo(callerId), now);
     }
 
     public List<HouseholdInvitationDetails> inbox(UUID callerId) {
         var email = requireEmail(callerId);
         var now = clock.instant();
         return householdInvitationRepository.findInbox(email, now).stream()
-                .map(invitation -> HouseholdInvitationDetails.from(invitation, now)).toList();
+                .map(invitation -> HouseholdInvitationDetails.from(invitation, getUserInfo(callerId), now)).toList();
     }
 
     public HouseholdInvitationDetails get(UUID invitationId, UUID callerId) {
         var invitation = requireRecipient(invitationId, requireEmail(callerId));
-        return HouseholdInvitationDetails.from(invitation, clock.instant());
+        return HouseholdInvitationDetails.from(invitation, getUserInfo(callerId), clock.instant());
     }
 
     public List<HouseholdInvitationDetails> forHousehold(UUID householdId, UUID callerId) {
@@ -101,7 +102,7 @@ public class HouseholdInvitationService {
         householdAuthorizationService.requirePermission(householdId, callerId, HOUSEHOLD_MEMBER_INVITE);
         var now = clock.instant();
         return householdInvitationRepository.findForHousehold(householdId).stream()
-                .map(invitation -> HouseholdInvitationDetails.from(invitation, now)).toList();
+                .map(invitation -> HouseholdInvitationDetails.from(invitation, getUserInfo(callerId), now)).toList();
     }
 
     @Transactional
@@ -116,7 +117,10 @@ public class HouseholdInvitationService {
 
         // Reuse the historical identity, including self-approval attribution, on an explicit re-invitation.
         var membership = householdMemberRepository.findIncludingRemoved(household.getHouseholdId(), callerId)
-                .map(previous -> { previous.rejoin(invitation.getHouseholdRole(), now); return previous; })
+                .map(previous -> {
+                    previous.rejoin(invitation.getHouseholdRole(), now);
+                    return previous;
+                })
                 .orElseGet(() -> new HouseholdMember(UUID.randomUUID(), household, callerId, invitation.getHouseholdRole()));
         householdMemberRepository.saveAndFlush(membership);
         invitation.respond(ACCEPTED, now);
@@ -137,7 +141,7 @@ public class HouseholdInvitationService {
 
         householdInvitationRepository.flush();
 
-        return HouseholdInvitationDetails.from(invitation, now);
+        return HouseholdInvitationDetails.from(invitation, getUserInfo(callerId), now);
     }
 
     @Transactional
@@ -153,7 +157,7 @@ public class HouseholdInvitationService {
         var now = clock.instant();
         requirePending(invitation, now);
         invitation.respond(REVOKED, now);
-        
+
         householdInvitationRepository.flush();
     }
 
@@ -185,5 +189,9 @@ public class HouseholdInvitationService {
         if (householdMemberRepository.findByHousehold_HouseholdIdAndUserId(householdId, userId).isPresent()) {
             throw new HouseholdInvitationException(CONFLICT, "This account is already a household member.");
         }
+    }
+
+    private UserInfo getUserInfo(UUID callerId) {
+        return userDirectory.findUserInfoByIds(List.of(callerId)).get(callerId);
     }
 }

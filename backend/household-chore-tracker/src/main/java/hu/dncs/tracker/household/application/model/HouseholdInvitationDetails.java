@@ -2,6 +2,7 @@ package hu.dncs.tracker.household.application.model;
 
 import hu.dncs.tracker.household.domain.model.HouseholdInvitation;
 import hu.dncs.tracker.household.domain.model.HouseholdInvitationStatus;
+import hu.dncs.tracker.identity.api.UserInfo;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -10,23 +11,16 @@ public record HouseholdInvitationDetails(
         UUID householdInvitationId,
         UUID householdId,
         String householdName,
-        String email,
-        UUID invitedByUserId,
-        UUID householdRoleId,
-        String householdRoleName,
+        String invitedByLastName,
+        String invitedByFirstName,
         HouseholdInvitationStatus status,
         Instant expiresAt,
-        Instant respondedAt,
-        Instant createdAt,
-        Instant updatedAt,
-        Long version
+        Instant createdAt
 ) {
-    public static HouseholdInvitationDetails from(HouseholdInvitation invitation, Instant now) {
+    public static HouseholdInvitationDetails from(HouseholdInvitation invitation, UserInfo userInfo, Instant now) {
         return new HouseholdInvitationDetails(invitation.getHouseholdInvitationId(),
                 invitation.getHousehold().getHouseholdId(), invitation.getHousehold().getName(),
-                invitation.getEmail(), invitation.getInvitedByUserId(),
-                invitation.getHouseholdRole().getHouseholdRoleId(), invitation.getHouseholdRole().getName(),
-                invitation.statusAt(now), invitation.getExpiresAt(), invitation.getRespondedAt(),
-                invitation.getCreatedAt(), invitation.getUpdatedAt(), invitation.getVersion());
+                userInfo.lastName(), userInfo.firstName(), invitation.statusAt(now), invitation.getExpiresAt(),
+                invitation.getCreatedAt());
     }
 }

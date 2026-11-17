@@ -24,4 +24,6 @@ struct CurrentUserWrapperView: View {
 
 #Preview {
     CurrentUserWrapperView()
+        .environment(AppState())
+        .environment(\.container, DependencyContainer.mock())
 }
