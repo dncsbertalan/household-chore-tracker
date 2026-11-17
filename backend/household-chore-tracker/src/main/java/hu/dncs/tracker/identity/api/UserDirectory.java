@@ -1,12 +1,12 @@
 package hu.dncs.tracker.identity.api;
 
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserLookup {
+/** Read-only user directory exposed to other modules. */
+public interface UserDirectory {
     Map<UUID, UserInfo> findUserInfoByIds(Collection<UUID> userIds);
 
     boolean userExists(UUID userId);

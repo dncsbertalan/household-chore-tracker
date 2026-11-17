@@ -14,7 +14,7 @@ import hu.dncs.tracker.household.infrastructure.persistence.HouseholdMemberRepos
 import hu.dncs.tracker.household.infrastructure.persistence.HouseholdRepository;
 import hu.dncs.tracker.household.infrastructure.persistence.HouseholdRoleRepository;
 import hu.dncs.tracker.household.infrastructure.persistence.PermissionRepository;
-import hu.dncs.tracker.identity.api.UserLookup;
+import hu.dncs.tracker.identity.api.UserDirectory;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -30,11 +30,11 @@ public class CreateHouseholdUseCase {
     private final HouseholdRoleRepository householdRoleRepository;
     private final HouseholdMemberRepository householdMemberRepository;
     private final PermissionRepository permissionRepository;
-    private final UserLookup userLookup;
+    private final UserDirectory userDirectory;
 
     @Transactional
     public CreatedHousehold execute(CreateHouseholdCommand command, UUID authenticatedUserId) {
-        if (!userLookup.userExists(authenticatedUserId)) {
+        if (!userDirectory.userExists(authenticatedUserId)) {
             throw new HouseholdCreatorNotFoundException();
         }
 

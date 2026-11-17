@@ -23,6 +23,9 @@ public class Household {
     @Column(name = "description", length = 500)
     private String description;
 
+    @Column(name = "owner_user_id", nullable = false)
+    private UUID ownerUserId;
+
     @Column(name = "created_by_user_id", nullable = false)
     private UUID createdByUserId;
 
@@ -45,6 +48,7 @@ public class Household {
         this.name = validateName(name);
         this.description = validateDescription(description);
         this.createdByUserId = Objects.requireNonNull(createdByUserId);
+        this.ownerUserId = Objects.requireNonNull(createdByUserId);
     }
 
     private static String validateName(String name) {
@@ -68,12 +72,20 @@ public class Household {
         return description;
     }
 
-    /** Match Swift's CharacterSet.whitespacesAndNewlines, including NBSP, NEL, and zero-width space. */
+    /**
+     * Match Swift's CharacterSet.whitespacesAndNewlines, including NBSP, NEL, and zero-width space.
+     */
     public static String trimmedText(String value) {
-        if (value == null) return "";
+        if (value == null) {
+            return "";
+        }
         int start = 0, end = value.length();
-        while (start < end && isSpace(value.charAt(start))) start++;
-        while (end > start && isSpace(value.charAt(end - 1))) end--;
+        while (start < end && isSpace(value.charAt(start))) {
+            start++;
+        }
+        while (end > start && isSpace(value.charAt(end - 1))) {
+            end--;
+        }
         return value.substring(start, end);
     }
 

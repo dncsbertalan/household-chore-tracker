@@ -1,7 +1,7 @@
 package hu.dncs.tracker.idempotency.api.web;
 
 import hu.dncs.tracker.idempotency.application.usecase.ExecuteIdempotentRequestUseCase;
-import hu.dncs.tracker.identity.api.UserLookup;
+import hu.dncs.tracker.identity.api.UserDirectory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.webmvc.autoconfigure.WebMvcRegistrations;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +13,7 @@ import tools.jackson.databind.ObjectMapper;
 class IdempotencyWebConfiguration implements WebMvcRegistrations {
     private final ExecuteIdempotentRequestUseCase executor;
     private final ObjectMapper objectMapper;
-    private final UserLookup users;
+    private final UserDirectory users;
 
     @Override
     public RequestMappingHandlerAdapter getRequestMappingHandlerAdapter() {

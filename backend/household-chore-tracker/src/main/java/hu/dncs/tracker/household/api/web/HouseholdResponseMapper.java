@@ -1,10 +1,13 @@
 package hu.dncs.tracker.household.api.web;
 
-import hu.dncs.tracker.household.api.web.response.*;
+import hu.dncs.tracker.household.api.web.response.HouseholdMemberRemovalResponse;
+import hu.dncs.tracker.household.api.web.response.HouseholdResponse;
+import hu.dncs.tracker.household.api.web.response.HouseholdRolesResponse;
+import hu.dncs.tracker.household.api.web.response.JoinedHouseholdResponse;
 import hu.dncs.tracker.household.application.model.*;
 import hu.dncs.tracker.household.domain.model.HouseholdMember;
+import hu.dncs.tracker.identity.api.UserDirectory;
 import hu.dncs.tracker.identity.api.UserInfo;
-import hu.dncs.tracker.identity.api.UserLookup;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +18,7 @@ import java.util.UUID;
 @Component
 @RequiredArgsConstructor
 class HouseholdResponseMapper {
-    private final UserLookup users;
+    private final UserDirectory users;
 
     List<HouseholdResponse> from(List<HouseholdDetails> households) {
         var userInfo = userInfo(households.stream().flatMap(household -> household.members().stream()).toList());

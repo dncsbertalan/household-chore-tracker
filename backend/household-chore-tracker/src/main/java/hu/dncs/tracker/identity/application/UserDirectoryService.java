@@ -1,7 +1,7 @@
 package hu.dncs.tracker.identity.application;
 
 import hu.dncs.tracker.identity.api.UserInfo;
-import hu.dncs.tracker.identity.api.UserLookup;
+import hu.dncs.tracker.identity.api.UserDirectory;
 import hu.dncs.tracker.identity.infrastructure.persistence.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-class UserLookupImpl implements UserLookup {
+class UserDirectoryService implements UserDirectory {
     private final UserRepository userRepository;
 
     @Override

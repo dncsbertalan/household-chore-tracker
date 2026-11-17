@@ -1,9 +1,11 @@
 package hu.dncs.tracker.household.api.web;
 
 import hu.dncs.tracker.household.application.model.*;
-import hu.dncs.tracker.household.domain.model.*;
+import hu.dncs.tracker.household.domain.model.Household;
+import hu.dncs.tracker.household.domain.model.HouseholdMember;
+import hu.dncs.tracker.household.domain.model.HouseholdRole;
+import hu.dncs.tracker.identity.api.UserDirectory;
 import hu.dncs.tracker.identity.api.UserInfo;
-import hu.dncs.tracker.identity.api.UserLookup;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -15,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 class HouseholdResponseMapperTests {
-    private final UserLookup users = mock(UserLookup.class);
+    private final UserDirectory users = mock(UserDirectory.class);
     private final HouseholdResponseMapper responses = new HouseholdResponseMapper(users);
     private final JsonMapper json = JsonMapper.builder().build();
     private final UserInfo ada = new UserInfo(UUID.randomUUID(), "ada@example.com", "Ada", "Lovelace");

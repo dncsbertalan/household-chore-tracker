@@ -11,7 +11,7 @@ import hu.dncs.tracker.household.infrastructure.persistence.HouseholdInvitationR
 import hu.dncs.tracker.household.infrastructure.persistence.HouseholdMemberRepository;
 import hu.dncs.tracker.household.infrastructure.persistence.HouseholdRepository;
 import hu.dncs.tracker.household.infrastructure.persistence.HouseholdRoleRepository;
-import hu.dncs.tracker.identity.api.UserLookup;
+import hu.dncs.tracker.identity.api.UserDirectory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,7 @@ public class HouseholdInvitationService {
     private final HouseholdRoleRepository householdRoleRepository;
     private final HouseholdMemberRepository householdMemberRepository;
     private final HouseholdAuthorizationService householdAuthorizationService;
-    private final UserLookup userLookup;
+    private final UserDirectory userDirectory;
     private final Clock clock;
 
     private static void requirePending(HouseholdInvitation invitation, Instant now) {
@@ -65,7 +65,7 @@ public class HouseholdInvitationService {
                 .filter(candidate -> householdId.equals(candidate.getHouseholdId()))
                 .orElseThrow(() -> new HouseholdInvitationException(INVALID_REQUEST, "The invited role must belong to this household."));
 
-        userLookup.findUserIdByEmail(command.email()).ifPresent(userId -> requireNotMember(householdId, userId));
+        userDirectory.findUserIdByEmail(command.email()).ifPresent(userId -> requireNotMember(householdId, userId));
 
         var now = clock.instant();
         householdInvitationRepository.findPending(householdId, command.email())
@@ -177,7 +177,7 @@ public class HouseholdInvitationService {
     }
 
     private String requireEmail(UUID userId) {
-        return userLookup.findEmailByUserId(userId).orElseThrow(() ->
+        return userDirectory.findEmailByUserId(userId).orElseThrow(() ->
                 new AuthenticationCredentialsNotFoundException("The authenticated account is no longer available."));
     }
 

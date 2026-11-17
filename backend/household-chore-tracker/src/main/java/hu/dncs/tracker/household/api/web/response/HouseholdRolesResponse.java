@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public record HouseholdRolesResponse(HouseholdResponse household, List<PermissionResponse> permissions,
-                                      HouseholdRoleManagement.Actions actions) {
+                                     HouseholdRoleManagement.Actions actions) {
     public static HouseholdRolesResponse from(HouseholdRoleManagement result, Map<UUID, UserInfo> users) {
         return new HouseholdRolesResponse(HouseholdResponse.from(result.household(), users),
                 result.permissions().stream().map(PermissionResponse::from).toList(), result.actions());

@@ -34,35 +34,35 @@ import java.util.UUID;
 @RequestMapping("/api/v1/households")
 @RequiredArgsConstructor
 class HouseholdController {
-    private final HouseholdResponseMapper responses;
+    private final HouseholdResponseMapper householdResponseMapper;
     private final CreateHouseholdUseCase createHouseholdUseCase;
 
-    private final GetHouseholdsUseCase getHouseholds;
-    private final DeleteHouseholdUseCase deleteHousehold;
-    private final UpdateHouseholdUseCase updateHousehold;
+    private final GetHouseholdsUseCase getHouseholdsUseCase;
+    private final DeleteHouseholdUseCase deleteHouseholdUseCase;
+    private final UpdateHouseholdUseCase updateHouseholdUseCase;
 
     @PutMapping("/{id}")
     @Idempotent("household.update")
     HouseholdResponse update(@PathVariable UUID id, @Valid @RequestBody UpdateHouseholdRequest request, Authentication authentication) {
-        return responses.from(updateHousehold.execute(id, request.toCommand(), UUID.fromString(authentication.getName())));
+        return householdResponseMapper.from(updateHouseholdUseCase.execute(id, request.toCommand(), UUID.fromString(authentication.getName())));
     }
 
     @DeleteMapping("/{id}")
     @Idempotent("household.delete")
     ResponseEntity<Void> delete(@PathVariable UUID id, @RequestParam @Min(0) Long version,
             @RequestParam(defaultValue = "false") boolean confirmed, Authentication authentication) {
-        deleteHousehold.execute(id, version, confirmed, UUID.fromString(authentication.getName()));
+        deleteHouseholdUseCase.execute(id, version, confirmed, UUID.fromString(authentication.getName()));
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping
     List<HouseholdResponse> all(Authentication authentication) {
-        return responses.from(getHouseholds.all(UUID.fromString(authentication.getName())));
+        return householdResponseMapper.from(getHouseholdsUseCase.all(UUID.fromString(authentication.getName())));
     }
 
     @GetMapping("/{id}")
     HouseholdResponse one(@PathVariable UUID id, Authentication authentication) {
-        return responses.from(getHouseholds.one(id, UUID.fromString(authentication.getName())));
+        return householdResponseMapper.from(getHouseholdsUseCase.one(id, UUID.fromString(authentication.getName())));
     }
 
     @PostMapping
@@ -78,6 +78,6 @@ class HouseholdController {
         );
 
         return ResponseEntity.created(URI.create("/api/v1/households/" + created.household().getHouseholdId()))
-                .body(responses.from(created));
+                .body(householdResponseMapper.from(created));
     }
 }

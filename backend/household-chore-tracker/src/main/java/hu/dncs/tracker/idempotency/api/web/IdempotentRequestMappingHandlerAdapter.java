@@ -3,7 +3,7 @@ package hu.dncs.tracker.idempotency.api.web;
 import hu.dncs.tracker.idempotency.application.usecase.ExecuteIdempotentRequestUseCase;
 import hu.dncs.tracker.idempotency.domain.model.ProcessedRequestId;
 import hu.dncs.tracker.idempotency.domain.model.StoredResponse;
-import hu.dncs.tracker.identity.api.UserLookup;
+import hu.dncs.tracker.identity.api.UserDirectory;
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.ServletResponse;
@@ -47,10 +47,10 @@ final class IdempotentRequestMappingHandlerAdapter extends RequestMappingHandler
             HttpHeaders.CONTENT_TYPE, HttpHeaders.CONTENT_LENGTH, HttpHeaders.LOCATION, HttpHeaders.ETAG);
     private final ExecuteIdempotentRequestUseCase executor;
     private final ObjectMapper mapper;
-    private final UserLookup users;
+    private final UserDirectory users;
 
     IdempotentRequestMappingHandlerAdapter(ExecuteIdempotentRequestUseCase executor, ObjectMapper mapper,
-                                           UserLookup users) {
+                                           UserDirectory users) {
         this.executor = executor;
         this.mapper = mapper;
         this.users = users;
