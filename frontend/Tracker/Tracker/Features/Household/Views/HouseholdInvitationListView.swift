@@ -20,7 +20,12 @@ struct HouseholdInvitationListView: View {
         ScrollView {
             VStack(alignment: .leading) {
                 ForEach(viewModel.householdInvitations) { invitation in
-                    HouseholdInvitationListItemView(invitation: invitation, onAccept: nil, onDecline: nil)
+                    HouseholdInvitationListItemView(
+                        invitation: invitation,
+                        isProcessing: viewModel.processingInvitationIDs.contains(invitation.id),
+                        onAccept: { Task { await viewModel.accept(invitation) } },
+                        onDecline: { Task { await viewModel.decline(invitation) } }
+                    )
                 }
             }
             .padding()
@@ -39,7 +44,7 @@ struct HouseholdInvitationListView: View {
         .refreshable {
             await viewModel.load()
         }
-        .alert("Unable to load invitations", isPresented: Binding(
+        .alert("Unable to update invitations", isPresented: Binding(
             get: { viewModel.errorMessage != nil },
             set: { if !$0 { viewModel.errorMessage = nil } }
         )) {

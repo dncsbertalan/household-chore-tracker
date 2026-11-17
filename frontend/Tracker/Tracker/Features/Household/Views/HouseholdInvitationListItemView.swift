@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HouseholdInvitationListItemView: View {
     let invitation: HouseholdInvitationDto
+    var isProcessing = false
     let onAccept: (() -> Void)?
     let onDecline: (() -> Void)?
 
@@ -16,7 +17,10 @@ struct HouseholdInvitationListItemView: View {
         VStack(alignment: .leading, spacing: Theme.Spacing.lg) {
             header
             details
-            actions
+            
+            if isPending {
+                actions
+            }
         }
         .padding(Theme.Spacing.lg)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -63,6 +67,10 @@ private extension HouseholdInvitationListItemView {
             }
 
             Spacer()
+
+            if !isProcessing {
+                ProgressView().accessibilityLabel("household.invitation.isProcessingAction")
+            }
         }
         .fixedSize(horizontal: false, vertical: true)
     }
@@ -97,8 +105,8 @@ private extension HouseholdInvitationListItemView {
                     .padding(.vertical, 12)
             }
             .buttonStyle(.glass)
-            .disabled(!isPending)
-
+            .disabled(!isPending || isProcessing)
+            
             Button {
                 onAccept?()
             } label: {
@@ -108,7 +116,7 @@ private extension HouseholdInvitationListItemView {
                     .padding(.vertical, 12)
             }
             .buttonStyle(.glassProminent)
-            .disabled(!isPending)
+            .disabled(!isPending || isProcessing)
         }
         .padding(.top, 4)
     }
@@ -163,7 +171,7 @@ private extension HouseholdInvitationListItemView {
     }
 
     func infoRow(icon: String, text: String) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 8) {
+        HStack(alignment: .firstTextBaseline, spacing: Theme.Spacing.sm) {
             Image(systemName: icon)
                 .font(.system(size: 13, weight: .medium))
                 .foregroundStyle(.secondary)
