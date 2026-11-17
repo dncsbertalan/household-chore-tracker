@@ -10,6 +10,7 @@ import SwiftData
 
 struct RootView: View {
     @Environment(AppState.self) private var appState
+    @Environment(\.container) private var container
     @Environment(\.locale) private var locale
 
 
@@ -34,6 +35,9 @@ struct RootView: View {
             }
             // Recreate screen models so stored validation messages also use the new language.
             .id(locale)
+            .task(id: appState.sessionRevision) {
+                await appState.loadCurrentUser(from: container.currentUserRepository)
+            }
         }
     }
 }

@@ -11,7 +11,7 @@ import Observation
 @MainActor
 @Observable
 final class CurrentUserViewModel {
-    private(set) var user: CurrentUser?
+    var user: CurrentUser? { appState.currentUser }
     private(set) var isLoading = false
     private(set) var isLoggingOut = false
     private(set) var errorMessage: String?
@@ -52,19 +52,12 @@ final class CurrentUserViewModel {
     func load() async {
         guard !isLoading else { return }
 
-        user = nil
         errorMessage = nil
 
         isLoading = true
         defer { isLoading = false }
 
-        do {
-            let user = try await userRepository.getCurrentUser()
-            try Task.checkCancellation()
-            self.user = user
-        } catch is CancellationError {
-        } catch {
-            errorMessage = error.localizedDescription
-        }
+        await appState.loadCurrentUser(from: userRepository)
+        errorMessage = appState.currentUserError
     }
 }

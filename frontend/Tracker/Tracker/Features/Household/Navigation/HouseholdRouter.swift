@@ -10,7 +10,7 @@ enum HouseholdRoute: Hashable {
 }
 
 enum HouseholdSheet: String, Identifiable {
-    case forgotPassword
+    case createHousehold
 
     var id: String { rawValue }
 }

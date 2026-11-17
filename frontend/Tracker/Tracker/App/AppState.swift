@@ -17,18 +17,41 @@ final class AppState {
     var sessionRevision = 0
     var isAuthenticated = false
     
+    private(set) var currentUser: CurrentUser?
+    private(set) var currentUserError: String?
+    var currentUserId: UUID? { currentUser?.id }
+
     var isOnline = false
     
     func authenticationSucceeded() {
         sessionRevision += 1
+        currentUser = nil
+        currentUserError = nil
         isAuthenticated = true
     }
     
     func authenticationEnded() {
         sessionRevision += 1
         isAuthenticated = false
+        currentUser = nil
+        currentUserError = nil
         selectedHouseholdId = nil
         selectedTab = .household
+    }
+
+    func loadCurrentUser(from repository: any CurrentUserRepositoryProtocol) async {
+        guard isAuthenticated else { return }
+        let revision = sessionRevision
+        currentUserError = nil
+        do {
+            let user = try await repository.getCurrentUser()
+            try Task.checkCancellation()
+            guard isAuthenticated, revision == sessionRevision else { return }
+            currentUser = user
+        } catch {
+            guard !Task.isCancelled, isAuthenticated, revision == sessionRevision else { return }
+            currentUserError = error.localizedDescription
+        }
     }
 
     func restoreAuthentication(from tokenStore: any TokenStoreProtocol) async {
@@ -41,11 +64,17 @@ final class AppState {
             isAuthenticated = tokens.map {
                 $0.refreshPending != true && ($0.accessExpiresAt > now || $0.refreshExpiresAt > now)
             } ?? false
+            if !isAuthenticated {
+                currentUser = nil
+                currentUserError = nil
+            }
         } catch {
             // An unavailable Keychain does not establish a session.
             guard revision == sessionRevision else { return }
 
             isAuthenticated = false
+            currentUser = nil
+            currentUserError = nil
         }
     }
     

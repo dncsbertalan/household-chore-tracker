@@ -19,7 +19,7 @@ nonisolated struct HouseholdMemberResponse: Decodable, Identifiable, Sendable {
     let householdRole: HouseholdRoleResponse
     let joinedAt: Date
     let createdAt: Date
-    let updatedAt: String
+    let updatedAt: Date
     let version: Int64
 
     var id: UUID { householdMemberId }

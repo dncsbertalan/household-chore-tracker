@@ -8,11 +8,14 @@
 import SwiftUI
 
 struct HouseholdTabView: View {
+    @Environment(\.container) private var container
     @State private var router = HouseholdRouter()
     
     var body: some View {
         NavigationStack(path: $router.path) {
-            HouseholdListView()
+            HouseholdListView(viewModel: HouseholdsViewModel(
+                householdRepository: container.householdRepository
+            ))
                 .navigationDestination(for: HouseholdRoute.self) { route in
                     destination(for: route)
                 }
@@ -35,7 +38,7 @@ struct HouseholdTabView: View {
     private func sheetDestination(for sheet: HouseholdSheet) -> some View {
         NavigationStack {
             switch sheet {
-            case .forgotPassword:
+            case .createHousehold:
                 Text("faza")
             }
         }
@@ -44,4 +47,6 @@ struct HouseholdTabView: View {
 
 #Preview {
     HouseholdTabView()
+        .environment(\.container, DependencyContainer.mock())
+        .environment(AppState())
 }
