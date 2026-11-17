@@ -8,6 +8,7 @@
 import Foundation
 
 final class APIClient: Sendable {
+    
     private let session: URLSession
     private let decoder: JSONDecoder
     private let encoder: JSONEncoder
@@ -30,7 +31,7 @@ final class APIClient: Sendable {
         encoder.dateEncodingStrategy = .iso8601
     }
 
-    // MARK: - Core request method
+    // MARK: - Request with response
     func request<T: Decodable>(
         endpoint: String,
         method: HTTPMethod = .get,
@@ -38,6 +39,35 @@ final class APIClient: Sendable {
         queryItems: [URLQueryItem]? = nil,
         headers: [String: String]? = nil
     ) async throws -> T {
+        let data = try await execute(endpoint: endpoint, method: method, body: body, queryItems: queryItems, headers: headers)
+
+        // Decode response
+        do {
+            return try decoder.decode(T.self, from: data)
+        } catch {
+            throw APIError.decodingFailed(error)
+        }
+    }
+    
+    // MARK: - Request without response
+    func request(
+        endpoint: String,
+        method: HTTPMethod = .get,
+        body: (any Encodable)? = nil,
+        queryItems: [URLQueryItem]? = nil,
+        headers: [String: String]? = nil
+    ) async throws {
+        _ = try await execute(endpoint: endpoint, method: method, body: body, queryItems: queryItems, headers: headers)
+    }
+
+    // MARK: - Core request execution
+    func execute(
+        endpoint: String,
+        method: HTTPMethod = .get,
+        body: (any Encodable)? = nil,
+        queryItems: [URLQueryItem]? = nil,
+        headers: [String: String]? = nil
+    ) async throws -> Data {
         var url = baseURL.appendingPathComponent(endpoint)
 
         // Append query parameters
@@ -78,11 +108,6 @@ final class APIClient: Sendable {
             throw APIError.from(statusCode: httpResponse.statusCode, data: data)
         }
 
-        // Decode response
-        do {
-            return try decoder.decode(T.self, from: data)
-        } catch {
-            throw APIError.decodingFailed(error)
-        }
+        return data
     }
 }
