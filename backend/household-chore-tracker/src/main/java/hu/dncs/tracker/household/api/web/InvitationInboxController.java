@@ -30,13 +30,13 @@ class InvitationInboxController {
 
     @PostMapping("/{invitationId}/accept")
     @Idempotent("household.invitation.accept")
-    JoinedHouseholdResponse accept(@PathVariable UUID invitationId, @CurrentUserId UUID userId) {
-        return responses.from(householdInvitationService.accept(invitationId, userId));
+    void accept(@PathVariable UUID invitationId, @CurrentUserId UUID userId) {
+        householdInvitationService.accept(invitationId, userId);
     }
 
     @PostMapping("/{invitationId}/decline")
     @Idempotent("household.invitation.decline")
-    HouseholdInvitationDto decline(@PathVariable UUID invitationId, @CurrentUserId UUID userId) {
-        return HouseholdInvitationDto.from(householdInvitationService.decline(invitationId, userId));
+    void decline(@PathVariable UUID invitationId, @CurrentUserId UUID userId) {
+        householdInvitationService.decline(invitationId, userId);
     }
 }

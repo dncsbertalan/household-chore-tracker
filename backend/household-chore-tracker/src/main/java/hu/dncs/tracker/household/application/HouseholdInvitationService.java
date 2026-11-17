@@ -106,7 +106,7 @@ public class HouseholdInvitationService {
     }
 
     @Transactional
-    public JoinedHousehold accept(UUID invitationId, UUID callerId) {
+    public void accept(UUID invitationId, UUID callerId) {
         var invitation = lockRecipientInvitation(invitationId, callerId);
 
         var now = clock.instant();
@@ -125,14 +125,10 @@ public class HouseholdInvitationService {
         householdMemberRepository.saveAndFlush(membership);
         invitation.respond(ACCEPTED, now);
         householdInvitationRepository.flush();
-
-        // Return the role catalog used by the invitation workflow.
-        return new JoinedHousehold(household,
-                householdRoleRepository.findAllByHouseholdIdOrderByCreatedAtAscHouseholdRoleIdAsc(household.getHouseholdId()), membership);
     }
 
     @Transactional
-    public HouseholdInvitationDetails decline(UUID invitationId, UUID callerId) {
+    public void decline(UUID invitationId, UUID callerId) {
         var invitation = lockRecipientInvitation(invitationId, callerId);
 
         var now = clock.instant();
@@ -140,8 +136,6 @@ public class HouseholdInvitationService {
         invitation.respond(DECLINED, now);
 
         householdInvitationRepository.flush();
-
-        return HouseholdInvitationDetails.from(invitation, getUserInfo(callerId), now);
     }
 
     @Transactional
