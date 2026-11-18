@@ -37,7 +37,7 @@ struct HouseholdListView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 NavigationLink {
-                    HouseholdInvitationListView(viewModel: HouseholdInvitationListViewModel(householdInvitationRepository: container.householdInvitationRepository), )
+                    HouseholdInvitationListView(viewModel: HouseholdInvitationListViewModel(householdInvitationRepository: container.householdInvitationRepository))
                 } label: {
                     Label("invitation.list.inbox", systemImage: "tray")
                 }
@@ -47,7 +47,7 @@ struct HouseholdListView: View {
             
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    router.sheet = .createHousehold
+                    router.present(.createHousehold)
                 } label: {
                     Label("household.create", systemImage: "plus")
                 }
@@ -56,6 +56,11 @@ struct HouseholdListView: View {
         }
         .task {
             await viewModel.load()
+        }
+        .onChange(of: router.sheet) { oldValue, newValue in
+            if oldValue == .createHousehold && newValue == nil {
+                Task { await viewModel.load() }
+            }
         }
         .refreshable {
             await viewModel.load()

@@ -13,4 +13,5 @@ nonisolated struct CreateHouseholdRequest: Codable, Sendable {
     let description: String?
     let roles: [CreateHouseholdRoleRequest]
     let creatorRoleId: UUID
+    let householdMemberId: UUID
 }

@@ -40,7 +40,7 @@ struct HouseholdTabView: View {
         NavigationStack {
             switch sheet {
             case .createHousehold:
-                Text("faza")
+                CreateHouseholdView(viewModel: CreateHouseholdViewModel(householdRepository: container.householdRepository))
             }
         }
     }
