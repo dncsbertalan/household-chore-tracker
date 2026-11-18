@@ -11,6 +11,7 @@ struct HouseholdInvitationListView: View {
     @State private var viewModel: HouseholdInvitationListViewModel
     @Environment(HouseholdRouter.self) private var router
     @Environment(AppState.self) private var appState
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     init(viewModel: HouseholdInvitationListViewModel) {
         _viewModel = State(initialValue: viewModel)
@@ -26,8 +27,13 @@ struct HouseholdInvitationListView: View {
                         onAccept: { Task { await viewModel.accept(invitation) } },
                         onDecline: { Task { await viewModel.decline(invitation) } }
                     )
+                    .transition(.identity)
                 }
             }
+            .animation(
+                reduceMotion ? nil : .smooth(duration: 0.3),
+                value: viewModel.householdInvitations.map(\.id)
+            )
             .padding()
         }
         .frame(maxWidth: .infinity)

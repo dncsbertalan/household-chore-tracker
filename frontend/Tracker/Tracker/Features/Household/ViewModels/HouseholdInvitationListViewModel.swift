@@ -47,9 +47,6 @@ final class HouseholdInvitationListViewModel {
     }
 
     func accept(_ invitation: HouseholdInvitationDto) async {
-        do {
-            try await Task.sleep(for: .seconds(5))
-        } catch {}
         await respond(to: invitation, accepting: true)
     }
 
@@ -63,6 +60,10 @@ final class HouseholdInvitationListViewModel {
               processingInvitationIDs.insert(invitation.id).inserted else { return }
         
         defer { processingInvitationIDs.remove(invitation.id) }
+        
+        do {
+            try await Task.sleep(for: .seconds(3))
+        } catch {}
         
         errorMessage = nil
 
