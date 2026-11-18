@@ -10,6 +10,7 @@ import Foundation
 enum HouseholdRoute: Hashable {
     case invitations
     case householdDetail(_ householdId: UUID)
+    case householdMemberDetails(_ member: HouseholdMemberResponse, isCurrentUser: Bool)
 }
 
 enum HouseholdSheet: String, Identifiable {

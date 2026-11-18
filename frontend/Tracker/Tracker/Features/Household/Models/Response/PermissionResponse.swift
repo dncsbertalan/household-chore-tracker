@@ -6,7 +6,7 @@
 //
 
 
-nonisolated struct PermissionResponse: Decodable, Identifiable, Sendable {
+nonisolated struct PermissionResponse: Decodable, Identifiable, Sendable, Equatable, Hashable {
     let permissionId: Int64
     let name: String
     let description: String?
