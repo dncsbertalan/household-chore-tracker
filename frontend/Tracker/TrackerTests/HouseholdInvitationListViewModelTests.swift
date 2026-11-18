@@ -3,6 +3,36 @@ import XCTest
 
 @MainActor
 final class HouseholdInvitationListViewModelTests: XCTestCase {
+    func testSuccessfulResponsesRefreshHouseholdsAndBadge() async {
+        let invitations = ControlledInvitationRepository()
+        let households = CountingHouseholdRepository()
+        let parent = HouseholdsViewModel(householdRepository: households, householdInvitationRepository: invitations)
+        await parent.load()
+        XCTAssertEqual(parent.householdInvitations.count, 2)
+        XCTAssertTrue(parent.householdSummaries.isEmpty)
+        let inbox = parent.makeInvitationListViewModel()
+        await inbox.load()
+        let first = inbox.householdInvitations[0]
+        let second = inbox.householdInvitations[1]
+
+        let accept = Task { await inbox.accept(first) }
+        await invitations.waitForRequests(1)
+        await households.addHousehold()
+        await invitations.complete(first.id)
+        await accept.value
+        XCTAssertEqual(parent.householdInvitations.map(\.id), [second.id])
+        XCTAssertEqual(parent.householdSummaries.count, 1)
+
+        let decline = Task { await inbox.decline(second) }
+        await invitations.waitForRequests(2)
+        await invitations.complete(second.id)
+        await decline.value
+        XCTAssertTrue(parent.householdInvitations.isEmpty)
+        XCTAssertEqual(parent.householdSummaries.count, 1)
+        let calls = await households.calls
+        XCTAssertEqual(calls, 3)
+    }
+
     func testRequestsAreIndependentAndDuplicateActionsAreIgnored() async {
         let repository = ControlledInvitationRepository()
         let viewModel = HouseholdInvitationListViewModel(householdInvitationRepository: repository)
@@ -78,5 +108,17 @@ private actor ControlledInvitationRepository: HouseholdInvitationRepositoryProto
         } else {
             continuation?.resume()
         }
+    }
+}
+
+private actor CountingHouseholdRepository: HouseholdRepositoryProtocol {
+    var calls = 0
+    private var summaries: [HouseholdSummaryResponse] = []
+    func getSummaries() async throws -> [HouseholdSummaryResponse] {
+        calls += 1
+        return summaries
+    }
+    func addHousehold() {
+        summaries = [HouseholdSummaryResponse(householdId: UUID(), name: "Joined home", description: nil, members: [])]
     }
 }

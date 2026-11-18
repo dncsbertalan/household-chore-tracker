@@ -11,6 +11,7 @@ struct HouseholdListView: View {
     @State private var viewModel: HouseholdsViewModel
     @Environment(HouseholdRouter.self) private var router
     @Environment(AppState.self) private var appState
+    @Environment(\.container) private var container
 
     init(viewModel: HouseholdsViewModel) {
         _viewModel = State(initialValue: viewModel)
@@ -36,8 +37,7 @@ struct HouseholdListView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 NavigationLink {
-                    //HouseholdInvitationsView(accountId: userId, repository: invitationRepository)
-                    Text("hi")
+                    HouseholdInvitationListView(viewModel: HouseholdInvitationListViewModel(householdInvitationRepository: container.householdInvitationRepository), )
                 } label: {
                     Label("invitation.list.inbox", systemImage: "tray")
                 }
@@ -86,4 +86,5 @@ private let previewAppState: AppState = {
     }
     .environment(HouseholdRouter())
     .environment(previewAppState)
+    .environment(\.container, DependencyContainer.mock())
 }

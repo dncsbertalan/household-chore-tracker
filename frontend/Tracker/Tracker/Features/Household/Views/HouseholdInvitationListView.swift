@@ -50,7 +50,7 @@ struct HouseholdInvitationListView: View {
         .refreshable {
             await viewModel.load()
         }
-        .alert("Unable to update invitations", isPresented: Binding(
+        .alert("Unable to load invitations", isPresented: Binding(
             get: { viewModel.errorMessage != nil },
             set: { if !$0 { viewModel.errorMessage = nil } }
         )) {
