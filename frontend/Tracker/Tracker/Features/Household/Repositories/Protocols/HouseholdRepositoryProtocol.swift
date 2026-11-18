@@ -9,5 +9,6 @@ import Foundation
 
 nonisolated protocol HouseholdRepositoryProtocol: Sendable {
     func create(_ request: CreateHouseholdRequest, idempotencyKey: UUID) async throws
+    func get(householdId: UUID) async throws -> HouseholdResponse
     func getSummaries() async throws -> [HouseholdSummaryResponse]
 }

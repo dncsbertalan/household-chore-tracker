@@ -21,6 +21,10 @@ nonisolated struct HouseholdRepository: HouseholdRepositoryProtocol {
         )
     }
 
+    func get(householdId: UUID) async throws -> HouseholdResponse {
+        try await apiClient.request(endpoint: "api/v1/households/\(householdId)")
+    }
+
     func getSummaries() async throws -> [HouseholdSummaryResponse] {
         try await apiClient.request(endpoint: "api/v1/households/summaries")
     }

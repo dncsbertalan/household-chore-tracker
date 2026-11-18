@@ -112,6 +112,9 @@ private actor ControlledInvitationRepository: HouseholdInvitationRepositoryProto
 }
 
 private actor CountingHouseholdRepository: HouseholdRepositoryProtocol {
+    func get(householdId: UUID) async throws -> HouseholdResponse {
+        try await PreviewHouseholdRepository().get(householdId: householdId)
+    }
     func create(_ request: CreateHouseholdRequest, idempotencyKey: UUID) async throws {}
     var calls = 0
     private var summaries: [HouseholdSummaryResponse] = []

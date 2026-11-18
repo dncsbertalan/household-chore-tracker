@@ -40,6 +40,13 @@ nonisolated struct PreviewHouseholdRepository: HouseholdRepositoryProtocol {
     
     func create(_ request: CreateHouseholdRequest, idempotencyKey: UUID) async throws {}
 
+    func get(householdId: UUID) async throws -> HouseholdResponse {
+        let summary = Self.mockedData.first { $0.id == householdId } ?? Self.mockedData[0]
+        let owner = summary.members[0]
+        return HouseholdResponse(householdId: summary.id, name: summary.name, description: summary.description,
+                                 members: summary.members, roles: [owner.householdRole], owner: owner, me: owner, createdAt: .now)
+    }
+
     func getSummaries() async throws -> [HouseholdSummaryResponse] {
         PreviewHouseholdRepository.mockedData
     }
