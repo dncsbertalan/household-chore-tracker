@@ -19,14 +19,17 @@ public record HouseholdResponse(
         Long version,
         List<HouseholdRoleResponse> roles,
         HouseholdMemberResponse creatorMembership,
-        List<HouseholdMemberResponse> members
+        List<HouseholdMemberResponse> members,
+        HouseholdMemberResponse owner,
+        HouseholdMemberResponse me
 ) {
-    public static HouseholdResponse from(HouseholdDetails details, Map<UUID, UserInfo> users) {
+    public static HouseholdResponse from(HouseholdDetails details, Map<UUID, UserInfo> users,
+                                         HouseholdMemberResponse owner, HouseholdMemberResponse me) {
         var household = details.household();
         return new HouseholdResponse(household.getHouseholdId(), household.getName(), household.getDescription(),
                 household.getCreatedByUserId(), household.getCreatedAt(), household.getUpdatedAt(), household.getVersion(),
                 details.roles().stream().map(HouseholdRoleResponse::from).toList(), null,
-                details.members().stream().map(member -> HouseholdMemberResponse.from(member, users.get(member.getUserId()))).toList());
+                details.members().stream().map(member -> HouseholdMemberResponse.from(member, users.get(member.getUserId()))).toList(), owner, me);
     }
 
     public static HouseholdResponse from(CreateHouseholdResult created, Map<UUID, UserInfo> users) {
@@ -35,6 +38,8 @@ public record HouseholdResponse(
                 household.getCreatedByUserId(), household.getCreatedAt(), household.getUpdatedAt(), household.getVersion(),
                 created.roles().stream().map(HouseholdRoleResponse::from).toList(),
                 HouseholdMemberResponse.from(created.creatorMembership(), users.get(created.creatorMembership().getUserId())),
-                List.of(HouseholdMemberResponse.from(created.creatorMembership(), users.get(created.creatorMembership().getUserId()))));
+                List.of(HouseholdMemberResponse.from(created.creatorMembership(), users.get(created.creatorMembership().getUserId()))),
+                HouseholdMemberResponse.from(created.creatorMembership(), users.get(created.creatorMembership().getUserId())),
+                HouseholdMemberResponse.from(created.creatorMembership(), users.get(created.creatorMembership().getUserId())));
     }
 }

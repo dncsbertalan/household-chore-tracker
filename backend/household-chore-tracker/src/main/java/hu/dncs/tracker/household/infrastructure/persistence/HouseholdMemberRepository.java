@@ -21,6 +21,7 @@ public interface HouseholdMemberRepository extends JpaRepository<HouseholdMember
     @Query("select m from HouseholdMember m where m.household.householdId = :householdId and m.userId = :userId and m.removedAt is null")
     Optional<HouseholdMember> findByHousehold_HouseholdIdAndUserId(UUID householdId, UUID userId);
 
+    @EntityGraph(attributePaths = {"household", "householdRole", "householdRole.permissions"})
     @Query("select m from HouseholdMember m where m.household.householdId = :householdId and m.userId = :userId")
     Optional<HouseholdMember> findIncludingRemoved(UUID householdId, UUID userId);
 

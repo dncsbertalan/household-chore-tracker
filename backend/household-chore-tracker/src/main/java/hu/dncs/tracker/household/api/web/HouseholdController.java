@@ -45,7 +45,7 @@ class HouseholdController {
     @PutMapping("/{id}")
     @Idempotent("household.update")
     HouseholdResponse update(@PathVariable UUID id, @Valid @RequestBody UpdateHouseholdRequest request, Authentication authentication) {
-        return householdResponseMapper.from(updateHouseholdUseCase.execute(id, request.toCommand(), UUID.fromString(authentication.getName())));
+        return householdResponseMapper.from(updateHouseholdUseCase.execute(id, request.toCommand(), UUID.fromString(authentication.getName())), UUID.fromString(authentication.getName()));
     }
 
     @DeleteMapping("/{id}")
@@ -58,7 +58,7 @@ class HouseholdController {
 
     @GetMapping
     List<HouseholdResponse> all(Authentication authentication) {
-        return householdResponseMapper.from(getHouseholdsUseCase.all(UUID.fromString(authentication.getName())));
+        return householdResponseMapper.from(getHouseholdsUseCase.all(UUID.fromString(authentication.getName())), UUID.fromString(authentication.getName()));
     }
 
     @GetMapping("/summaries")
@@ -68,7 +68,7 @@ class HouseholdController {
 
     @GetMapping("/{id}")
     HouseholdResponse one(@PathVariable UUID id, Authentication authentication) {
-        return householdResponseMapper.from(getHouseholdsUseCase.one(id, UUID.fromString(authentication.getName())));
+        return householdResponseMapper.from(getHouseholdsUseCase.one(id, UUID.fromString(authentication.getName())), UUID.fromString(authentication.getName()));
     }
 
     @PostMapping
