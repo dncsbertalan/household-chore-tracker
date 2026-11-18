@@ -68,7 +68,7 @@ private extension HouseholdInvitationListItemView {
 
             Spacer()
 
-            if !isProcessing {
+            if isProcessing {
                 ProgressView().accessibilityLabel("household.invitation.isProcessingAction")
             }
         }
