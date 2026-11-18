@@ -19,9 +19,15 @@ struct HouseholdListView: View {
     
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading) {
+            LazyVStack(alignment: .leading, spacing: Theme.Spacing.lg) {
                 ForEach(viewModel.householdSummaries) { household in
-                    HouseholdListItemView(household: household)
+                    Button {
+                        router.navigate(to: .householdDetail(household.householdId))
+                    }
+                    label: {
+                        HouseholdListItemView(household: household)
+                    }
+                    .buttonStyle(.plain)
                 }
             }
             .padding()
@@ -36,8 +42,8 @@ struct HouseholdListView: View {
         }
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                NavigationLink {
-                    HouseholdInvitationListView(viewModel: HouseholdInvitationListViewModel(householdInvitationRepository: container.householdInvitationRepository))
+                Button {
+                    router.navigate(to: .invitations)
                 } label: {
                     Label("invitation.list.inbox", systemImage: "tray")
                 }

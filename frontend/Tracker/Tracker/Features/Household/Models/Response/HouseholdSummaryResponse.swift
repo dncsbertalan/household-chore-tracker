@@ -5,7 +5,6 @@
 //  Created by Dancs Bertalan on 2026. 11. 17..
 //
 
-
 import Foundation
 
 nonisolated struct HouseholdSummaryResponse: Decodable, Identifiable, Sendable {

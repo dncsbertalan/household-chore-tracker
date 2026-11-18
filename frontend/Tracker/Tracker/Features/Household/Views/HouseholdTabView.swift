@@ -30,8 +30,10 @@ struct HouseholdTabView: View {
     @ViewBuilder
     private func destination(for route: HouseholdRoute) -> some View {
         switch route {
-        case .main:
-            Text("faza")
+        case .invitations:
+            HouseholdInvitationListView(viewModel: HouseholdInvitationListViewModel(householdInvitationRepository: container.householdInvitationRepository))
+        case .householdDetail(let householdId):
+            HouseholdInvitationListView(viewModel: HouseholdInvitationListViewModel(householdInvitationRepository: container.householdInvitationRepository))
         }
     }
     

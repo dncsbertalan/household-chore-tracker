@@ -5,8 +5,11 @@
 //  Created by Dancs Bertalan on 2026. 11. 07..
 //
 
+import Foundation
+
 enum HouseholdRoute: Hashable {
-    case main
+    case invitations
+    case householdDetail(_ householdId: UUID)
 }
 
 enum HouseholdSheet: String, Identifiable {
