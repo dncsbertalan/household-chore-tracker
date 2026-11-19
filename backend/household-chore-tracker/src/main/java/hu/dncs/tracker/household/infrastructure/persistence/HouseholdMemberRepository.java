@@ -1,5 +1,6 @@
 package hu.dncs.tracker.household.infrastructure.persistence;
 
+import hu.dncs.tracker.household.domain.model.HouseholdPermission;
 import org.springframework.data.jpa.repository.EntityGraph;
 
 import hu.dncs.tracker.household.domain.model.HouseholdMember;
@@ -42,5 +43,5 @@ public interface HouseholdMemberRepository extends JpaRepository<HouseholdMember
             """)
     boolean hasPermission(@Param("householdId") UUID householdId,
                           @Param("userId") UUID userId,
-                          @Param("permissionName") String permissionName);
+                          @Param("permissionName") HouseholdPermission permissionName);
 }

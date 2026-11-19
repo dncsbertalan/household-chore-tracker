@@ -81,7 +81,7 @@ class HouseholdMemberRemovalIntegrationTests {
         assertThat(replay.getResponse().getContentAsString()).isEqualTo(first.getResponse().getContentAsString());
         assertThat(members.findById(target.getHouseholdMemberId()).orElseThrow().getRemovedAt()).isNotNull();
         assertThat(members.findByHousehold_HouseholdIdAndUserId(f.household, target.getUserId())).isEmpty();
-        assertThat(members.hasPermission(f.household, target.getUserId(), HOUSEHOLD_MEMBER_REMOVE.name())).isFalse();
+        assertThat(members.hasPermission(f.household, target.getUserId(), HOUSEHOLD_MEMBER_REMOVE)).isFalse();
         for (var url : List.of(path(f), path(f)+"/roles", "/api/v1/chores/"+chore.choreId(), path(f)+"/chores")) {
             mvc.perform(get(url).with(jwt().jwt(j -> j.subject(target.getUserId().toString())))).andExpect(status().isForbidden());
         }

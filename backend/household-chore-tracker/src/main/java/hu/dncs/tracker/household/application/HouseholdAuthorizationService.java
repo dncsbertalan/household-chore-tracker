@@ -24,7 +24,7 @@ public class HouseholdAuthorizationService {
      */
     public boolean hasPermission(UUID householdId, UUID authenticatedUserId, HouseholdPermission permission) {
         return householdMemberRepository.hasPermission(Objects.requireNonNull(householdId),
-                Objects.requireNonNull(authenticatedUserId), Objects.requireNonNull(permission).name());
+                Objects.requireNonNull(authenticatedUserId), Objects.requireNonNull(permission));
     }
 
     /**
