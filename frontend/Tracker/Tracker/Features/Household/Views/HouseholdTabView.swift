@@ -30,6 +30,8 @@ struct HouseholdTabView: View {
     @ViewBuilder
     private func destination(for route: HouseholdRoute) -> some View {
         switch route {
+        case .createChore(let household):
+            CreateChoreView(viewModel: CreateChoreViewModel(household: household, repository: container.choreRepository))
         case .invitations:
             HouseholdInvitationListView(viewModel: HouseholdInvitationListViewModel(householdInvitationRepository: container.householdInvitationRepository))
         case .householdDetail(let householdId):

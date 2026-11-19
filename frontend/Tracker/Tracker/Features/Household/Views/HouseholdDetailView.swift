@@ -66,6 +66,15 @@ struct HouseholdDetailView: View {
                     .accessibilityIdentifier("inviteHouseholdMember")
                 }
             }
+            if let household = viewModel.household,
+               household.me.householdRole.permissions.contains(.choreCreate) {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { router.navigate(to: .createChore(household: household)) } label: {
+                        Label("Create chore", systemImage: "plus")
+                    }
+                    .accessibilityIdentifier("createChore")
+                }
+            }
         }
         .task { await viewModel.load() }
         .refreshable { await viewModel.load() }
