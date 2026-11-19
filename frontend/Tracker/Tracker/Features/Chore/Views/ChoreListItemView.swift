@@ -15,7 +15,7 @@ struct ChoreListItemView: View {
                     .font(.caption.weight(.semibold)).foregroundStyle(.tint)
             }
             if let occurrence = chore.occurrence {
-                Text(occurrence.occurrenceStatus.label).font(.subheadline).foregroundStyle(.secondary)
+                ChoreStatusCapsule(status: occurrence.occurrenceStatus)
                 if let due = occurrence.dueAt {
                     Text("Due \(due.formatted(date: .abbreviated, time: .shortened))")
                         .font(.caption).foregroundStyle(.secondary)

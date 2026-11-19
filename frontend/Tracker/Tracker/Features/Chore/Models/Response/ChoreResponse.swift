@@ -6,6 +6,9 @@ nonisolated struct ChoreResponse: Decodable, Identifiable, Sendable {
     let title: String
     let description: String?
     var assignedMembers: [HouseholdMemberResponse] = []
+    var assignedMemberIds: [UUID] = []
+    var requiredApprovalCount: Int = 0
+    var completions: [Completion]?
     var version: Int64 = 0
     var schedule: Schedule?
     var occurrence: Occurrence?
@@ -19,12 +22,16 @@ nonisolated struct ChoreResponse: Decodable, Identifiable, Sendable {
         let scheduleType: String
         let recurrenceUnit: ChoreRecurrenceUnit?
         let recurrenceInterval: Int
+        var version: Int64 = 0
+        var startsAt: Date?
+        var timeZoneIdentifier: String = "UTC"
     }
     struct Occurrence: Decodable, Identifiable, Sendable {
         let choreOccurrenceId: UUID
         let scheduledAt: Date?
         let dueAt: Date?
         let occurrenceStatus: Status
+        var version: Int64 = 0
         var id: UUID { choreOccurrenceId }
     }
     enum Status: String, Decodable, Sendable {
@@ -41,5 +48,20 @@ nonisolated struct ChoreResponse: Decodable, Identifiable, Sendable {
             }
         }
     }
-    struct Actions: Decodable, Sendable { let canCreateOccurrence: Bool }
+    struct Completion: Decodable, Identifiable, Sendable {
+        let choreCompletionId: UUID
+        let choreOccurrenceId: UUID
+        let status: String
+        let version: Int64
+        var id: UUID { choreCompletionId }
+    }
+    var pendingCompletion: Completion? {
+        completions?.first { $0.choreOccurrenceId == occurrence?.id && $0.status == "AWAITING_APPROVAL" }
+    }
+    struct Actions: Decodable, Sendable {
+        let canCreateOccurrence: Bool
+        var canComplete = false
+        var canApprove = false
+        var canReject = false
+    }
 }

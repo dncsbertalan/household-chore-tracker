@@ -31,7 +31,7 @@ struct HouseholdTabView: View {
     private func destination(for route: HouseholdRoute) -> some View {
         switch route {
         case .choreDetail(let choreId):
-            ChoreDetailView(viewModel: ChoreDetailViewModel(choreId: choreId, repository: container.choreRepository))
+            ChoreDetailView(viewModel: ChoreDetailViewModel(choreId: choreId, repository: container.choreRepository, householdRepository: container.householdRepository))
         case .createChore(let household):
             CreateChoreView(viewModel: CreateChoreViewModel(household: household, repository: container.choreRepository))
         case .invitations:
