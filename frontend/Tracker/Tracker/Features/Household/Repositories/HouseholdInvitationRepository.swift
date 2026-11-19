@@ -14,6 +14,13 @@ nonisolated struct HouseholdInvitationRepository: HouseholdInvitationRepositoryP
         self.apiClient = apiClient
     }
 
+    func invite(householdId: UUID, request: InviteHouseholdMemberRequest, idempotencyKey: UUID) async throws {
+        try await apiClient.request(
+            endpoint: "api/v1/households/\(householdId)/invitations", method: .post, body: request,
+            headers: ["Idempotency-Key": idempotencyKey.uuidString.lowercased()]
+        )
+    }
+
     func accept(invitationId: UUID, idempotencyKey: UUID) async throws {
         try await apiClient.request(
             endpoint: "api/v1/household-invitations/\(invitationId)/accept",

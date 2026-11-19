@@ -52,10 +52,20 @@ struct HouseholdDetailView: View {
             }
         }
         .navigationTitle(viewModel.household?.name ?? "household.household")
-        //.navigationBarTitleDisplayMode(.inline)
         .scrollEdgeEffectStyle(.soft, for: .top)
         .overlay {
             if viewModel.isLoading && viewModel.household == nil { ProgressView() }
+        }
+        .toolbar {
+            if let household = viewModel.household,
+               household.me.householdRole.permissions.contains(.memberInvite) == true {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { router.present(.createHouseholdInvitation(household: household)) } label: {
+                        Label("Invite member", systemImage: "person.badge.plus")
+                    }
+                    .accessibilityIdentifier("inviteHouseholdMember")
+                }
+            }
         }
         .task { await viewModel.load() }
         .refreshable { await viewModel.load() }

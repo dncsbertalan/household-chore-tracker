@@ -13,10 +13,19 @@ enum HouseholdRoute: Hashable {
     case householdMemberDetails(_ member: HouseholdMemberResponse, isCurrentUser: Bool)
 }
 
-enum HouseholdSheet: String, Identifiable {
+enum HouseholdSheet: Identifiable, Equatable {
     case createHousehold
+    case createHouseholdInvitation(household: HouseholdResponse)
 
-    var id: String { rawValue }
+    var id: String {
+        switch self {
+        case .createHousehold:
+            return "createHousehold"
+
+        case .createHouseholdInvitation(let household):
+            return "createHouseholdInvitation-\(household.id)"
+        }
+    }
 }
 
 typealias HouseholdRouter = Router<HouseholdRoute, HouseholdSheet>

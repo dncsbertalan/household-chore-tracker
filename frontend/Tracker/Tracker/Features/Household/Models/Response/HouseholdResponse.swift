@@ -7,7 +7,7 @@
 
 import Foundation
 
-nonisolated struct HouseholdResponse: Decodable, Identifiable, Sendable {
+nonisolated struct HouseholdResponse: Decodable, Identifiable, Sendable, Equatable {
     let householdId: UUID
     let name: String
     let description: String?
@@ -16,6 +16,27 @@ nonisolated struct HouseholdResponse: Decodable, Identifiable, Sendable {
     let owner: HouseholdMemberResponse
     let me: HouseholdMemberResponse
     let createdAt: Date
-
+    
     var id: UUID { householdId }
+}
+
+nonisolated extension HouseholdResponse {
+    static var mockData: HouseholdResponse {
+        HouseholdResponse(householdId: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!,
+                          name: "Home",
+                          description: nil,
+                          members: [
+                            HouseholdMemberResponse.mockData
+                          ],
+                          roles: [
+                            HouseholdRoleResponse(
+                                householdRoleId: UUID(uuidString: "11111111-1111-1111-1111-111111111112")!,
+                                householdId: UUID(uuidString: "11111111-1111-1111-1111-111111111112")!, name: "Owner", isSystemRole: false,
+                                permissions: HouseholdPermission.allCases, createdAt: .now, updatedAt: .now, version: 1)
+                          ],
+                          owner: HouseholdMemberResponse.mockData,
+                          me: HouseholdMemberResponse.mockData,
+                          createdAt: .now
+        )
+    }
 }

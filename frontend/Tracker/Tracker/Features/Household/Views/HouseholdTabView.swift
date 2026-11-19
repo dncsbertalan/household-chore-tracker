@@ -45,6 +45,10 @@ struct HouseholdTabView: View {
             switch sheet {
             case .createHousehold:
                 CreateHouseholdView(viewModel: CreateHouseholdViewModel(householdRepository: container.householdRepository))
+            case .createHouseholdInvitation(let household):
+                CreateHouseholdInvitationView(viewModel: CreateHouseholdInvitationViewModel(
+                    household: household, repository: container.householdInvitationRepository
+                ))
             }
         }
     }
