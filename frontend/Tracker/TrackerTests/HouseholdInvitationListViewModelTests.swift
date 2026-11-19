@@ -76,6 +76,7 @@ final class HouseholdInvitationListViewModelTests: XCTestCase {
 }
 
 private actor ControlledInvitationRepository: HouseholdInvitationRepositoryProtocol {
+    func invite(householdId: UUID, request: InviteHouseholdMemberRequest, idempotencyKey: UUID) async throws {}
     let invitations = (0..<2).map { _ in
         HouseholdInvitationDto(
             householdInvitationId: UUID(), householdId: UUID(), householdName: "Home",

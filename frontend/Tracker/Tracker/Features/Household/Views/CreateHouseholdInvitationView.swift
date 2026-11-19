@@ -25,7 +25,7 @@ struct CreateHouseholdInvitationView: View {
                         }
                     }
                     if viewModel.household.roles.isEmpty {
-                        Text("No roles available.").foregroundStyle(.secondary)
+                        Text("household.roles.noAvailable").foregroundStyle(.secondary)
                     }
                 }
                 header: {
@@ -36,7 +36,7 @@ struct CreateHouseholdInvitationView: View {
                 }
             }
             .disabled(viewModel.isInviting)
-            .navigationTitle("Invite member")
+            .navigationTitle("household.invitation.inviteMember")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

@@ -61,7 +61,7 @@ struct HouseholdDetailView: View {
                household.me.householdRole.permissions.contains(.memberInvite) == true {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { router.present(.createHouseholdInvitation(household: household)) } label: {
-                        Label("Invite member", systemImage: "person.badge.plus")
+                        Label("household.invitation.inviteMember", systemImage: "person.badge.plus")
                     }
                     .accessibilityIdentifier("inviteHouseholdMember")
                 }
