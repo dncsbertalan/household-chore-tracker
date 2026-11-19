@@ -36,9 +36,11 @@ struct HouseholdMemberNameView: View {
             }
             .font(font)
             
-            Text("\(line2)")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            if !line2.isEmpty {
+                Text("\(line2)")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 }

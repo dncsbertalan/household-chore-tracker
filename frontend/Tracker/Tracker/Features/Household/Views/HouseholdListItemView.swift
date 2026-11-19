@@ -23,8 +23,10 @@ struct HouseholdListItemView: View {
                 Text("\(household.members.count) members")
                     .font(.subheadline)
                 
-                ForEach(household.members) { member in
-                    AvatarView(firstName: member.firstName, lastName: member.lastName, size: 32)
+                HStack {
+                    ForEach(household.members) { member in
+                        AvatarView(firstName: member.firstName, lastName: member.lastName, size: 32)
+                    }
                 }
             }
             
