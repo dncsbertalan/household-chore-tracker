@@ -71,4 +71,29 @@ final class HouseholdRolesViewModel {
             return false
         }
     }
+    
+    var canCreate: Bool { response?.actions.canCreate == true }
+
+    func canCreate(name: String) -> Bool {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        return canCreate && !isLoading && !isSaving && !trimmed.isEmpty && trimmed.utf16.count <= 50
+            && !roles.contains { $0.name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == trimmed.lowercased() }
+    }
+
+    func create(name: String, permissions: Set<HouseholdPermission>) async -> Bool {
+        guard canCreate(name: name) else { return false }
+        isSaving = true
+        errorMessage = nil
+        defer { isSaving = false }
+        let request = SaveHouseholdRoleRequest(name: name.trimmingCharacters(in: .whitespacesAndNewlines),
+            permissions: permissions.sorted { $0.rawValue < $1.rawValue })
+        do {
+            let encoder = JSONEncoder(); encoder.outputFormatting = .sortedKeys
+            let signature = "create:" + (try encoder.encode(request)).base64EncodedString()
+            let key = keys[signature] ?? UUID(); keys[signature] = key
+            response = try await repository.create(householdId: householdId, request: request, idempotencyKey: key)
+            return true
+        } catch { errorMessage = error.localizedDescription; return false }
+    }
+
 }

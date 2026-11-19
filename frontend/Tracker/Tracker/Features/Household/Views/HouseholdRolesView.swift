@@ -24,6 +24,16 @@ struct HouseholdRolesView: View {
             }
         }
         .navigationTitle("Household roles")
+        .toolbar {
+            if viewModel.canCreate {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink {
+                        CreateHouseholdRoleView(viewModel: viewModel)
+                    } label: { Label("Create role", systemImage: "plus") }
+                    .disabled(viewModel.isLoading || viewModel.isSaving)
+                }
+            }
+        }
         .scrollEdgeEffectStyle(.soft, for: .top)
         .overlay {
             if viewModel.isLoading && viewModel.roles.isEmpty {

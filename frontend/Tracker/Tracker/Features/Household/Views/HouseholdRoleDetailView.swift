@@ -17,35 +17,8 @@ struct HouseholdRoleDetailView: View {
         viewModel.roles.first { $0.id == originalRole.id } ?? originalRole
     }
     
-    private let groups: [(String, [HouseholdPermission])] = [
-        ("Household", [.update, .delete]),
-        ("Members", [.memberView, .memberInvite, .memberRemove, .memberAssignRole]),
-        ("Roles", [.roleView, .roleCreate, .roleUpdate, .roleDelete]),
-        ("Chores", [.choreCreate, .choreUpdate, .choreDelete, .choreAssignMember]),
-        ("Completion and approval", [.choreComplete, .choreReopen, .choreApproveCompletion, .choreSelfApproveCompletion])
-    ]
-
     var body: some View {
-        Form {
-            Section {
-                TextField("Role name", text: $name)
-            } header: { Text("Name") } footer: {
-                if role.isSystemRole {
-                    Text("System roles cannot be edited.")
-                }
-            }
-            
-            ForEach(groups, id: \.0) { group in
-                Section(group.0) {
-                    ForEach(group.1) { permission in
-                        Toggle(isOn: Binding(
-                            get: { permissions.contains(permission) },
-                            set: { if $0 { permissions.insert(permission) } else { permissions.remove(permission) } }
-                        )) { Text(permission.title) }
-                    }
-                }
-            }
-        }
+        HouseholdRoleForm(name: $name, permissions: $permissions, isSystemRole: role.isSystemRole)
         .disabled(!viewModel.canEdit(role) || viewModel.isSaving)
         .navigationTitle(role.name)
         .navigationBarTitleDisplayMode(.inline)

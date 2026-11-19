@@ -7,5 +7,6 @@ nonisolated struct HouseholdRolesResponse: Decodable, Sendable {
     struct Actions: Decodable, Sendable {
         let canView: Bool
         let canUpdate: Bool
+        var canCreate = false
     }
 }

@@ -3,6 +3,11 @@ import Foundation
 nonisolated struct HouseholdRoleRepository: HouseholdRoleRepositoryProtocol {
     let apiClient: APIClient
     
+    func create(householdId: UUID, request: SaveHouseholdRoleRequest, idempotencyKey: UUID) async throws -> HouseholdRolesResponse {
+        try await apiClient.request(endpoint: "api/v1/households/\(householdId)/roles", method: .post,
+                                    body: request, headers: ["Idempotency-Key": idempotencyKey.uuidString.lowercased()])
+    }
+
     func get(householdId: UUID) async throws -> HouseholdRolesResponse {
         try await apiClient.request(endpoint: "api/v1/households/\(householdId)/roles")
     }
