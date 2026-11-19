@@ -21,30 +21,48 @@ struct HouseholdDetailView: View {
             if let household = viewModel.household {
                 VStack(alignment: .leading, spacing: Theme.Spacing.lg) {
 
-                    Text("household.members")
-                        .font(.title2.bold())
+                    Section {
+                        Text("household.members")
+                            .font(.title2.bold())
 
-                    ForEach(household.members) { member in
-                        Button {
-                            router.navigate(to: .householdMemberDetails(member, isCurrentUser: member.userId == household.me.userId))
-                        } label: {
-                            HStack(spacing: Theme.Spacing.md) {
-                                AvatarView(firstName: member.firstName, lastName: member.lastName, size: 44)
-                                VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
-                                    HouseholdMemberNameView(member: member, isCurrentUser: member.userId == household.me.userId)
-                                    Text(member.householdRole.name)
-                                        .font(.subheadline)
+                        ForEach(household.members) { member in
+                            Button {
+                                router.navigate(to: .householdMemberDetails(member, isCurrentUser: member.userId == household.me.userId))
+                            } label: {
+                                HStack(spacing: Theme.Spacing.md) {
+                                    AvatarView(firstName: member.firstName, lastName: member.lastName, size: 44)
+                                    VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
+                                        HouseholdMemberNameView(member: member, isCurrentUser: member.userId == household.me.userId)
+                                        Text(member.householdRole.name)
+                                            .font(.subheadline)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
                                         .foregroundStyle(.secondary)
                                 }
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .foregroundStyle(.secondary)
+                                .padding()
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .background(.thinMaterial, in: RoundedRectangle(cornerRadius: Theme.CornerRadius.xl))
                             }
-                            .padding()
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(.thinMaterial, in: RoundedRectangle(cornerRadius: Theme.CornerRadius.xl))
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
+                    }
+                    
+                    Section {
+                        Text("Chores")
+                            .font(.title2.bold())
+                        if viewModel.isLoadingChores && viewModel.chores.isEmpty {
+                            ProgressView()
+                        } else if let error = viewModel.choresErrorMessage {
+                            Text(error).foregroundStyle(.secondary)
+                            Button("Retry") { Task { await viewModel.loadChores() } }
+                        } else if viewModel.chores.isEmpty {
+                            Text("No chores yet.").foregroundStyle(.secondary)
+                        }
+                        ForEach(viewModel.chores) { chore in
+                            ChoreListItemView(chore: chore)
+                        }
                     }
                 }
                 .padding()
@@ -94,7 +112,8 @@ struct HouseholdDetailView: View {
     NavigationStack {
         HouseholdDetailView(viewModel: HouseholdDetailViewModel(
             householdId: PreviewHouseholdRepository.mockedData[0].id,
-            householdRepository: PreviewHouseholdRepository()
+            householdRepository: PreviewHouseholdRepository(),
+            choreRepository: PreviewChoreRepository()
         ))
     }
     .environment(HouseholdRouter())
