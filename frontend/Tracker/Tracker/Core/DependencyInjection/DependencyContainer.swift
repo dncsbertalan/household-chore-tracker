@@ -11,6 +11,7 @@ import Foundation
 final class DependencyContainer {
 
     let householdRoleRepository: any HouseholdRoleRepositoryProtocol
+    let choreSuggestionRepository: any ChoreSuggestionRepositoryProtocol
     let choreRepository: any ChoreRepositoryProtocol
     let apiClient: APIClient
     let householdRepository: any HouseholdRepositoryProtocol
@@ -21,6 +22,7 @@ final class DependencyContainer {
 
     init(
         householdRoleRepository: (any HouseholdRoleRepositoryProtocol)? = nil,
+        choreSuggestionRepository: (any ChoreSuggestionRepositoryProtocol)? = nil,
         choreRepository: (any ChoreRepositoryProtocol)? = nil,
         tokenStore: (any TokenStoreProtocol)? = nil,
         apiClient: APIClient? = nil,
@@ -33,6 +35,7 @@ final class DependencyContainer {
         let resolvedAPIClient = apiClient
             ?? APIClient(tokenStore: resolvedTokenStore)
 
+        self.choreSuggestionRepository = choreSuggestionRepository ?? ChoreSuggestionRepository(apiClient: resolvedAPIClient)
         self.choreRepository = choreRepository ?? ChoreRepository(apiClient: resolvedAPIClient)
         self.householdRoleRepository = householdRoleRepository ?? HouseholdRoleRepository(apiClient: resolvedAPIClient)
         self.tokenStore = resolvedTokenStore
@@ -59,6 +62,7 @@ final class DependencyContainer {
     static func mock() -> DependencyContainer {
         DependencyContainer(
             householdRoleRepository: PreviewHouseholdRoleRepository(),
+            choreSuggestionRepository: PreviewChoreSuggestionRepository(),
             choreRepository: PreviewChoreRepository(),
             currentUserRepository: PreviewCurrentUserRepository(),
             householdRepository: PreviewHouseholdRepository(),
