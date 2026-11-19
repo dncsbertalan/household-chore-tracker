@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ChoreDetailView: View {
+    @State private var showsAssignments = false
     @State private var viewModel: ChoreDetailViewModel
     @Environment(AppState.self) private var appState
 
@@ -14,6 +15,7 @@ struct ChoreDetailView: View {
                         Text(description)
                     }
                 }
+                
                 if chore.isOnDemand {
                     Section {
                         Label("On demand", systemImage: "hand.tap")
@@ -26,7 +28,7 @@ struct ChoreDetailView: View {
                                     if viewModel.isStarting { ProgressView() }
                                 }
                             }
-                            .disabled(viewModel.isStarting || viewModel.isLoading)
+                            .disabled(viewModel.isBusy)
                         }
                     } footer: {
                         Text("This is a reusable chore. Start an occurrence when it needs to be done.")
@@ -41,7 +43,28 @@ struct ChoreDetailView: View {
                     }
                 }
                 
+                Section("Actions") {
+                    if chore.actions?.canComplete == true, let occurrence = chore.occurrence {
+                        Button("Complete chore") { Task { await viewModel.perform(.complete(occurrence.id)) } }
+                    }
+                    
+                    if let completion = chore.pendingCompletion {
+                        if chore.actions?.canApprove == true {
+                            Button("Approve completion") { Task { await viewModel.perform(.approve(completion.id)) } }
+                        }
+                        if chore.actions?.canReject == true {
+                            Button("Reject completion", role: .destructive) { Task { await viewModel.perform(.reject(completion.id)) } }
+                        }
+                    }
+                    if viewModel.isActing { ProgressView() }
+                }
+                .disabled(viewModel.isBusy)
+                
                 Section("Assigned members") {
+                    if viewModel.canAssignMembers {
+                        Button("Change assigned members") { showsAssignments = true }
+                            .disabled(viewModel.isBusy)
+                    }
                     if chore.assignedMembers.isEmpty { Text("Unassigned").foregroundStyle(.secondary) }
                     ForEach(chore.assignedMembers) { member in
                         HStack {
@@ -50,6 +73,7 @@ struct ChoreDetailView: View {
                         }
                     }
                 }
+                
                 if let history = chore.occurrences, history.count > 1 {
                     Section("Previous occurrences") {
                         ForEach(history.filter { $0.id != chore.occurrence?.id }) { occurrence in
@@ -70,14 +94,16 @@ struct ChoreDetailView: View {
         .task { await viewModel.load() }
         .refreshable { await viewModel.load() }
         .alert("Unable to update chore", isPresented: Binding(
-            get: { viewModel.errorMessage != nil }, set: { if !$0 { viewModel.errorMessage = nil } }
+            get: { viewModel.errorMessage != nil && !showsAssignments }, set: { if !$0 { viewModel.errorMessage = nil } }
         )) {
             Button("common.ok", role: .cancel) { viewModel.errorMessage = nil }
         } message: { Text(viewModel.errorMessage ?? "") }
     }
     
     @ViewBuilder private func occurrenceDetails(_ occurrence: ChoreResponse.Occurrence) -> some View {
-        LabeledContent("Status", value: occurrence.occurrenceStatus.label)
+        LabeledContent("Status") {
+            ChoreStatusCapsule(status: occurrence.occurrenceStatus)
+        }
         if let scheduled = occurrence.scheduledAt {
             LabeledContent("Scheduled", value: scheduled.formatted(date: .abbreviated, time: .shortened))
         }
@@ -89,7 +115,7 @@ struct ChoreDetailView: View {
 
 #Preview {
     NavigationStack {
-        ChoreDetailView(viewModel: ChoreDetailViewModel(choreId: UUID(), repository: PreviewChoreRepository()))
+        ChoreDetailView(viewModel: ChoreDetailViewModel(choreId: UUID(), repository: PreviewChoreRepository(), householdRepository: PreviewHouseholdRepository()))
     }
     .environment(AppState())
 }
