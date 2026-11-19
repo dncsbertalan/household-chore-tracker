@@ -18,10 +18,14 @@ enum HouseholdRoute: Hashable {
 
 enum HouseholdSheet: Identifiable, Equatable {
     case createHousehold
+    case createChore(household: HouseholdResponse)
+    case assistedChore(household: HouseholdResponse)
     case createHouseholdInvitation(household: HouseholdResponse)
 
     var id: String {
         switch self {
+        case .createChore(let household): return "createChore-\(household.id)"
+        case .assistedChore(let household): return "assistedChore-\(household.id)"
         case .createHousehold:
             return "createHousehold"
 

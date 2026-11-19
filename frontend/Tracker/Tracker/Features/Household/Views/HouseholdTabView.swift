@@ -49,6 +49,11 @@ struct HouseholdTabView: View {
     private func sheetDestination(for sheet: HouseholdSheet) -> some View {
         NavigationStack {
             switch sheet {
+            case .createChore(let household):
+                CreateChoreView(viewModel: CreateChoreViewModel(household: household, repository: container.choreRepository), showsCancel: true)
+            case .assistedChore(let household):
+                ChoreAssistanceView(viewModel: ChoreAssistanceViewModel(household: household, repository: container.choreSuggestionRepository),
+                                    choreRepository: container.choreRepository)
             case .createHousehold:
                 CreateHouseholdView(viewModel: CreateHouseholdViewModel(householdRepository: container.householdRepository))
             case .createHouseholdInvitation(let household):
