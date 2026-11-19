@@ -10,83 +10,88 @@ struct HouseholdMemberRolePickerView: View {
     }
     
     var body: some View {
-        NavigationStack {
-            List {
-                Section {
-                    if !viewModel.canAssignRole {
-                        Text("You don’t have permission to change member roles.")
-                    } else {
-                        ForEach(viewModel.roles) { role in
-                            Button {
-                                selectedRoleId = role.id
-                            } label: {
-                                HStack {
-                                    Text(role.name)
-                                    Spacer()
-                                    if role.id == selectedRoleId {
-                                        Image(systemName: "checkmark")
-                                            .foregroundStyle(.tint)
-                                    }
+        List {
+            Section {
+                if !viewModel.canAssignRole {
+                    Text("You don’t have permission to change member roles.")
+                } else {
+                    ForEach(viewModel.roles) { role in
+                        Button {
+                            selectedRoleId = role.id
+                        } label: {
+                            HStack {
+                                Text(role.name)
+                                Spacer()
+                                if role.id == selectedRoleId {
+                                    Image(systemName: "checkmark")
+                                        .foregroundStyle(.tint)
                                 }
                             }
-                            .foregroundStyle(.primary)
-                            .disabled(viewModel.isSaving || viewModel.isLoading)
                         }
-                    }
-                }
-                footer: {
-                    Text("household.changeRole.footer")
-                }
-            }
-            .navigationTitle("household.changeRole")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button {
-                        dismiss()
-                    }
-                    label: {
-                        Label("common.cancel", systemImage: "xmark")
-                    }
-                    .disabled(viewModel.isSaving)
-                }
-                
-                ToolbarItem(placement: .confirmationAction) {
-                    if viewModel.isSaving {
-                        ProgressView()
-                    } else {
-                        Button {
-                            guard let role = selectedRole else { return }
-                            Task {
-                                if await viewModel.assign(role) { dismiss() }
-                            }
-                        } label: {
-                            Label("Save role", systemImage: "checkmark")
-                        }
-                        .disabled(!viewModel.canAssignRole || viewModel.isLoading || selectedRole == nil
-                                  || selectedRoleId == viewModel.member.householdRole.id)
+                        .foregroundStyle(.primary)
+                        .disabled(viewModel.isSaving || viewModel.isLoading)
                     }
                 }
             }
-            .refreshable { await viewModel.load() }
-            .alert("Unable to update role", isPresented: Binding(
-                get: { viewModel.errorMessage != nil },
-                set: { if !$0 { viewModel.errorMessage = nil } }
-            )) {
-                Button("common.ok", role: .cancel) { viewModel.errorMessage = nil }
-            } message: { Text(viewModel.errorMessage ?? "") }
+            footer: {
+                Text("household.changeRole.footer")
+            }
         }
-        .navigationBarBackButtonHidden()
-        .disabled(viewModel.isSaving)
-        .interactiveDismissDisabled(viewModel.isSaving)
+        .navigationTitle("household.changeRole")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button {
+                    dismiss()
+                }
+                label: {
+                    Label("common.cancel", systemImage: "xmark")
+                }
+                .disabled(viewModel.isSaving)
+            }
+            
+            ToolbarItem(placement: .confirmationAction) {
+                if viewModel.isSaving {
+                    ProgressView()
+                } else {
+                    Button {
+                        guard let role = selectedRole else { return }
+                        Task {
+                            if await viewModel.assign(role) { dismiss() }
+                        }
+                    } label: {
+                        Label("Save role", systemImage: "checkmark")
+                    }
+                    .disabled(!viewModel.canAssignRole || viewModel.isLoading || selectedRole == nil
+                              || selectedRoleId == viewModel.member.householdRole.id)
+                }
+            }
+        }
+        .refreshable { await viewModel.load() }
+        .alert("Unable to update role", isPresented: Binding(
+            get: { viewModel.errorMessage != nil },
+            set: { if !$0 { viewModel.errorMessage = nil } }
+        )) {
+            Button("common.ok", role: .cancel) { viewModel.errorMessage = nil }
+        } message: { Text(viewModel.errorMessage ?? "") }
+            .task {
+                selectedRoleId = viewModel.member.householdRole.id
+                await viewModel.load()
+                selectedRoleId = viewModel.member.householdRole.id
+            }
+            .navigationBarBackButtonHidden()
+            .disabled(viewModel.isSaving)
+            .interactiveDismissDisabled(viewModel.isSaving)
     }
 }
 
 #Preview {
-    HouseholdMemberRolePickerView(viewModel: HouseholdMemberDetailViewModel(
-        member: PreviewHouseholdRepository.mockedData[0].members[0],
-        repository: RolePickerPreviewRepository()
-    ))
+    NavigationStack {
+        HouseholdMemberRolePickerView(viewModel: HouseholdMemberDetailViewModel(
+            member: PreviewHouseholdRepository.mockedData[0].members[0],
+            repository: RolePickerPreviewRepository()
+        ))
+    }
 }
 
 private actor RolePickerPreviewRepository: HouseholdRepositoryProtocol {

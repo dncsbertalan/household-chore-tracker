@@ -37,7 +37,7 @@ struct HouseholdMemberDetailView: View {
             Section {
                 if viewModel.canAssignRole {
                     NavigationLink {
-                        HouseholdMemberRolePickerView(viewModel: HouseholdMemberDetailViewModel(member: member, repository: container.householdRepository))
+                        HouseholdMemberRolePickerView(viewModel: viewModel)
                     }
                     label: {
                         LabeledContent("Role", value: member.householdRole.name)
