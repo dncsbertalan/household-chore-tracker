@@ -7,7 +7,7 @@
 
 import Foundation
 
-nonisolated struct HouseholdResponse: Decodable, Identifiable, Sendable, Equatable {
+nonisolated struct HouseholdResponse: Decodable, Identifiable, Sendable, Hashable {
     let householdId: UUID
     let name: String
     let description: String?
