@@ -14,6 +14,7 @@ final class APIClient: Sendable {
     private let encoder: JSONEncoder
     private let baseURL: URL
     private let tokenStore: any TokenStoreProtocol
+    private let tokenRefresher: TokenRefresher
 
     init(
         baseURL: URL = URL(string: "http://localhost:8080")!,
@@ -23,6 +24,7 @@ final class APIClient: Sendable {
         self.baseURL = baseURL
         self.session = session
         self.tokenStore = tokenStore
+        self.tokenRefresher = TokenRefresher(baseURL: baseURL, session: session, tokenStore: tokenStore)
 
         self.decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .iso8601
@@ -83,8 +85,13 @@ final class APIClient: Sendable {
         urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
 
         // Inject auth token if available
-        if let tokens = try await tokenStore.load() {
-            urlRequest.setValue("Bearer \(tokens.accessToken)", forHTTPHeaderField: "Authorization")
+        let isAuthRequest = url.path.contains("/auth/")
+        var accessToken: String?
+        if !isAuthRequest {
+            accessToken = try await tokenRefresher.accessToken()
+            if let accessToken {
+                urlRequest.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+            }
         }
 
         // Merge custom headers
@@ -96,7 +103,16 @@ final class APIClient: Sendable {
         }
 
         // Execute request
-        let (data, response) = try await session.data(for: urlRequest)
+        var (data, response) = try await session.data(for: urlRequest)
+        if (response as? HTTPURLResponse)?.statusCode == 401, !isAuthRequest,
+           let accessToken, urlRequest.value(forHTTPHeaderField: "Authorization") == "Bearer \(accessToken)" {
+            let refreshed = try await tokenRefresher.accessToken(rejected: accessToken)
+            try Task.checkCancellation()
+            guard let refreshed else { throw APIError.unauthorized }
+            // Retry the exact request once, retaining its body and idempotency key.
+            urlRequest.setValue("Bearer \(refreshed)", forHTTPHeaderField: "Authorization")
+            (data, response) = try await session.data(for: urlRequest)
+        }
 
         // Validate HTTP response
         guard let httpResponse = response as? HTTPURLResponse else {
