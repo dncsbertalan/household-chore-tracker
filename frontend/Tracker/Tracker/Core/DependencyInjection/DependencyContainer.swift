@@ -10,6 +10,7 @@ import Foundation
 @MainActor
 final class DependencyContainer {
 
+    let householdRoleRepository: any HouseholdRoleRepositoryProtocol
     let choreRepository: any ChoreRepositoryProtocol
     let apiClient: APIClient
     let householdRepository: any HouseholdRepositoryProtocol
@@ -19,6 +20,7 @@ final class DependencyContainer {
     let authService: any AuthenticationServiceProtocol
 
     init(
+        householdRoleRepository: (any HouseholdRoleRepositoryProtocol)? = nil,
         choreRepository: (any ChoreRepositoryProtocol)? = nil,
         tokenStore: (any TokenStoreProtocol)? = nil,
         apiClient: APIClient? = nil,
@@ -32,6 +34,7 @@ final class DependencyContainer {
             ?? APIClient(tokenStore: resolvedTokenStore)
 
         self.choreRepository = choreRepository ?? ChoreRepository(apiClient: resolvedAPIClient)
+        self.householdRoleRepository = householdRoleRepository ?? HouseholdRoleRepository(apiClient: resolvedAPIClient)
         self.tokenStore = resolvedTokenStore
         self.apiClient = resolvedAPIClient
 
@@ -55,6 +58,7 @@ final class DependencyContainer {
 
     static func mock() -> DependencyContainer {
         DependencyContainer(
+            householdRoleRepository: PreviewHouseholdRoleRepository(),
             choreRepository: PreviewChoreRepository(),
             currentUserRepository: PreviewCurrentUserRepository(),
             householdRepository: PreviewHouseholdRepository(),
