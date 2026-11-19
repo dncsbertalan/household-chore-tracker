@@ -2,60 +2,20 @@
 //  RootView.swift
 //  Tracker
 //
-//  Created by Dancs Bertalan on 2026. 11. 07..
+//  Created by Dancs Bertalan on 2026. 11. 19..
 //
 
 import SwiftUI
 import SwiftData
 
-struct RootView: View {
-    @Environment(AppState.self) private var appState
-    @Environment(\.container) private var container
-    @Environment(\.locale) private var locale
-
-
+struct Test: View {
     var body: some View {
-        @Bindable var appState = appState
-        
-        if !appState.isAuthenticated {
-            WelcomeMainView()
-        } else {
-            TabView(selection: $appState.selectedTab) {
-                HouseholdTabView()
-                    .tabItem { Label("tab.name.household", systemImage: "house") }
-                    .tag(AppState.Tab.household)
-                
-                Text("faza")
-                    .tabItem { Label("tab.name.chores", systemImage: "checklist") }
-                    .tag(AppState.Tab.chores)
-                
-                ProfileTabView()
-                    .tabItem { Label("tab.name.profile", systemImage: "person") }
-                    .tag(AppState.Tab.profile)
-            }
-            // Recreate screen models so stored validation messages also use the new language.
-            .id(locale)
-            .task(id: appState.sessionRevision) {
-                await appState.loadCurrentUser(from: container.currentUserRepository)
-            }
+        List {
+            Text("0")
+            Text("1")
         }
     }
 }
-
-private let previewAppState: AppState = {
-    let appState = AppState()
-    appState.isAuthenticated = true
-    return appState
-}()
-
-#Preview("logged in") {
-    RootView()
-        .environment(previewAppState)
-        .environment(\.container, DependencyContainer.mock())
-}
-
 #Preview {
-    RootView()
-        .environment(AppState())
-        .environment(\.container, DependencyContainer.mock())
+    Test()
 }
