@@ -11,6 +11,8 @@ final class HouseholdMemberDetailViewModel {
     var errorMessage: String?
 
     @ObservationIgnored private let repository: any HouseholdRepositoryProtocol
+    @ObservationIgnored private var nicknameRequest: UpdateMemberNicknameRequest?
+    @ObservationIgnored private var nicknameKey = UUID()
     @ObservationIgnored private var lastRequest: AssignHouseholdRoleRequest?
     @ObservationIgnored private var idempotencyKey = UUID()
 
@@ -67,6 +69,27 @@ final class HouseholdMemberDetailViewModel {
             errorMessage = error.localizedDescription
             return false
         }
+    }
+
+    func canSaveNickname(_ value: String) -> Bool {
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return !isLoading && !isSaving && trimmed.utf16.count <= 100 && trimmed != (member.nickname ?? "")
+    }
+
+    func saveNickname(_ value: String) async -> Bool {
+        guard canSaveNickname(value) else { return false }
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        let request = UpdateMemberNicknameRequest(nickname: trimmed.isEmpty ? nil : trimmed, version: member.version)
+        if nicknameRequest != request { nicknameRequest = request; nicknameKey = UUID() }
+        isSaving = true
+        errorMessage = nil
+        defer { isSaving = false }
+        do {
+            member = try await repository.updateNickname(householdId: member.householdId, memberId: member.id,
+                                                          request: request, idempotencyKey: nicknameKey)
+            return true
+        } catch is CancellationError { return false }
+        catch { errorMessage = error.localizedDescription; return false }
     }
 
     private func update(_ response: HouseholdResponse) {

@@ -27,6 +27,11 @@ nonisolated struct HouseholdRepository: HouseholdRepositoryProtocol {
         return response.household
     }
 
+    func updateNickname(householdId: UUID, memberId: UUID, request: UpdateMemberNicknameRequest, idempotencyKey: UUID) async throws -> HouseholdMemberResponse {
+        try await apiClient.request(endpoint: "api/v1/households/\(householdId)/members/\(memberId)/nickname",
+            method: .put, body: request, headers: ["Idempotency-Key": idempotencyKey.uuidString.lowercased()])
+    }
+
     func create(_ request: CreateHouseholdRequest, idempotencyKey: UUID) async throws {
         try await apiClient.request(
             endpoint: "api/v1/households", method: .post, body: request,

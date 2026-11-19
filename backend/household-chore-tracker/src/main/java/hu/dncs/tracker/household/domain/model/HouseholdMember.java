@@ -79,6 +79,12 @@ public class HouseholdMember {
         updatedAt = now;
     }
 
+    public void updateNickname(String value) {
+        var normalized = Household.trimmedText(value);
+        if (normalized.length() > 100) throw new IllegalArgumentException("Nickname must be at most 100 characters.");
+        nickname = normalized.isEmpty() ? null : normalized;
+    }
+
     public void assignRole(HouseholdRole role) {
         if (!household.getHouseholdId().equals(role.getHouseholdId())) {
             throw new IllegalArgumentException("Member role must belong to the same household.");

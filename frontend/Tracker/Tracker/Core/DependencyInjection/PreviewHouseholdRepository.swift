@@ -33,6 +33,13 @@ nonisolated struct PreviewHouseholdRepository: HouseholdRepositoryProtocol {
         try await get(householdId: householdId)
     }
 
+    func updateNickname(householdId: UUID, memberId: UUID, request: UpdateMemberNicknameRequest, idempotencyKey: UUID) async throws -> HouseholdMemberResponse {
+        let member = Self.mockedData.flatMap(\.members).first { $0.id == memberId } ?? Self.mockedData[0].members[0]
+        return HouseholdMemberResponse(householdMemberId: member.id, householdId: member.householdId, userId: member.userId,
+            email: member.email, firstName: member.firstName, lastName: member.lastName, nickname: request.nickname,
+            householdRole: member.householdRole, joinedAt: member.joinedAt, createdAt: member.createdAt, updatedAt: .now, version: member.version + 1)
+    }
+
     func create(_ request: CreateHouseholdRequest, idempotencyKey: UUID) async throws {}
 
     func get(householdId: UUID) async throws -> HouseholdResponse {

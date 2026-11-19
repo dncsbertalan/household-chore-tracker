@@ -82,6 +82,10 @@ class HouseholdResponseMapper {
                 removal.management() == null ? null : from(removal.management(), callerId));
     }
 
+    HouseholdMemberResponse from(HouseholdMember member) {
+        return HouseholdMemberResponse.from(member, userInfo(List.of(member)).get(member.getUserId()));
+    }
+
     private Map<UUID, UserInfo> userInfo(List<HouseholdMember> members) {
         return users.findUserInfoByIds(members.stream().map(HouseholdMember::getUserId).distinct().toList());
     }

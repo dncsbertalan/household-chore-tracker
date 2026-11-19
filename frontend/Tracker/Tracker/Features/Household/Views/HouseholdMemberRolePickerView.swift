@@ -125,6 +125,10 @@ private actor RolePickerPreviewRepository: HouseholdRepositoryProtocol {
         return try await get(householdId: householdId)
     }
     
+    func updateNickname(householdId: UUID, memberId: UUID, request: UpdateMemberNicknameRequest, idempotencyKey: UUID) async throws -> HouseholdMemberResponse {
+        try await PreviewHouseholdRepository().updateNickname(householdId: householdId, memberId: memberId, request: request, idempotencyKey: idempotencyKey)
+    }
+
     func create(_ request: CreateHouseholdRequest, idempotencyKey: UUID) async throws {}
     
     func getSummaries() async throws -> [HouseholdSummaryResponse] { [sample] }

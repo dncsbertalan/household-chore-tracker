@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HouseholdMemberDetailView: View {
     @Environment(\.container) private var container
+    @State private var showsNicknameEditor = false
     @State private var viewModel: HouseholdMemberDetailViewModel
     private var member: HouseholdMemberResponse { viewModel.member }
     let isCurrentUser: Bool
@@ -52,9 +53,20 @@ struct HouseholdMemberDetailView: View {
                 LabeledContent("Joined", value: member.joinedAt.formatted(date: .abbreviated, time: .omitted))
             }
         }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { showsNicknameEditor = true } label: {
+                    Label("Edit nickname", systemImage: "pencil")
+                }
+                .disabled(viewModel.isLoading || viewModel.isSaving)
+            }
+        }
+        .sheet(isPresented: $showsNicknameEditor) {
+            HouseholdMemberNicknameView(viewModel: viewModel)
+        }
         .task { await viewModel.load() }
         .alert("Unable to load member", isPresented: Binding(
-            get: { viewModel.errorMessage != nil },
+            get: { viewModel.errorMessage != nil && !showsNicknameEditor },
             set: { if !$0 { viewModel.errorMessage = nil } }
         )) {
             Button("Retry") { Task { await viewModel.load() } }

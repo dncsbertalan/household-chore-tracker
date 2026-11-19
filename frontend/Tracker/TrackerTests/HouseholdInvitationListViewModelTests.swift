@@ -119,6 +119,10 @@ private actor CountingHouseholdRepository: HouseholdRepositoryProtocol {
     func get(householdId: UUID) async throws -> HouseholdResponse {
         try await PreviewHouseholdRepository().get(householdId: householdId)
     }
+    func updateNickname(householdId: UUID, memberId: UUID, request: UpdateMemberNicknameRequest, idempotencyKey: UUID) async throws -> HouseholdMemberResponse {
+        try await PreviewHouseholdRepository().updateNickname(householdId: householdId, memberId: memberId, request: request, idempotencyKey: idempotencyKey)
+    }
+
     func create(_ request: CreateHouseholdRequest, idempotencyKey: UUID) async throws {}
     var calls = 0
     private var summaries: [HouseholdSummaryResponse] = []

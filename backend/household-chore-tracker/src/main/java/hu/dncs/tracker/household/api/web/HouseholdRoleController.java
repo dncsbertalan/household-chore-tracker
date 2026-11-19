@@ -19,6 +19,16 @@ import java.util.UUID;
 class HouseholdRoleController {
     private final HouseholdResponseMapper responses;
     private final HouseholdRoleManagementService service;
+    private final hu.dncs.tracker.household.application.usecase.UpdateMemberNicknameUseCase updateNickname;
+
+    @PutMapping("/members/{memberId}/nickname")
+    @Idempotent("household.member.nickname.update")
+    hu.dncs.tracker.household.api.web.response.HouseholdMemberResponse updateNickname(
+            @PathVariable UUID householdId, @PathVariable UUID memberId,
+            @Valid @RequestBody UpdateMemberNicknameRequest request, Authentication auth) {
+        return responses.from(updateNickname.execute(householdId, memberId, request.toCommand(), user(auth)));
+    }
+
     @GetMapping("/roles")
     HouseholdRolesResponse get(@PathVariable UUID householdId, Authentication auth) {
         return responses.from(service.get(householdId, user(auth)), user(auth));
