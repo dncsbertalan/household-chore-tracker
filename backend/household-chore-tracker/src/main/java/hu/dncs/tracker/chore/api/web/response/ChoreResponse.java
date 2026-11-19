@@ -1,6 +1,7 @@
 package hu.dncs.tracker.chore.api.web.response;
 
 import hu.dncs.tracker.chore.application.model.ChoreActions;
+import hu.dncs.tracker.household.api.web.response.HouseholdMemberResponse;
 
 import hu.dncs.tracker.chore.application.model.ChoreDetails;
 
@@ -14,7 +15,8 @@ public record ChoreResponse(
         Instant createdAt, Long version, List<UUID> assignedMemberIds, int requiredApprovalCount,
         Schedule schedule, Occurrence occurrence,
         UUID createdByHouseholdMemberId, UUID updatedByHouseholdMemberId, Instant updatedAt,
-        List<Occurrence> occurrences, List<Completion> completions, ChoreActions actions
+        List<Occurrence> occurrences, List<Completion> completions, ChoreActions actions,
+        List<HouseholdMemberResponse> assignedMembers
 ) {
     public static ChoreResponse from(CreatedChore created) {
         var chore = created.chore();
@@ -22,7 +24,7 @@ public record ChoreResponse(
                 chore.getCreatedByUserId(), chore.getCreatedAt(), chore.getVersion(), sorted(chore.getAssignedMemberIds()),
                 chore.getRequiredApprovalCount(), created.schedule() == null ? null : Schedule.from(created.schedule()),
                 created.occurrence() == null ? null : Occurrence.from(created.occurrence()),
-                chore.getCreatedByHouseholdMemberId(), chore.getUpdatedByHouseholdMemberId(), chore.getUpdatedAt(), null, null, null);
+                chore.getCreatedByHouseholdMemberId(), chore.getUpdatedByHouseholdMemberId(), chore.getUpdatedAt(), null, null, null, List.of());
     }
 
     public static ChoreResponse from(ChoreDetails details) {
@@ -31,7 +33,13 @@ public record ChoreResponse(
                 response.createdByUserId(), response.createdAt(), response.version(), response.assignedMemberIds(),
                 response.requiredApprovalCount(), response.schedule(), response.occurrence(), response.createdByHouseholdMemberId(),
                 response.updatedByHouseholdMemberId(), response.updatedAt(), details.occurrences().stream().map(Occurrence::from).toList(),
-                details.completions().stream().map(c -> Completion.from(c, details.approvals())).toList(), details.actions());
+                details.completions().stream().map(c -> Completion.from(c, details.approvals())).toList(), details.actions(), response.assignedMembers());
+    }
+
+    public ChoreResponse withAssignedMembers(List<HouseholdMemberResponse> members) {
+        return new ChoreResponse(choreId, householdId, title, description, createdByUserId, createdAt, version,
+                assignedMemberIds, requiredApprovalCount, schedule, occurrence, createdByHouseholdMemberId,
+                updatedByHouseholdMemberId, updatedAt, occurrences, completions, actions, members);
     }
 
     public record Completion(UUID choreCompletionId, UUID choreOccurrenceId, UUID completedByHouseholdMemberId,

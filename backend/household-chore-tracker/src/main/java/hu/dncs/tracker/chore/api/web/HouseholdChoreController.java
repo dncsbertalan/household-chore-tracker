@@ -17,9 +17,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 class HouseholdChoreController {
     private final GetChoresUseCase getChores;
+    private final ChoreResponseMapper responses;
 
     @GetMapping
     List<ChoreResponse> all(@PathVariable UUID householdId, Authentication authentication) {
-        return getChores.execute(UUID.fromString(authentication.getName()), householdId).stream().map(ChoreResponse::from).toList();
+        return responses.from(getChores.execute(UUID.fromString(authentication.getName()), householdId));
     }
 }

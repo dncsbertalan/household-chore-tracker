@@ -5,7 +5,24 @@ struct ChoreListItemView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
-            Text(chore.title).font(.headline)
+            HStack {
+                Text(chore.title).font(.headline)
+                Spacer()
+                Image(systemName: "chevron.right").foregroundStyle(.secondary)
+            }
+            if chore.isOnDemand {
+                Label("On demand", systemImage: "hand.tap")
+                    .font(.caption.weight(.semibold)).foregroundStyle(.tint)
+            }
+            if let occurrence = chore.occurrence {
+                Text(occurrence.occurrenceStatus.label).font(.subheadline).foregroundStyle(.secondary)
+                if let due = occurrence.dueAt {
+                    Text("Due \(due.formatted(date: .abbreviated, time: .shortened))")
+                        .font(.caption).foregroundStyle(.secondary)
+                }
+            } else if chore.isOnDemand {
+                Text("Ready to start").font(.subheadline).foregroundStyle(.secondary)
+            }
             if let description = chore.description, !description.isEmpty {
                 Text(description).font(.subheadline).foregroundStyle(.secondary)
             }

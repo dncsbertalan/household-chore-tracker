@@ -9,6 +9,7 @@ import Foundation
 
 enum HouseholdRoute: Hashable {
     case createChore(household: HouseholdResponse)
+    case choreDetail(_ choreId: UUID)
     case invitations
     case householdDetail(_ householdId: UUID)
     case householdMemberDetails(_ member: HouseholdMemberResponse, isCurrentUser: Bool)

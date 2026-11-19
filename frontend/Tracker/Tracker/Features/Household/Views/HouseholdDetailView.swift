@@ -61,7 +61,10 @@ struct HouseholdDetailView: View {
                             Text("No chores yet.").foregroundStyle(.secondary)
                         }
                         ForEach(viewModel.chores) { chore in
+                            Button { router.navigate(to: .choreDetail(chore.id)) } label: {
                             ChoreListItemView(chore: chore)
+                        }
+                        .buttonStyle(.plain)
                         }
                     }
                 }

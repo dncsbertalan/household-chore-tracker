@@ -42,6 +42,7 @@ class ChoreController {
     private final CreateChoreUseCase createChoreUseCase;
 
     private final GetChoresUseCase getChores;
+    private final ChoreResponseMapper responses;
     private final UpdateChoreUseCase updateChore;
 
     private final ChoreCompletionUseCase completion;
@@ -49,21 +50,21 @@ class ChoreController {
     @PostMapping("/{id}/occurrences")
     @Idempotent("chore.occurrence.start")
     ChoreResponse start(@PathVariable UUID id, @Valid @RequestBody ChoreActionRequest request, Authentication auth) {
-        return ChoreResponse.from(completion.start(id, action(request), UUID.fromString(auth.getName())));
+        return responses.from(completion.start(id, action(request), UUID.fromString(auth.getName())));
     }
 
     @PostMapping("/{id}/occurrences/{occurrenceId}/complete")
     @Idempotent("chore.complete")
     ChoreResponse complete(@PathVariable UUID id, @PathVariable UUID occurrenceId,
             @Valid @RequestBody ChoreActionRequest request, Authentication auth) {
-        return ChoreResponse.from(completion.complete(id, occurrenceId, action(request), UUID.fromString(auth.getName())));
+        return responses.from(completion.complete(id, occurrenceId, action(request), UUID.fromString(auth.getName())));
     }
 
     @PostMapping("/{id}/completions/{completionId}/approve")
     @Idempotent("chore.completion.approve")
     ChoreResponse approve(@PathVariable UUID id, @PathVariable UUID completionId,
             @Valid @RequestBody ChoreActionRequest request, Authentication auth) {
-        return ChoreResponse.from(completion.review(id, completionId, ChoreApprovalDecision.APPROVED,
+        return responses.from(completion.review(id, completionId, ChoreApprovalDecision.APPROVED,
                 action(request), UUID.fromString(auth.getName())));
     }
 
@@ -71,7 +72,7 @@ class ChoreController {
     @Idempotent("chore.completion.reject")
     ChoreResponse reject(@PathVariable UUID id, @PathVariable UUID completionId,
             @Valid @RequestBody ChoreActionRequest request, Authentication auth) {
-        return ChoreResponse.from(completion.review(id, completionId, ChoreApprovalDecision.REJECTED,
+        return responses.from(completion.review(id, completionId, ChoreApprovalDecision.REJECTED,
                 action(request), UUID.fromString(auth.getName())));
     }
 
@@ -84,7 +85,7 @@ class ChoreController {
     ChoreResponse update(@PathVariable UUID id,
                          @Valid @RequestBody UpdateChoreRequest request,
                          Authentication authentication) {
-        return ChoreResponse.from(updateChore.execute(id, request.toCommand(), UUID.fromString(authentication.getName())));
+        return responses.from(updateChore.execute(id, request.toCommand(), UUID.fromString(authentication.getName())));
     }
 
     private final GetChoreUseCase getChore;
@@ -100,13 +101,13 @@ class ChoreController {
 
     @GetMapping("/{id}")
     ChoreResponse one(@PathVariable UUID id, Authentication authentication) {
-        return ChoreResponse.from(getChore.execute(id, UUID.fromString(authentication.getName())));
+        return responses.from(getChore.execute(id, UUID.fromString(authentication.getName())));
     }
 
 
     @GetMapping
     List<ChoreResponse> all(Authentication authentication) {
-        return getChores.execute(UUID.fromString(authentication.getName()), null).stream().map(ChoreResponse::from).toList();
+        return responses.from(getChores.execute(UUID.fromString(authentication.getName()), null));
     }
 
     @PostMapping
@@ -114,6 +115,6 @@ class ChoreController {
     ResponseEntity<ChoreResponse> create(@Valid @RequestBody CreateChoreRequest request, Authentication authentication) {
         var created = createChoreUseCase.execute(request.toCommand(), UUID.fromString(authentication.getName()));
         return ResponseEntity.created(URI.create("/api/v1/chores/" + created.chore().getChoreId()))
-                .body(ChoreResponse.from(created));
+                .body(responses.from(created));
     }
 }
