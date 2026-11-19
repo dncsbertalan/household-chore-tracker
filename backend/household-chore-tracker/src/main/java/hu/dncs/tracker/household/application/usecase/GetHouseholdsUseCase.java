@@ -30,6 +30,7 @@ public class GetHouseholdsUseCase {
         var id = household.getHouseholdId();
         var grants = caller.getHouseholdRole().getPermissions().stream().map(Permission::getName).toList();
         boolean viewMembers = grants.contains(HouseholdPermission.HOUSEHOLD_MEMBER_VIEW)
+                || grants.contains(HouseholdPermission.CHORE_ASSIGN_MEMBER)
                 || grants.contains(HouseholdPermission.HOUSEHOLD_MEMBER_ASSIGN_ROLE)
                 || grants.contains(HouseholdPermission.HOUSEHOLD_MEMBER_REMOVE);
         boolean viewRoles = viewMembers || grants.contains(HouseholdPermission.HOUSEHOLD_ROLE_VIEW)

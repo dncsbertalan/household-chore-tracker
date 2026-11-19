@@ -19,6 +19,16 @@ nonisolated struct ChoreRepository: ChoreRepositoryProtocol {
                                     headers: ["Idempotency-Key": idempotencyKey.uuidString.lowercased()])
     }
 
+    func perform(choreId: UUID, action: ChoreAction, request: ChoreActionRequest, idempotencyKey: UUID) async throws -> ChoreResponse {
+        try await apiClient.request(endpoint: "api/v1/chores/\(choreId)/\(action.path)", method: .post,
+                                    body: request, headers: ["Idempotency-Key": idempotencyKey.uuidString.lowercased()])
+    }
+
+    func update(choreId: UUID, request: UpdateChoreRequest, idempotencyKey: UUID) async throws -> ChoreResponse {
+        try await apiClient.request(endpoint: "api/v1/chores/\(choreId)", method: .put,
+                                    body: request, headers: ["Idempotency-Key": idempotencyKey.uuidString.lowercased()])
+    }
+
     func create(_ request: CreateChoreRequest, idempotencyKey: UUID) async throws {
         try await apiClient.request(endpoint: "api/v1/chores", method: .post, body: request,
                                     headers: ["Idempotency-Key": idempotencyKey.uuidString.lowercased()])

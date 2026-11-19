@@ -22,5 +22,20 @@ nonisolated struct PreviewChoreRepository: ChoreRepositoryProtocol {
         return chore
     }
 
+    func perform(choreId: UUID, action: ChoreAction, request: ChoreActionRequest, idempotencyKey: UUID) async throws -> ChoreResponse {
+        var chore = try await get(choreId: choreId)
+        let status: ChoreResponse.Status
+        switch action { case .reject: status = .pending; default: status = .completed }
+        chore.occurrence = .init(choreOccurrenceId: UUID(), scheduledAt: nil, dueAt: nil, occurrenceStatus: status)
+        return chore
+    }
+
+    func update(choreId: UUID, request: UpdateChoreRequest, idempotencyKey: UUID) async throws -> ChoreResponse {
+        var chore = try await get(choreId: choreId)
+        chore.assignedMemberIds = request.assignedMemberIds
+        chore.assignedMembers = PreviewHouseholdRepository.mockedData[0].members.filter { request.assignedMemberIds.contains($0.id) }
+        return chore
+    }
+
     func create(_ request: CreateChoreRequest, idempotencyKey: UUID) async throws {}
 }
