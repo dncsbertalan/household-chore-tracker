@@ -13,7 +13,7 @@ nonisolated struct HouseholdRoleResponse: Decodable, Identifiable, Sendable, Equ
     let householdId: UUID
     let name: String
     let isSystemRole: Bool
-    let permissions: [PermissionResponse]
+    let permissions: [HouseholdPermission]
     let createdAt: Date
     let updatedAt: Date
     let version: Int64

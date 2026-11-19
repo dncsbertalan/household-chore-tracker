@@ -1,49 +1,81 @@
 //
-//  HouseholdMemberDetailView 2.swift
+//  HouseholdMemberDetailView.swift
 //  Tracker
 //
 //  Created by Dancs Bertalan on 2026. 11. 19..
 //
 
-
 import SwiftUI
 
 struct HouseholdMemberDetailView: View {
-    let member: HouseholdMemberResponse
+    @Environment(\.container) private var container
+    @State private var viewModel: HouseholdMemberDetailViewModel
+    private var member: HouseholdMemberResponse { viewModel.member }
     let isCurrentUser: Bool
-
+    
+    init(member: HouseholdMemberResponse, isCurrentUser: Bool, repository: any HouseholdRepositoryProtocol) {
+        self.isCurrentUser = isCurrentUser
+        _viewModel = State(initialValue: HouseholdMemberDetailViewModel(member: member, repository: repository))
+    }
+    
     var body: some View {
-        ScrollView {
-            VStack(spacing: Theme.Spacing.lg) {
-                VStack(spacing: 16) {
+        List {
+            // MARK: Name and profile pic
+            Section {
+                VStack(spacing: Theme.Spacing.lg) {
                     AvatarView(firstName: member.firstName, lastName: member.lastName, size: 104)
                     HouseholdMemberNameView(member: member, isCurrentUser: isCurrentUser,
                                             font: .title.bold(), alignment: .center)
-                        .multilineTextAlignment(.center)
-                        .accessibilityAddTraits(.isHeader)
+                    .multilineTextAlignment(.center)
+                    .accessibilityAddTraits(.isHeader)
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-
-                VStack(alignment: .leading, spacing: Theme.Spacing.lg) {
-                    VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
-                        Text("Role").font(.subheadline).foregroundStyle(.secondary)
-                        Text(member.householdRole.name).font(.headline)
-                    }
-                    VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
-                        Text("Joined").font(.subheadline).foregroundStyle(.secondary)
-                        Text(member.joinedAt, format: .dateTime.year().month(.wide).day())
-                            .font(.headline)
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
-                .background(.thinMaterial, in: RoundedRectangle(cornerRadius: Theme.CornerRadius.xl))
             }
-            .padding()
+            .listRowBackground(Color.clear)
+            
+            // MARK: Role
+            Section {
+                if viewModel.canAssignRole {
+                    NavigationLink {
+                        HouseholdMemberRolePickerView(viewModel: HouseholdMemberDetailViewModel(member: member, repository: container.householdRepository))
+                    }
+                    label: {
+                        LabeledContent("Role", value: member.householdRole.name)
+                    }
+                } else {
+                    LabeledContent("Role", value: member.householdRole.name)
+                }
+            }
+            
+            // MARK: Joined
+            Section {
+                LabeledContent("Joined", value: member.joinedAt.formatted(date: .abbreviated, time: .omitted))
+            }
         }
-        .navigationTitle("Member")
-        .navigationBarTitleDisplayMode(.inline)
-        .scrollEdgeEffectStyle(.soft, for: .top)
+        .task { await viewModel.load() }
+        .alert("Unable to load member", isPresented: Binding(
+            get: { viewModel.errorMessage != nil },
+            set: { if !$0 { viewModel.errorMessage = nil } }
+        )) {
+            Button("Retry") { Task { await viewModel.load() } }
+            Button("common.ok", role: .cancel) { viewModel.errorMessage = nil }
+        } message: { Text(viewModel.errorMessage ?? "") }
+            .navigationTitle("Member")
+            .navigationBarTitleDisplayMode(.inline)
+            .scrollEdgeEffectStyle(.soft, for: .top)
     }
+    
+    private var roleLabel: some View {
+        VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
+            Text("Role").font(.subheadline).foregroundStyle(.secondary)
+            Text(member.householdRole.name).font(.headline)
+        }
+    }
+}
+
+#Preview {
+    NavigationStack {
+        HouseholdMemberDetailView(member: PreviewHouseholdRepository.mockedData[0].members[0], isCurrentUser: true, repository: PreviewHouseholdRepository())
+    }
+    .environment(\.container, DependencyContainer.mock())
 }

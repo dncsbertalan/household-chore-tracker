@@ -112,6 +112,9 @@ private actor ControlledInvitationRepository: HouseholdInvitationRepositoryProto
 }
 
 private actor CountingHouseholdRepository: HouseholdRepositoryProtocol {
+    func assignRole(householdId: UUID, memberId: UUID, request: AssignHouseholdRoleRequest, idempotencyKey: UUID) async throws -> HouseholdResponse {
+        try await get(householdId: householdId)
+    }
     func get(householdId: UUID) async throws -> HouseholdResponse {
         try await PreviewHouseholdRepository().get(householdId: householdId)
     }

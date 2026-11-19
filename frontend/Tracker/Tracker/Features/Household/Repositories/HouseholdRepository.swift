@@ -14,6 +14,19 @@ nonisolated struct HouseholdRepository: HouseholdRepositoryProtocol {
         self.apiClient = apiClient
     }
     
+    private struct RoleAssignmentResponse: Decodable {
+        let household: HouseholdResponse
+    }
+
+    func assignRole(householdId: UUID, memberId: UUID, request: AssignHouseholdRoleRequest, idempotencyKey: UUID) async throws -> HouseholdResponse {
+        let response: RoleAssignmentResponse = try await apiClient.request(
+            endpoint: "api/v1/households/\(householdId)/members/\(memberId)/role",
+            method: .put, body: request,
+            headers: ["Idempotency-Key": idempotencyKey.uuidString.lowercased()]
+        )
+        return response.household
+    }
+
     func create(_ request: CreateHouseholdRequest, idempotencyKey: UUID) async throws {
         try await apiClient.request(
             endpoint: "api/v1/households", method: .post, body: request,

@@ -24,3 +24,31 @@ nonisolated struct HouseholdMemberResponse: Decodable, Identifiable, Sendable, E
 
     var id: UUID { householdMemberId }
 }
+
+nonisolated extension HouseholdMemberResponse {
+    static var mockData: HouseholdMemberResponse {
+        HouseholdMemberResponse(
+            householdMemberId: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!,
+            householdId: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!,
+            userId: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!, email: "dancs.bertalan@icloud.com", firstName: "Bertalan", lastName: "Dancs", nickname: "Berci",
+            householdRole: HouseholdRoleResponse(
+                householdRoleId: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!,
+                householdId: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!, name: "Owner", isSystemRole: false,
+                permissions: HouseholdPermission.allCases, createdAt: .now, updatedAt: .now, version: 1),
+            joinedAt: Date(), createdAt: Date(), updatedAt: .now, version: 1
+        )
+    }
+    
+    static var mockData2: HouseholdMemberResponse {
+        HouseholdMemberResponse(
+            householdMemberId: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!,
+            householdId: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!,
+            userId: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!, email: "dancs.bertalan@icloud.com", firstName: "Bertalan", lastName: "Dancs", nickname: nil,
+            householdRole: HouseholdRoleResponse(
+                householdRoleId: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!,
+                householdId: UUID(uuidString: "11111111-1111-1111-1111-111111111111")!, name: "Owner", isSystemRole: false,
+                permissions: HouseholdPermission.allCases, createdAt: .now, updatedAt: .now, version: 1),
+            joinedAt: Date(), createdAt: Date(), updatedAt: .now, version: 1
+        )
+    }
+}

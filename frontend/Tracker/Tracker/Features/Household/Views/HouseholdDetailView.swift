@@ -8,8 +8,10 @@
 import SwiftUI
 
 struct HouseholdDetailView: View {
-    @State private var viewModel: HouseholdDetailViewModel
+    @Environment(HouseholdRouter.self) private var router
 
+    @State private var viewModel: HouseholdDetailViewModel
+    
     init(viewModel: HouseholdDetailViewModel) {
         _viewModel = State(initialValue: viewModel)
     }
@@ -18,24 +20,31 @@ struct HouseholdDetailView: View {
         ScrollView {
             if let household = viewModel.household {
                 VStack(alignment: .leading, spacing: Theme.Spacing.lg) {
-                    Text(household.name)
-                        .font(.largeTitle.bold())
+
                     Text("household.members")
                         .font(.title2.bold())
+
                     ForEach(household.members) { member in
-                        HStack(spacing: Theme.Spacing.md) {
-                            AvatarView(firstName: member.firstName, lastName: member.lastName, size: 44)
-                            VStack(alignment: .leading, spacing: Theme.Spacing.sm) {
-                                Text("\(member.firstName) \(member.lastName)")
-                                    .font(.headline)
-                                Text(member.householdRole.name)
-                                    .font(.subheadline)
+                        Button {
+                            router.navigate(to: .householdMemberDetails(member, isCurrentUser: member.userId == household.me.userId))
+                        } label: {
+                            HStack(spacing: Theme.Spacing.md) {
+                                AvatarView(firstName: member.firstName, lastName: member.lastName, size: 44)
+                                VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
+                                    HouseholdMemberNameView(member: member, isCurrentUser: member.userId == household.me.userId)
+                                    Text(member.householdRole.name)
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                                Spacer()
+                                Image(systemName: "chevron.right")
                                     .foregroundStyle(.secondary)
                             }
-                            Spacer()
+                            .padding()
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(.thinMaterial, in: RoundedRectangle(cornerRadius: Theme.CornerRadius.xl))
                         }
-                        .padding()
-                        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: Theme.CornerRadius.xl))
+                        .buttonStyle(.plain)
                     }
                 }
                 .padding()
@@ -43,7 +52,7 @@ struct HouseholdDetailView: View {
             }
         }
         .navigationTitle(viewModel.household?.name ?? "household.household")
-        .navigationBarTitleDisplayMode(.inline)
+        //.navigationBarTitleDisplayMode(.inline)
         .scrollEdgeEffectStyle(.soft, for: .top)
         .overlay {
             if viewModel.isLoading && viewModel.household == nil { ProgressView() }
@@ -69,4 +78,5 @@ struct HouseholdDetailView: View {
             householdRepository: PreviewHouseholdRepository()
         ))
     }
+    .environment(HouseholdRouter())
 }

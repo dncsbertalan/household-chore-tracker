@@ -35,7 +35,7 @@ struct HouseholdTabView: View {
         case .householdDetail(let householdId):
             HouseholdDetailView(viewModel: HouseholdDetailViewModel(householdId: householdId, householdRepository: container.householdRepository))
         case .householdMemberDetails(let member, let isCurrentUser):
-            HouseholdMemberDetailView(member: member, isCurrentUser: isCurrentUser)
+            HouseholdMemberDetailView(member: member, isCurrentUser: isCurrentUser, repository: container.householdRepository)
         }
     }
     
