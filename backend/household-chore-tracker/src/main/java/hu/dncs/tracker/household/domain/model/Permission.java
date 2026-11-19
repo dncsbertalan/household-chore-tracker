@@ -13,18 +13,13 @@ public class Permission {
     @Column(name = "permission_id")
     private Long permissionId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "name", nullable = false, unique = true, length = 100)
-    private String name;
+    private HouseholdPermission name;
 
     @Column(name = "description")
     private String description;
 
     protected Permission() {
     }
-
-    public Permission(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
-
 }

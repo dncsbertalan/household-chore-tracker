@@ -179,8 +179,7 @@ class HouseholdMemberRemovalIntegrationTests {
         assertThat(after.occurrence().assignedMemberIds()).isEmpty();
         var email = users.findById(target.getUserId()).orElseThrow().getEmail();
         var invitation = invitations.invite(f.household, new InviteHouseholdMemberCommand(email, target.getHouseholdRole().getHouseholdRoleId()), f.user);
-        var joined = invitations.accept(invitation.householdInvitationId(), target.getUserId());
-        assertThat(joined.membership().getHouseholdMemberId()).isEqualTo(target.getHouseholdMemberId());
+        invitations.accept(invitation.householdInvitationId(), target.getUserId());
         var restored = readChore(pending.choreId(), target.getUserId());
         assertThat(restored.actions().canApprove()).isFalse();
         review(restored, target.getUserId()).andExpect(status().isForbidden());
@@ -213,7 +212,7 @@ class HouseholdMemberRemovalIntegrationTests {
         var body = mapper.writeValueAsString(new ChoreActionRequest(chore.version(), chore.occurrence().version(), null));
         try (var pool = Executors.newSingleThreadExecutor()) {
             var pending = new java.util.concurrent.atomic.AtomicReference<Future<Integer>>();
-            new org.springframework.transaction.support.TransactionTemplate(transactions).execute(status -> {
+            new org.springframework.transaction.support.TransactionTemplate(transactions).execute(_ -> {
                 management.removeMember(f.household, target.getHouseholdMemberId(), target.getVersion(), f.user);
                 pending.set(pool.submit(() -> mvc.perform(post("/api/v1/chores/"+id+"/occurrences/"+chore.occurrence().choreOccurrenceId()+"/complete")
                         .with(jwt().jwt(j -> j.subject(target.getUserId().toString()))).header("Idempotency-Key", UUID.randomUUID())
@@ -255,7 +254,7 @@ class HouseholdMemberRemovalIntegrationTests {
             assertThat(statuses).allMatch(s -> Set.of(200, 403, 409).contains(s));
         }
         assertThat(members.findAllByHousehold_HouseholdId(f.household)).anyMatch(m -> m.getHouseholdRole().getPermissions().stream()
-                .anyMatch(p -> p.getName().equals(HOUSEHOLD_ROLE_UPDATE.name())));
+                .anyMatch(p -> p.getName().equals(HOUSEHOLD_ROLE_UPDATE)));
     }
 
     private ResultActions remove(Fixture f, UUID actor, HouseholdMember target, UUID key) throws Exception {

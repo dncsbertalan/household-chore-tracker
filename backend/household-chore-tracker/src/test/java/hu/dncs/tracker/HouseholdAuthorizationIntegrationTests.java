@@ -1,10 +1,7 @@
 package hu.dncs.tracker;
 
 import hu.dncs.tracker.household.application.HouseholdAuthorizationService;
-import hu.dncs.tracker.household.domain.model.Household;
-import hu.dncs.tracker.household.domain.model.HouseholdMember;
-import hu.dncs.tracker.household.domain.model.HouseholdPermission;
-import hu.dncs.tracker.household.domain.model.HouseholdRole;
+import hu.dncs.tracker.household.domain.model.*;
 import hu.dncs.tracker.household.infrastructure.persistence.HouseholdMemberRepository;
 import hu.dncs.tracker.household.infrastructure.persistence.HouseholdRepository;
 import hu.dncs.tracker.household.infrastructure.persistence.HouseholdRoleRepository;
@@ -152,9 +149,8 @@ class HouseholdAuthorizationIntegrationTests {
 
     @Test
     void migratedCatalogMatchesEveryEnumName() {
-        assertThat(permissions.findAll()).extracting(permission -> permission.getName())
-                .containsExactlyInAnyOrderElementsOf(Arrays.stream(HouseholdPermission.values())
-                        .map(Enum::name).toList());
+        assertThat(permissions.findAll()).extracting(Permission::getName)
+                .containsExactlyInAnyOrderElementsOf(Arrays.stream(HouseholdPermission.values()).toList());
     }
 
     private void assertDenied(UUID householdId, UUID userId) {

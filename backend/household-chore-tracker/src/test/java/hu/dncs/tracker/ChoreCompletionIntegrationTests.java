@@ -120,7 +120,7 @@ class ChoreCompletionIntegrationTests {
         var role = roles.findAllByHouseholdIdOrderByCreatedAtAscHouseholdRoleIdAsc(f.household).stream()
                 .filter(r -> r.getHouseholdRoleId().equals(f.role)).findFirst().orElseThrow();
         role.getPermissions().add(permissions.findByName(CHORE_SELF_APPROVE_COMPLETION).orElseThrow());
-        role.getPermissions().removeIf(p -> p.getName().equals(CHORE_APPROVE_COMPLETION.name()));
+        role.getPermissions().removeIf(p -> p.getName().equals(CHORE_APPROVE_COMPLETION));
         role = roles.saveAndFlush(role);
         assertThat(detail(f, f.user).actions().canApprove()).isFalse();
         send(f, f.user, suffix, detail(f, f.user), UUID.randomUUID()).andExpect(status().isForbidden());

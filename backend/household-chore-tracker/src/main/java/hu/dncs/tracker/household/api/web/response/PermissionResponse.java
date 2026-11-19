@@ -8,6 +8,6 @@ public record PermissionResponse(
         String description
 ) {
     public static PermissionResponse from(Permission permission) {
-        return new PermissionResponse(permission.getPermissionId(), permission.getName(), permission.getDescription());
+        return new PermissionResponse(permission.getPermissionId(), permission.getName().name(), permission.getDescription());
     }
 }

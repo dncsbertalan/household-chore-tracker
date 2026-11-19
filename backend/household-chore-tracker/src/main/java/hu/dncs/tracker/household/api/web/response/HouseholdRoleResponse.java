@@ -1,5 +1,6 @@
 package hu.dncs.tracker.household.api.web.response;
 
+import hu.dncs.tracker.household.domain.model.HouseholdPermission;
 import hu.dncs.tracker.household.domain.model.HouseholdRole;
 import hu.dncs.tracker.household.domain.model.Permission;
 
@@ -13,7 +14,7 @@ public record HouseholdRoleResponse(
         UUID householdId,
         String name,
         Boolean isSystemRole,
-        List<PermissionResponse> permissions,
+        List<HouseholdPermission> permissions,
         Instant createdAt,
         Instant updatedAt,
         Long version
@@ -22,6 +23,6 @@ public record HouseholdRoleResponse(
         return new HouseholdRoleResponse(role.getHouseholdRoleId(), role.getHouseholdId(), role.getName(),
                 role.getIsSystemRole(), role.getPermissions().stream()
                 .sorted(Comparator.comparing(Permission::getName))
-                .map(PermissionResponse::from).toList(), role.getCreatedAt(), role.getUpdatedAt(), role.getVersion());
+                .map(Permission::getName).toList(), role.getCreatedAt(), role.getUpdatedAt(), role.getVersion());
     }
 }

@@ -152,7 +152,7 @@ public class HouseholdRoleManagementService {
     private boolean hasManager(UUID householdId) {
         return members.findAllByHousehold_HouseholdId(householdId).stream()
                 .anyMatch(m -> m.getHouseholdRole().getHouseholdId().equals(householdId)
-                        && m.getHouseholdRole().getPermissions().stream().anyMatch(p -> p.getName().equals(HOUSEHOLD_ROLE_UPDATE.name())));
+                        && m.getHouseholdRole().getPermissions().stream().anyMatch(p -> p.getName().equals(HOUSEHOLD_ROLE_UPDATE)));
     }
     private void requireManager(UUID householdId) {
         if (!hasManager(householdId)) throw error(LAST_MANAGER, "At least one member must retain permission to update household roles.");
