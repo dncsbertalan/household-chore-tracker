@@ -79,6 +79,16 @@ struct HouseholdDetailView: View {
         }
         .toolbar {
             if let household = viewModel.household,
+               household.me.householdRole.permissions.contains(where: {
+                   [.roleView, .roleCreate, .roleUpdate, .roleDelete, .memberAssignRole, .memberRemove, .memberView, .memberInvite].contains($0)
+               }) {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button { router.navigate(to: .householdRoles(household.id)) } label: {
+                        Label("Household roles", systemImage: "person.2")
+                    }
+                }
+            }
+            if let household = viewModel.household,
                household.me.householdRole.permissions.contains(.memberInvite) == true {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button { router.present(.createHouseholdInvitation(household: household)) } label: {
